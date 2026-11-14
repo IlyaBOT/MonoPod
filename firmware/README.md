@@ -1,3 +1,13 @@
+# MonoPod v0.10.7.5 — Wi-Fi Sync Performance
+
+Изменения производительности: `README_PERFORMANCE_v0.10.7.5_RU.md`.
+
+## v0.10.7.5 — Arduino-ESP32 3.3.12 compile hotfix
+
+- Fixed Wi-Fi Sync `sessionAuthorized()` const qualifier: `WebServer::client()` is non-const in Arduino-ESP32 3.3.12.
+- No behavior changes to authentication, SD SPI (16 MHz default) or TFT SPI (20 MHz).
+- Build on real ESP32-S3 remains to be verified in Arduino IDE.
+
 ## v0.10.7.4 — SPI tuning for the N16R8 prototype
 
 - ST7735S: **20 MHz** default (user-tested), including the emergency low-battery display.

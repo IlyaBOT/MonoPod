@@ -8,6 +8,9 @@ public:void begin();void end();void loop();bool active()const{return syncModeAct
   bool pending()const{return waitingForConsent;}String requester()const{return requestName;}
   void answer(bool yes);
 private:WebServer server{80};bool routesReady=false,running=false,syncModeActive=false,autoSession=false,stopRequested=false,usingSta=false,uploadActive=false,uploadOk=false,otaUploadSeen=false,otaUploadOk=false,waitingForConsent=false,requestApproved=false,requestDenied=false;
+  bool wifiPowerOverride=false;
+  uint8_t wifiPreviousPowerSave=0;
+  void boostTransferWiFi();void restoreTransferWiFi();
   uint32_t requestSince=0;IPAddress requestIP;String requestName="MonoPod Desktop",sessionToken,uploadError;
   void startListener();void stopListener();bool sessionAuthorized();void upload();void finished();void otaUpload();void otaFinished();void result(bool ok);bool allowed();void routes();
 };

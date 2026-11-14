@@ -82,6 +82,18 @@ void WiFiSyncService::otaFinished(){
  }
  ui.redraw();
 }
+void WiFiSyncService::boostTransferWiFi(){
+ if(wifiPowerOverride || !usingSta || WiFi.status()!=WL_CONNECTED)return;
+ wifiPreviousPowerSave=(uint8_t)WiFi.getSleep();
+ wifiPowerOverride=WiFi.setSleep(false);
+ if(wifiPowerOverride)MONOPOD_LOG.println("[Wi-Fi Sync] Modem sleep disabled for transfer");
+}
+void WiFiSyncService::restoreTransferWiFi(){
+ if(!wifiPowerOverride)return;
+ WiFi.setSleep((wifi_ps_type_t)wifiPreviousPowerSave);
+ wifiPowerOverride=false;
+ MONOPOD_LOG.println("[Wi-Fi Sync] Restored Wi-Fi power-save mode");
+}
 bool WiFiSyncService::sessionAuthorized() {
   if(!syncModeActive)return false;
   if(!autoSession)return true; // Legacy explicit session remains compatible.
@@ -110,6 +122,7 @@ void WiFiSyncService::answer(bool yes){
     syncModeActive=true;autoSession=true;requestApproved=true;requestDenied=false;
     sessionToken=String((uint32_t)esp_random(),HEX)+String((uint32_t)esp_random(),HEX);
     wifiOta.newSession();
+    boostTransferWiFi();
     MONOPOD_LOG.println("[Wi-Fi Sync] Consent accepted");
   }
   ui.redraw();
@@ -240,11 +253,12 @@ void WiFiSyncService::begin(){
  if(running){server.stop();MDNS.end();running=false;} // Re-arm with an explicit session.
  if(!usingSta){wifiNetworks.suspendForSync();WiFi.mode(WIFI_AP);if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){syncMode.leave(SyncTransport::WiFi);wifiNetworks.resumeAfterSync();ui.notify("Wi-Fi AP failed");return;}}
  if(!routesReady){routes();routesReady=true;}wifiOta.newSession();server.begin();running=true;syncModeActive=true;autoSession=false;waitingForConsent=false;stopRequested=false;
+ boostTransferWiFi();
  MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP at http://%s:80\n",usingSta?"LAN":"AP",ip().c_str());ui.redraw();
 }
 void WiFiSyncService::end(){
  if(!syncModeActive||busy())return;
- wifiOta.stopSession();server.stop();if(usingSta)MDNS.end();running=false;syncModeActive=false;stopRequested=false;
+ wifiOta.stopSession();server.stop();if(usingSta)MDNS.end();restoreTransferWiFi();running=false;syncModeActive=false;stopRequested=false;
  const bool wasAuto=autoSession;autoSession=false;sessionToken="";requestApproved=false;
  if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}
  media.rescan(true);syncMode.leave(SyncTransport::WiFi);

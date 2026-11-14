@@ -2,6 +2,7 @@
 // MonoPodDB v1: CRC-checked portable TSV cache. Internal SD cache, not a SQL database.
 // Never mutate /MonoPod/MonoPodDB from Desktop: use /api/library/{info,db,refresh}.
 #include "Types.h"
+#include "FastCrc32.h"
 #include <SD.h>
 #include <vector>
 namespace MonoPodDB {
@@ -10,8 +11,7 @@ constexpr const char* TEMP="/MonoPod/.MonoPodDB.tmp";
 constexpr const char* BACKUP="/MonoPod/.MonoPodDB.bak";
 constexpr uint16_t VERSION=1;
 inline uint32_t crcStep(uint32_t crc,const uint8_t* data,size_t len){
- for(size_t i=0;i<len;i++){crc^=data[i];for(uint8_t j=0;j<8;j++)crc=(crc>>1)^((crc&1)?0xEDB88320UL:0);}
- return crc;
+ return FastCrc32::update(crc,data,len);
 }
 inline String number(uint64_t n){char b[24];snprintf(b,sizeof(b),"%llu",(unsigned long long)n);return String(b);}
 inline String hex32(uint32_t n){char b[9];snprintf(b,sizeof(b),"%08lX",(unsigned long)n);return String(b);}

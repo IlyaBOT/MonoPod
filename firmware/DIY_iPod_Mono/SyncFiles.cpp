@@ -5,7 +5,10 @@
 #include "Settings.h"
 #include "ClockService.h"
 #include "MonoPodDB.h"
+#include "FastCrc32.h"
+#include "BufferedSdWrite.h"
 #include <WiFi.h>
+#include <esp_heap_caps.h>
 namespace SyncFiles {
 String error;
 namespace {
@@ -14,12 +17,53 @@ const char* BACKUP="/.monopod-transfer.bak";
 const char* JOURNAL="/.monopod-transfer.target";
 File output;String target;uint32_t expected=0,checksum=0,received=0,runningCRC=~0u,lastWrite=0;
 bool active=false,isTheme=false;
+// 16KiB internal DRAM (prefer DMA-accessible RAM over PSRAM for SD SPI).
+// Fallback to 8/4KiB, then zero-copy direct writes if memory is exhausted.
+constexpr size_t kPreferredWriteBuffer = 16 * 1024;
+uint8_t* writeStorage = nullptr;
+BufferedSdWrite::Buffer bufferedWrite;
+uint32_t transferStartedMs=0;
+uint64_t writeTimeUs=0, crcTimeUs=0, flushTimeUs=0;
+uint32_t sdWriteCalls=0;
+void freeWriteBuffer(){
+ bufferedWrite.reset(nullptr,0);
+ if(writeStorage){free(writeStorage);writeStorage=nullptr;}
+}
+void initWriteBuffer(){
+ freeWriteBuffer();
+ static constexpr size_t kCandidates[]={kPreferredWriteBuffer,8192,4096};
+ for(size_t size: kCandidates) {
+  // SPI DMA must not rely on a PSRAM-backed source buffer.
+  writeStorage=(uint8_t*)heap_caps_malloc(size,MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+  if(writeStorage){bufferedWrite.reset(writeStorage,size);break;}
+ }
+}
+size_t timedSdWrite(const uint8_t* data,size_t count){
+ const uint32_t started=micros();
+ const size_t wrote=output.write(data,count);
+ writeTimeUs+=(uint32_t)(micros()-started);
+ ++sdWriteCalls;
+ return wrote;
+}
+bool flushPending(){
+ return bufferedWrite.flush([](const uint8_t* data,size_t n){return timedSdWrite(data,n);});
+}
+void reportTransfer(const char* status){
+ const uint32_t ms=(uint32_t)(millis()-transferStartedMs);
+ // Wall clock includes HTTP receiving/parsing and SD latency, not just SPI.
+ const uint32_t kibps=ms? (uint32_t)(((uint64_t)received*1000ULL)/(1024ULL*ms)):0;
+ MONOPOD_LOG.printf("[SYNC PERF] %s bytes=%lu wall=%lu ms speed=%lu KiB/s sd=%llu us (%lu calls) crc=%llu us flush=%llu us buffer=%u B\n",
+  status,(unsigned long)received,(unsigned long)ms,(unsigned long)kibps,
+  (unsigned long long)writeTimeUs,(unsigned long)sdWriteCalls,
+  (unsigned long long)crcTimeUs,(unsigned long long)flushTimeUs,
+  (unsigned)bufferedWrite.capacity());
+}
 bool fail(const char* text){error=text;return false;}
 bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes"||p=="/monopod";}
 String number(uint64_t n){char buf[24];snprintf(buf,sizeof(buf),"%llu",(unsigned long long)n);return String(buf);}
 String entry(File& f,const String& path){uint32_t modified=(uint32_t)f.getLastWrite();bool valid=MonoPodDB::validTime(modified);return "{\"name\":"+quote(path.substring(path.lastIndexOf('/')+1))+",\"path\":"+quote(path)+",\"directory\":"+(f.isDirectory()?"true":"false")+",\"size\":"+number(f.size())+",\"modified\":"+number(valid?modified:0)+",\"modified_valid\":"+(valid?"true":"false")+"}";}
 }
-uint32_t crcStep(uint32_t c,const uint8_t* b,size_t n){for(size_t i=0;i<n;i++){c^=b[i];for(uint8_t j=0;j<8;j++)c=(c>>1)^((c&1)?0xedb88320UL:0);}return c;}
+uint32_t crcStep(uint32_t c,const uint8_t* b,size_t n){return FastCrc32::update(c,b,n);}
 String quote(const String& s){String out="\"";for(size_t i=0;i<s.length();i++){uint8_t c=s[i];if(c=='"'||c=='\\'){out+='\\';out+=(char)c;}else if(c<32){char h[7];snprintf(h,sizeof(h),"\\u%04x",c);out+=h;}else out+=(char)c;}return out+'"';}
 bool canonical(const String& in,String& out,bool theme){
  out="";if(in.isEmpty()||in[0]!='/'||in.length()>240)return fail("INVALID_PATH");
@@ -52,7 +96,7 @@ String info(){
  formats+=",\".aac\"";
 #endif
  formats+="]";
- return "{\"firmware\":\"0.10.7.4\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"ntp_server\":"+quote(clockService.ntpServer())+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"ntp_server\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\",\"ota_update_v1\",\"library_db_v1\",\"library_refresh\"]}";
+ return "{\"firmware\":\"0.10.7.5\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"ntp_server\":"+quote(clockService.ntpServer())+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"ntp_server\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\",\"ota_update_v1\",\"library_db_v1\",\"library_refresh\"]}";
 }
 String stat(const String& path,SyncTransport who){String p;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return "";File f=SD.open(p.c_str());if(!f){fail("NOT_FOUND");return "";}String result=entry(f,p);f.close();return result;}
 String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who){
@@ -87,15 +131,34 @@ bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme
  if(theme && !SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
  if(!SD.exists(parent.c_str()))return fail("PARENT_NOT_FOUND");
  SD.remove(PART);output=SD.open(PART,FILE_WRITE);if(!output)return fail("OPEN_FAILED");
- target=p;expected=size;checksum=crc;received=0;runningCRC=~0u;active=true;isTheme=theme;lastWrite=millis();return true;
+ target=p;expected=size;checksum=crc;received=0;runningCRC=~0u;active=true;isTheme=theme;lastWrite=millis();
+ transferStartedMs=millis();writeTimeUs=crcTimeUs=flushTimeUs=0;sdWriteCalls=0;
+ initWriteBuffer();return true;
 }
 bool write(const uint8_t* data,size_t n){if(!active)return fail("NO_TRANSFER");if(n>1073741824UL-received||(n>expected-received)|| (isTheme && received+n>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
- if(output.write(data,n)!=n)return fail("SD_WRITE");runningCRC=crcStep(runningCRC,data,n);received+=n;lastWrite=millis();return true;}
-void abort(){if(output)output.close();if(active)SD.remove(PART);active=false;target="";}
+ if(n && !bufferedWrite.append(data,n,[](const uint8_t* p,size_t len){return timedSdWrite(p,len);}))return fail("SD_WRITE");
+ const uint32_t started=micros();
+ runningCRC=crcStep(runningCRC,data,n);
+ crcTimeUs+=(uint32_t)(micros()-started);
+ received+=n;lastWrite=millis();return true;}
+void abort(){
+ if(active)reportTransfer("ABORT");
+ if(output)output.close();
+ freeWriteBuffer();
+ if(active)SD.remove(PART);
+ active=false;target="";
+}
 bool busy(){return active;}
 void tick(){if(active && (uint32_t)(millis()-lastWrite)>15000){abort();error="TIMEOUT";}}
 bool commit(){
- if(!active)return fail("NO_TRANSFER");output.flush();output.close();
+ if(!active)return fail("NO_TRANSFER");
+ // Cached data must be on SD before verifying length/CRC or renaming file.
+ if(!flushPending()){abort();return fail("SD_WRITE");}
+ const uint32_t flushedAt=micros();
+ output.flush();flushTimeUs+=(uint32_t)(micros()-flushedAt);
+ output.close();
+ reportTransfer("RECEIVED");
+ freeWriteBuffer();
  File verified=SD.open(PART,FILE_READ);bool validSize=verified && verified.size()==received;if(verified)verified.close();if(!validSize){abort();return fail("SD_SIZE_MISMATCH");}
  if(received!=expected || ~runningCRC!=checksum){abort();return fail("SIZE_OR_CRC_MISMATCH");}
  if(isTheme&&!ThemeManager::validate(PART)){abort();return fail("INVALID_THEME_OR_CRC");}
