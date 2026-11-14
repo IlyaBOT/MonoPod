@@ -8,7 +8,9 @@ int main(){
   try{
     ClockNative::reset();
     ClockService service;service.begin();
-    check(!service.ntpEnabled()&&service.ntpServer()=="pool.ntp.org");
+    check(!service.ntpEnabled()&&service.ntpServer()=="pool.ntp.org"&&service.use24Hour());
+    check(service.set24Hour(false)&&!service.use24Hour()&&!ClockNative::hour24);
+    check(service.set24Hour(true)&&service.use24Hour()&&ClockNative::hour24);
     service.loop();check(ClockNative::starts==0);
     check(service.setNtpEnabled(true)&&ClockNative::persistedNtp);
     service.loop();check(ClockNative::starts==0); // offline/AP has no NTP
@@ -31,7 +33,7 @@ int main(){
     ClockNative::online=true;service.loop();check(ClockNative::starts==4);
     check(service.setNtpEnabled(false)&&!ClockNative::sntp&&!ClockNative::persistedNtp);
     ClockService rebooted;rebooted.begin();
-    check(rebooted.ntpServer()=="ntp.example.org"&&rebooted.timezone()=="UTC-5:30"&&!rebooted.ntpEnabled());
+    check(rebooted.ntpServer()=="ntp.example.org"&&rebooted.timezone()=="UTC-5:30"&&!rebooted.ntpEnabled()&&rebooted.use24Hour());
     check(!rebooted.setNtpServer("http://bad")&&rebooted.ntpServer()=="ntp.example.org");
     service.setUnix(1);check(ClockNative::epoch==0);
     service.setUnix((time_t)1793500000);check(ClockNative::epoch==1793500000&&service.valid());

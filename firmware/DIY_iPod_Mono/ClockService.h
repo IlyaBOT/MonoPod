@@ -11,6 +11,8 @@ public:
   bool valid() const;
   String dateTime() const;
   String shortTime() const;
+  bool use24Hour() const { return hour24_; }
+  bool set24Hour(bool on);
   void setUnix(time_t epoch);
   bool setTimezone(const String& posix);
   bool setNtpEnabled(bool enabled);
@@ -21,6 +23,7 @@ public:
 private:
   String tz_=Config::TIMEZONE_TZ;
   bool ntp_=false;
+  bool hour24_=true;
   bool ntpStarted_=false;
   String ntpServer_="pool.ntp.org";
   void restartNtp();

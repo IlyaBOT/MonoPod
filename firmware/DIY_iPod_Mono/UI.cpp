@@ -20,10 +20,11 @@
 #endif
 #include "SyncMode.h"
 #include "UsbSync.h"
+#include "UsbMassStorage.h"
 #include "IpodIdentity.h"
 #include <time.h>
 PlayerUI ui;
-void PlayerUI::begin(){wheelBurst=0;lastWheelTurnAt=0;page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;lastPlaybackState=-1;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
+void PlayerUI::begin(){wasWifiPending=false;wheelBurst=0;lastWheelTurnAt=0;page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;lastPlaybackState=-1;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
 void PlayerUI::notify(const String& msg){blank=false;lastTouch=millis();backlight.wake();showMessage(msg);}
 void PlayerUI::navigate(Page next){
   history.push_back({page,selected,scroll,activeCategory,filter});
@@ -61,7 +62,7 @@ bool PlayerUI::listPage()const{
   case Page::Albums:case Page::Genres:case Page::Songs:case Page::Folders:
   case Page::Category:case Page::Extras:case Page::Settings:case Page::Backlight:case Page::Clicker:case Page::FontSmoothing:
   case Page::SleepTimer:case Page::WiFi:case Page::WiFiNetworks:case Page::Storage:
-  case Page::BacklightTimer:case Page::ResetAllSettings:case Page::About:return true;
+  case Page::BacklightTimer:case Page::UsbMode:case Page::ClockFormat:case Page::ResetAllSettings:case Page::About:return true;
 #if FEATURE_BLUETOOTH
   case Page::Bluetooth:case Page::BluetoothPaired:case Page::BluetoothScan:return true;
 #endif
@@ -77,7 +78,7 @@ String PlayerUI::title()const{
   case Page::Playlists:return "Playlists";case Page::Settings:return "Settings";case Page::Backlight:return "Backlight";
   case Page::Clicker:return "Clicker";case Page::BacklightTimer:return "Backlight Timer";
   case Page::ResetAllSettings:return "Reset All Settings";case Page::FontSmoothing:return "Font Smoothing";case Page::Extras:return "Extras";
-  case Page::Clock:return "Clock";case Page::NowPlaying:return "Now Playing";
+  case Page::Clock:return "Clock";case Page::ClockFormat:return "Time Format";case Page::UsbMode:return "USB Mode";case Page::NowPlaying:return "Now Playing";
   case Page::SleepTimer:return "Sleep Timer";case Page::About:return "About";case Page::BadApple:return "Bad Apple";
   case Page::WiFi:case Page::WiFiNetworks:case Page::WiFiPassword:return "Wi-Fi";
 #if FEATURE_BLUETOOTH
@@ -145,6 +146,12 @@ void PlayerUI::build(){
     add("Songs",0,false);add("Capacity",1,false);add("Available",2,false);
     add("Version",3,false);add("S/N",4,false);add("Model",5,false);
     break;
+  case Page::ClockFormat:
+    add(String(clockService.use24Hour()?"> ":"  ")+"24-Hour",24,false);
+    add(String(clockService.use24Hour()?"  ":"> ")+"12-Hour",12,false);break;
+  case Page::UsbMode:
+    add(String(settings.data.usbMode==UsbMode::MassStorage?"> ":"  ")+"Mass Storage",0,false);
+    add(String(settings.data.usbMode==UsbMode::ITunes?"> ":"  ")+"iTunes (Beta)",1,false);break;
   case Page::FontSmoothing:
     add(String(settings.data.fontSmoothing?"  ":"> ")+"Off",0,false);
     add(String(settings.data.fontSmoothing?"> ":"  ")+"On",1,false);break;
@@ -171,6 +178,8 @@ void PlayerUI::build(){
     add("Contrast",4,false);
     add("Brightness",3);
     add("Font Smoothing",5);
+    add(String("Time Format: ")+(clockService.use24Hour()?"24-Hour":"12-Hour"),14);
+    add("USB Mode",15);
     add("Reset All Settings",13);
     add("Wi-Fi",7);
 #if FEATURE_BLUETOOTH
@@ -381,6 +390,16 @@ void PlayerUI::open(){
     else showMessage(media.lastError());
     back();back();return;
   }
+  if(page==Page::UsbMode){
+    settings.data.usbMode=(UsbMode)items[selected].id;settings.markDirty();settings.saveNow();
+#if MONOPOD_EXPERIMENTAL_USB_MSC
+    showMessage("Reboot for USB mode");
+#else
+    showMessage("USB MSC requires test build");
+#endif
+    back();return;
+  }
+  if(page==Page::ClockFormat){clockService.set24Hour(items[selected].id==24);back();return;}
   if(page==Page::FontSmoothing){
     settings.data.fontSmoothing=(selected==1);settings.markDirty();back();return;
   }
@@ -398,6 +417,8 @@ void PlayerUI::open(){
     case 5:navigate(Page::FontSmoothing);return;
     case 6:navigate(Page::Clicker);return;
     case 7:navigate(Page::WiFi);return;
+    case 14:navigate(Page::ClockFormat);return;
+    case 15:navigate(Page::UsbMode);return;
 #if FEATURE_BLUETOOTH
     case 8:navigate(Page::Bluetooth);return;
 #endif
@@ -552,6 +573,15 @@ void PlayerUI::paintBluetoothDialog(){
 void PlayerUI::event(Key key,bool physicalWheel){
   if(key==Key::None)return;
   if(page==Page::BadApple){if(key==Key::Menu)back();return;}
+  // Modal consent before entering any sync state. No storage operation is allowed yet.
+  if(wifiSync.pending()){
+    if(key==Key::Up||key==Key::Previous){wifiConsentYes=true;dirty=true;}
+    else if(key==Key::Down||key==Key::Next){wifiConsentYes=false;dirty=true;}
+    else if(key==Key::PlayPause){wifiSync.answer(true);dirty=true;}
+    else if(key==Key::Menu){wifiSync.answer(false);dirty=true;}
+    else if(key==Key::Select){wifiSync.answer(wifiConsentYes);dirty=true;}
+    return;
+  }
   // Sync screen owns the entire input surface. Deliberate Wi-Fi exit only;
   // USB requires a host-side SYNC END (or later MSC safe eject).
   if(syncMode.active()){
@@ -668,10 +698,19 @@ void PlayerUI::updateNowPlayingOverlay(){
 void PlayerUI::paint(){
   if(page==Page::BadApple){dirty=false;lastRender=millis();return;}
   display.startFrame();
+  if(wifiSync.pending()){
+    display.clear();display.header("Wi-Fi Sync",false,false,0,false,false);
+    display.centerText(37,"Allow connection?",true);
+    display.centerText(57,display.fittedTitle(wifiSync.requester(),152,true),true);
+    display.centerText(83,wifiConsentYes?"> YES     NO":"  YES   > NO",false);
+    display.footer("PLAY: Yes  MENU: No");
+    display.endFrame();dirty=false;lastRender=millis();return;
+  }
   if(syncMode.active()){
     blank=false;
     display.syncScreen(syncMode.is(SyncTransport::WiFi),
-                       syncMode.is(SyncTransport::WiFi)?wifiSync.busy():usbSync.busy(),
+                       syncMode.is(SyncTransport::WiFi)?wifiSync.busy():
+                         (syncMode.is(SyncTransport::UsbMsc)?usbStorage.busy():usbSync.busy()),
                        syncMode.is(SyncTransport::WiFi)?wifiSync.ip():String(),
                        syncMode.is(SyncTransport::WiFi)?wifiSync.otaLine():String(),
                        syncMode.is(SyncTransport::WiFi)&&wifiSync.otaUpdating());
@@ -681,7 +720,7 @@ void PlayerUI::paint(){
   lastWiFiIndicator=wifiNetworks.indicator();lastBatteryBand=display.batteryBand();
   const uint8_t bars=lastWiFiIndicator==5?3:(lastWiFiIndicator==4?0:lastWiFiIndicator);
   String headerText=title();
-  if(page==Page::NowPlaying && clockService.valid())headerText=clockService.shortTime();
+  if((page==Page::NowPlaying || page==Page::Home) && clockService.valid())headerText=clockService.shortTime();
   display.header(headerText,input.held() && !devConsole.hardwareDisabled(),player.active(),page==Page::NowPlaying?0:bars,page==Page::NowPlaying,player.paused());
   display.headerTitleMarquee(headerText,marqueeOffset(nowTitleSince,millis()));
   if(page==Page::WiFiPassword){paintKeyboard();}
@@ -723,7 +762,7 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.10.7.2";break;
+        case 3:value="0.10.7.3";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }
@@ -818,6 +857,11 @@ void PlayerUI::loop(){
     badApple.loop();backlight.loop();return;
   }
 #endif
+  if(wifiSync.pending()!=wasWifiPending){wasWifiPending=wifiSync.pending();wifiConsentYes=false;dirty=true;}
+  if(syncMode.is(SyncTransport::UsbMsc) && usbStorage.busy()){
+    // USB host owns SD. Never update the TFT while USB/SPI sector I/O is live.
+    backlight.loop();return;
+  }
   if(syncMode.active()){
     // Never blank the sync warning, navigate, run sleep timers or scan Wi-Fi.
     blank=false;backlight.wake();backlight.loop();
@@ -963,7 +1007,7 @@ void PlayerUI::loop(){
       updateNowPlayingOverlay();
     }
   }
-  if(page==Page::NowPlaying && clockService.valid() && millis()-lastClockHeader>=1000UL){
+  if((page==Page::NowPlaying || page==Page::Home) && clockService.valid() && millis()-lastClockHeader>=1000UL){
     lastClockHeader=millis();
     const String next=clockService.shortTime();
     if(next!=shownClock){shownClock=next;dirty=true;}

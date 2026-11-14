@@ -3,13 +3,14 @@
 #include "Config.h"
 enum class Key : uint8_t { None, Up, Down, Menu, Select, SelectLong, Previous, Next, PlayPause, RemotePlay, RemotePause, HoldChanged };
 enum class Page : uint8_t { Home, Music, Playlists, Artists, Albums, Genres, Songs,
-   Folders, Category, NowPlaying, Settings, Backlight, BacklightTimer, ResetAllSettings, Clicker, FontSmoothing, Extras, Clock, SleepTimer, About, BadApple, WiFi, WiFiNetworks, WiFiPassword,
+   Folders, Category, NowPlaying, Settings, Backlight, BacklightTimer, ResetAllSettings, Clicker, FontSmoothing, Extras, Clock, ClockFormat, UsbMode, SleepTimer, About, BadApple, WiFi, WiFiNetworks, WiFiPassword,
 #if FEATURE_BLUETOOTH
    Bluetooth, BluetoothPaired, BluetoothScan, BluetoothPairConfirm, BluetoothPin, BluetoothDelete,
 #endif
    Storage, StorageEject, StorageFormat1, StorageFormat2, DeleteTrackConfirm };
 enum class Category : uint8_t { Artist, Album, Genre, Folder, Playlist };
 enum class RepeatMode : uint8_t { Off=0, One=1, All=2 };
+enum class UsbMode : uint8_t { MassStorage=0, ITunes=1 };
 enum class ClickerMode : uint8_t { Off=0, Speaker=1, Headphones=2, Both=3 };
 struct Track {
   String path, title, artist, album, albumArtist, genre, folder, extension, codec;
@@ -34,5 +35,6 @@ struct SettingsState {
   RepeatMode repeat = RepeatMode::Off;
   ClickerMode clicker = ClickerMode::Speaker; // route, not the fitted output hardware
   bool fontSmoothing = false; // default: crisp 1-bit rasterization
+  UsbMode usbMode = UsbMode::MassStorage;
   uint8_t contrast = 2;    // monochrome palette; not TFT physical contrast
 };

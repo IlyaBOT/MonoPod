@@ -8,6 +8,7 @@ public:
   void notify(const String& text);
 private:
   String shownClock="";
+  bool wifiConsentYes=false,wasWifiPending=false;
   uint32_t lastClockHeader=0;
   struct Item {String title;int id;bool submenu;};
   struct History {Page page;int selection;int scroll;Category category;String filter;};

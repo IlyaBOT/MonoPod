@@ -13,6 +13,7 @@ void SettingsStore::begin() {
   // v0.4 new key: do NOT read legacy clickmode (it encoded hardware Piezo/Haptic).
   data.clicker=(ClickerMode)constrain((int)pref.getUChar("clickroute",(uint8_t)ClickerMode::Speaker),0,3);
   data.fontSmoothing=pref.getBool("fontAA",false);
+  data.usbMode=(UsbMode)constrain((int)pref.getUChar("usbmode",0),0,1);
   data.contrast=constrain((int)pref.getUChar("palette",2),0,3);
 }
 void SettingsStore::markDirty() { dirty=true;updated=millis(); }
@@ -24,6 +25,7 @@ void SettingsStore::saveNow() {
   pref.putUChar("bklight",data.backlightSeconds);
   pref.putUChar("blpct",data.backlightBrightness);
   pref.putUChar("clickroute",(uint8_t)data.clicker);
+  pref.putUChar("usbmode",(uint8_t)data.usbMode);
   pref.putUChar("palette",data.contrast);pref.putBool("fontAA",data.fontSmoothing);
   dirty=false;
 }

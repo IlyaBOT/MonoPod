@@ -23,7 +23,7 @@ for name in ['ClockService.h', 'ClockConfigValidation.h']:
 # Only the platform include is adapted; the actual service implementation is unchanged.
 implementation = (root / 'DIY_iPod_Mono/ClockService.cpp').read_text(encoding='utf-8')
 assert '#include <sys/time.h>' in implementation
-(stage / 'ClockService.cpp').write_text(implementation.replace('#include <sys/time.h>', '#include "ClockNativePlatform.h"'), encoding='utf-8')
+(stage / 'ClockService.cpp').write_text(implementation.replace('settimeofday(&t,nullptr)', 'clock_native_settimeofday(&t,nullptr)').replace('#include <sys/time.h>', '#include "ClockNativePlatform.h"'), encoding='utf-8')
 if os.name == 'nt':
     vswhere = Path(os.environ.get('ProgramFiles(x86)', r'C:\Program Files (x86)')) / 'Microsoft Visual Studio/Installer/vswhere.exe'
     install = subprocess.check_output([str(vswhere), '-latest', '-products', '*', '-requires',

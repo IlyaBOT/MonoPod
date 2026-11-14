@@ -210,10 +210,26 @@ constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 #define EXCLUDE_BAD_APPLE_EASTEREGG (MONOPOD_BOARD == MONOPOD_BOARD_ESP32)
 #endif
 
+// USB storage experiment: requires Arduino-ESP32 3.x Tools > USB Mode: USB-OTG,
+// USB CDC On Boot: Disabled. This changes USB descriptors and requires a reboot.
+// Until tested on physical S3 and a throwaway FAT32 card, this MUST stay off.
+#ifndef MONOPOD_EXPERIMENTAL_USB_MSC
+#define MONOPOD_EXPERIMENTAL_USB_MSC 0
+#endif
+// Using Apple's VID is an interoperability experiment, not an Apple-certified product.
+#ifndef MONOPOD_EXPERIMENTAL_APPLE_IDENTITY
+#define MONOPOD_EXPERIMENTAL_APPLE_IDENTITY 0
+#endif
 // MonoPod USB Sync MPOD1 v4: native ESP32-S3 USB CDC (GPIO19 D-, GPIO20 D+).
 // USB sync is NOT Apple's iAP and does not implement iTunes pairing.
 #ifndef FEATURE_USB_SYNC
-#define FEATURE_USB_SYNC (MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3)
+#define FEATURE_USB_SYNC (MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3 && !MONOPOD_EXPERIMENTAL_USB_MSC)
+#endif
+#if MONOPOD_EXPERIMENTAL_USB_MSC && MONOPOD_BOARD != MONOPOD_BOARD_ESP32_S3
+#error "MSC experiment requires ESP32-S3"
+#endif
+#if MONOPOD_EXPERIMENTAL_USB_MSC && defined(ARDUINO_USB_MODE) && ARDUINO_USB_MODE != 0
+#error "Select Tools > USB Mode > USB-OTG (TinyUSB)"
 #endif
 #if FEATURE_USB_SYNC && MONOPOD_BOARD != MONOPOD_BOARD_ESP32_S3
 #error "Native USB Sync currently requires ESP32-S3"
@@ -222,7 +238,7 @@ constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 #error "Enable Tools > USB CDC On Boot in Arduino IDE for MonoPod USB Sync"
 #endif
 // Protect the USB transfer channel from firmware log lines.
-#if FEATURE_USB_SYNC
+#if FEATURE_USB_SYNC || MONOPOD_EXPERIMENTAL_USB_MSC
 #define MONOPOD_LOG Serial0
 #else
 #define MONOPOD_LOG Serial

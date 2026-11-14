@@ -1,8 +1,8 @@
 #pragma once
 #include "Arduino.h"
 // Host adapters never change the Windows clock, TZ, network or NVS.
-struct timeval {time_t tv_sec;long tv_usec;};
-inline int settimeofday(const timeval* value,void*){ClockNative::epoch=value->tv_sec;return 0;}
+#include <sys/time.h>
+inline int clock_native_settimeofday(const timeval* value,void*){ClockNative::epoch=value->tv_sec;return 0;}
 inline int clock_native_setenv(const char*,const char* value,int){ClockNative::timezone=value;return 0;}
 inline void clock_native_tzset(){}
 inline time_t clock_native_time(time_t* value){if(value)*value=ClockNative::epoch;return ClockNative::epoch;}

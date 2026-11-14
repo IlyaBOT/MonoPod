@@ -17,6 +17,7 @@ void ClockService::begin(){
     String tz=p.getString("tz",Config::TIMEZONE_TZ);
     if(validTz(tz))tz_=tz;
     ntp_=p.getBool("auto-ntp",false);
+    hour24_=p.getBool("24hour",true);
     String server=p.getString("ntp-server","pool.ntp.org");
     if(ClockConfigValidation::ntpServer(server.c_str()))ntpServer_=server;
     p.end();
@@ -33,13 +34,20 @@ bool ClockService::setTimezone(const String& value){
   size_t saved=p.putString("tz",value);p.end();if(!saved)return false;
   const bool changed=tz_!=value;
   tz_=value;setenv("TZ",tz_.c_str(),1);tzset();
-  if(changed)restartNtp();return true;
+  if(changed)restartNtp();
+  return true;
+}
+bool ClockService::set24Hour(bool on){
+  Preferences p;if(!p.begin("monopod-clock",false))return false;
+  size_t n=p.putBool("24hour",on);p.end();if(n!=1)return false;
+  hour24_=on;return true;
 }
 bool ClockService::setNtpEnabled(bool enabled){
   Preferences p;if(!p.begin("monopod-clock",false))return false;
   size_t saved=p.putBool("auto-ntp",enabled);p.end();if(saved!=1)return false;
   ntp_=enabled;
-  if(!enabled)restartNtp();return true;
+  if(!enabled)restartNtp();
+  return true;
 }
 void ClockService::restartNtp(){
   if(ntpStarted_ && esp_sntp_enabled())esp_sntp_stop();
@@ -72,11 +80,11 @@ bool ClockService::valid() const{return time(nullptr)>MIN_VALID_TIME;}
 String ClockService::dateTime() const{
   if(!valid())return "Time not set";
   time_t t=time(nullptr);tm value;localtime_r(&t,&value);
-  char b[32];strftime(b,sizeof(b),"%d.%m.%Y  %H:%M",&value);return String(b);
+  char b[32];strftime(b,sizeof(b),hour24_?"%d.%m.%Y  %H:%M":"%d.%m.%Y  %I:%M %p",&value);return String(b);
 }
 String ClockService::shortTime() const{
   if(!valid())return "";
   time_t t=time(nullptr);tm value;localtime_r(&t,&value);
-  char b[24];strftime(b,sizeof(b),"%I:%M %p",&value);
-  return b[0]=='0'?String(b+1):String(b);
+  char b[24];strftime(b,sizeof(b),hour24_?"%H:%M":"%I:%M %p",&value);
+  return !hour24_ && b[0]=='0'?String(b+1):String(b);
 }

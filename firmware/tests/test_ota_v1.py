@@ -15,7 +15,7 @@ def test_ota_wired_only_to_wifi_sync():
     ota = (FW / 'WiFiOta.cpp').read_text()
     assert 'server.on("/api/ota/info",HTTP_GET' in wifi
     assert 'server.on("/api/ota/upload",HTTP_POST' in wifi
-    assert 'server.collectHeaders(otaHeaders,3)' in wifi
+    assert 'server.collectHeaders(otaHeaders,4)' in wifi
     assert 'wifiOta.newSession();server.begin()' in wifi
     assert 'esp_ota_get_next_update_partition(nullptr)' in ota
     assert 'ESP_PARTITION_SUBTYPE_APP_OTA_0' in ota
@@ -28,7 +28,7 @@ def test_ota_wired_only_to_wifi_sync():
     assert 'badPinAttempts>=5' in ota
     assert 'wifiOta.abort("CLIENT_ABORTED")' in wifi
     assert 'TRANSFER_TIMEOUT' in ota
-    assert '0.10.7.2' in (FW / 'DIY_iPod_Mono.ino').read_text()
+    assert '0.10.7.3' in (FW / 'DIY_iPod_Mono.ino').read_text()
 
 
 def test_desktop_reference_posts_stream_and_hash(tmp_path):

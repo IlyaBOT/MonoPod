@@ -141,6 +141,9 @@ void MediaLibrary::rescan(bool verifyFingerprints) {
     tracks.reserve(Config::MAX_TRACKS);
 #endif
   error="";scanFolder("/Music",0);
+  // Legacy iTunes stores payloads in iPod_Control/Music/Fxx/;
+  // read tags directly, do NOT confuse its iTunesDB with MonoPodDB.
+  scanFolder("/iPod_Control/Music",0);
   if(tracks.empty()) scanFolder("/",0);
   std::sort(tracks.begin(),tracks.end(),[](const Track &a,const Track &b){return strLess(a.title,b.title);});
   if(tracks.size()>=Config::MAX_TRACKS) error="Library limit reached";
