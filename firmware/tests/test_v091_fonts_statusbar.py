@@ -10,7 +10,7 @@ def test_statusbar_offsets_and_wokwi_sync():
     physical = (FW / 'Display.cpp').read_text(encoding='utf-8')
     simulated = (ROOT / 'Wokwi_ILI9341' / 'Display.cpp').read_text(encoding='utf-8')
     assert physical == simulated
-    assert 'drawString(x,3,fitted,fg,bg,false,0,134)' in physical
+    assert 'drawString(x,3,fitted,themed(8,fg),bg,false,0,134)' in physical
     assert 'if(held)smallText(20,4,"H",fg,bg)' in physical
     assert 'OY+15-height' in physical
 

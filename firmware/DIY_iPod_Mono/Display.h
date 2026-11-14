@@ -38,6 +38,7 @@ public:
   void bootLogo();
   bool streamMonoFrame(const uint8_t* packed, uint16_t white=0xffff, uint16_t black=0x0000);
   bool streamGray2Frame(const uint8_t* packed,const uint16_t colors[4]);
+  uint16_t themed(uint8_t index,uint16_t fallback)const;
   uint16_t background()const{return bg;}
   uint16_t foreground()const{return fg;}
   uint16_t selectedBackground()const{return hi;}

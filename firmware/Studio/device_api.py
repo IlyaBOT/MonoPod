@@ -4,9 +4,19 @@ import http.client
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
+from urllib.error import URLError, HTTPError
 import uuid
 
 class DeviceClient:
+    @staticmethod
+    def _network_failure(exc):
+        return ConnectionError(
+            "MonoPod Wi-Fi Sync is unreachable. On the player select "
+            "Settings > Wi-Fi > Start Wi-Fi Sync, then enter http://<IP on its SYNC screen> "
+            "in MonoPod Studio. 192.168.4.1 works only when connected to the MonoPod-Sync AP. "
+            f"Original error: {exc}"
+        )
+
     def __init__(self,url='http://192.168.4.1'):
         self.url=url.rstrip('/')
         parsed=urlparse(self.url)
@@ -17,14 +27,24 @@ class DeviceClient:
         self.prefix=parsed.path.rstrip('/')
 
     def status(self):
-        with urlopen(Request(self.url+'/api/info'),timeout=8) as response:
-            return json.loads(response.read(16384))
+        try:
+            with urlopen(Request(self.url+'/api/info'),timeout=8) as response:
+                return json.loads(response.read(16384))
+        except HTTPError:
+            raise
+        except (URLError, OSError) as e:
+            raise self._network_failure(e) from e
 
     def form(self,endpoint,data):
         body=urlencode(data).encode('ascii')
         req=Request(self.url+endpoint,body,{'Content-Type':'application/x-www-form-urlencoded'},method='POST')
-        with urlopen(req,timeout=15) as response:
-            return response.read(2048).decode('utf8','replace')
+        try:
+            with urlopen(req,timeout=15) as response:
+                return response.read(2048).decode('utf8','replace')
+        except HTTPError:
+            raise
+        except (URLError, OSError) as e:
+            raise self._network_failure(e) from e
 
     def upload(self,endpoint,path,field='theme',progress=None):
         path=Path(path)
@@ -54,5 +74,7 @@ class DeviceClient:
             message=response.read(8192).decode('utf8','replace')
             if response.status>=400:raise RuntimeError(f'HTTP {response.status}: {message}')
             return message
+        except OSError as e:
+            raise self._network_failure(e) from e
         finally:
             conn.close()

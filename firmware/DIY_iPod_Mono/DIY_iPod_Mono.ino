@@ -17,6 +17,7 @@
 #include "ClockService.h"
 #include "UsbSync.h"
 #include "SyncMode.h"
+#include "SyncFiles.h"
 #include "IpodIdentity.h"
 #include "Feedback.h"
 #include "Battery.h"
@@ -30,7 +31,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.9.1.1 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.10.0 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -46,7 +47,15 @@ void setup(){
   // Each SPI peripheral MUST have its own CS; both high when idle.
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
+  MONOPOD_LOG.println("Boot: SD mount and library scan");
   const bool sdMounted=media.begin(); // IMPORTANT: initialize SD SPI mode BEFORE first TFT transaction
+  const bool recoveryNeeded=sdMounted && (SD.exists("/.monopod-transfer.target") || SD.exists("/Music/.monopod-target.txt") || SD.exists("/Music/.monopod-wifi.target"));
+  SyncFiles::recover();
+  if(recoveryNeeded)media.rescan(); // restored files must be present in the initial player index
+#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+  MONOPOD_LOG.printf("Boot: index complete; loop stack low-water=%u B\n",(unsigned)uxTaskGetStackHighWaterMark(nullptr));
+#endif
+  MONOPOD_LOG.println("Boot: TFT");
   display.begin();
   if(!sdMounted)MONOPOD_LOG.println("SD: "+media.lastError());
   else {MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
@@ -58,6 +67,7 @@ void setup(){
   input.begin();
   feedback.begin();
 #if FEATURE_AUDIO
+  MONOPOD_LOG.println("Boot: audio");
   if(!player.begin())MONOPOD_LOG.println("Audio: init failed");
 #endif
   clockService.begin();
@@ -65,6 +75,7 @@ void setup(){
   MONOPOD_LOG.printf("MonoPod device GUID=%s (%s)\n",IpodIdentity::guid(),IpodIdentity::fromEfuse()?"eFuse MAC":"NVS fallback");
   usbSync.begin();
   randomSeed(esp_random());
+  MONOPOD_LOG.println("Boot: Wi-Fi and UI");
   wifiNetworks.begin(); // restore last successful Wi-Fi connection from NVS at boot
   ui.begin();
   if(!media.sdOK())ui.notify("No microSD card");

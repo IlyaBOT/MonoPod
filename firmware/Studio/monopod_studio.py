@@ -17,7 +17,7 @@ PANEL='#20272d'
 TEXT='#e9edf1'
 MUTED='#a7b3bc'
 ACCENT='#75b7a0'
-APP='MonoPod Studio 0.8.4'
+APP='MonoPod Studio 0.9.1.1'
 
 class Studio(tk.Tk):
     def __init__(self):
@@ -37,7 +37,7 @@ class Studio(tk.Tk):
         }.items()}
         self.preview_photo=None
         self._preview_job=None
-        self.status_text=tk.StringVar(value='Offline editor — connect to MonoPod-Sync for device management')
+        self.status_text=tk.StringVar(value='Start Wi-Fi Sync on player, then use http://<IP shown on its screen> (or AP fallback)')
         self._style()
         self._build()
         for v in [self.font_path,self.main_size,self.small_size,self.smoothing,*self.palette.values()]:
@@ -119,7 +119,7 @@ class Studio(tk.Tk):
 
         top=self.panel(device_tab);top.pack(fill='x',padx=10,pady=10)
         self.label(top,'LOCAL DEVICE',fg=ACCENT,font=('Arial',10,'bold')).grid(row=0,column=0,sticky='w',pady=(0,12))
-        self.label(top,'Address:').grid(row=1,column=0,sticky='w')
+        self.label(top,'Sync URL (from player):').grid(row=1,column=0,sticky='w')
         self.entry(top,self.device,34).grid(row=1,column=1,sticky='we',padx=(10,10))
         self.btn(top,'Connect / Refresh',self.connect_device,True).grid(row=1,column=2)
         top.columnconfigure(1,weight=1)
@@ -145,7 +145,7 @@ class Studio(tk.Tk):
         self.log=ScrolledText(music,bg='#10171b',fg=TEXT,height=8,insertbackground=TEXT,
                               relief='flat',font=('Consolas',10))
         self.log.pack(fill='both',expand=True)
-        self.log.insert('end','USB-C (ESP32-S3): select native USB CDC port; Wi-Fi sync is a separate option.\n')
+        self.log.insert('end','Wi-Fi: Start Wi-Fi Sync on player and enter the URL shown on its display. 192.168.4.1 is AP fallback only.\nUSB-C (ESP32-S3): select native USB CDC port.\n')
         self.log.configure(state='disabled')
         bottom=tk.Frame(self,bg=BG,padx=22,pady=8);bottom.pack(fill='x')
         self.label(bottom,'MonoPod Studio • standalone offline editor',fg=MUTED,font=('Arial',9)).pack(side='left')

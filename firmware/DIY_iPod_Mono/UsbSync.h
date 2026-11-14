@@ -3,27 +3,12 @@
 #if FEATURE_USB_SYNC
 #include <SD.h>
 class UsbSyncService {
-public:
-  void begin();
-  void loop();
-  bool busy() const {return sending;}
+public:void begin();void loop();bool busy()const{return sending;}
 private:
-  File upload;
-  String line, fileName;
-  uint32_t size=0, received=0, receivedCrc=0xFFFFFFFFUL, expectedCrc=0;
-  uint16_t chunkRemaining=0;
-  uint8_t buffer[512];
-  uint16_t buffered=0;
-  uint32_t lastByteAt=0;
-  bool sending=false, replacing=false;
-  void command(const String& command);
-  void fail(const char* reason);
-  void reset(bool removePart);
-  bool flushBuffer();
-  void finish();
-  void reply(const String& payload);
+ String line;uint32_t size=0,received=0,lastByteAt=0,quietUntil=0;uint16_t chunkRemaining=0,buffered=0;
+ uint8_t buffer[1024];bool sending=false,discard=false;void command(const String& cmd);void reply(const String& payload);void fail(const char* reason);void finish();
 };
 #else
-class UsbSyncService {public: void begin(){} void loop(){} bool busy()const{return false;} };
+class UsbSyncService {public:void begin(){}void loop(){}bool busy()const{return false;}};
 #endif
 extern UsbSyncService usbSync;

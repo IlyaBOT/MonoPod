@@ -3,6 +3,7 @@
 #include "AudioEngine.h"
 #include "Feedback.h"
 #include "UI.h"
+#include "SyncFiles.h"
 SyncController syncMode;
 bool SyncController::enter(SyncTransport wanted) {
   if(wanted==SyncTransport::None || !media.sdOK()) return false;
@@ -14,6 +15,7 @@ bool SyncController::enter(SyncTransport wanted) {
   return true;
 }
 bool SyncController::leave(SyncTransport expected) {
+  if(SyncFiles::busy())return false;
   if(current!=expected || expected==SyncTransport::None) return false;
   current=SyncTransport::None;
   ui.redraw();

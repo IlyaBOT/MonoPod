@@ -1,3 +1,13 @@
+# MonoPod v0.10.0 — MonoPod Desktop protocol candidate
+
+Based on v0.9.1.1. Adds MPOD1 v4 and HTTP filesystem operations, verified streaming transfers, USB theme installation and a 12-color MPT2 palette while retaining MPT1 and legacy sync endpoints. Existing explicit Sync ownership, LAN STA reconnect behavior, stock antialiased font and player geometry are preserved.
+
+Desktop source and protocol documentation: `../MonoPod_Desktop/`. See `CHANGELOG_v0.10.0.md` and `../MonoPod_Desktop/docs/FINAL_REPORT_RU.md`.
+
+Both ESP32-S3 N16R8 and classic ESP32 profiles compiled with Arduino-ESP32 3.3.12. Binaries/manifests are in `../MonoPod_Desktop/firmware-builds/`. Hardware compatibility and power-loss behavior remain UNVERIFIED; no device was flashed. GPIO, AudioEngine, Backlight and Input were not rewritten.
+
+The historical documentation below is retained for reference.
+
 # MonoPod v0.9.1.1 — Wi-Fi Sync over LAN
 
 The player now keeps its existing STA connection to the router when entering Wi-Fi Sync. The HTTP service opens only after `Settings > Wi-Fi > Start Wi-Fi Sync`; it listens on the player's existing IP address on port 80. The Sync screen shows `IP: x.x.x.x`. In MonoPod Studio enter `http://x.x.x.x` (the old `192.168.4.1` is **only for AP fallback**).

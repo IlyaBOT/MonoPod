@@ -36,6 +36,7 @@ void Display::palette(uint8_t p){
   default:bg=0xbdf7;fg=0;hi=0x18a3;low=0x7390;break;
   }
 }
+uint16_t Display::themed(uint8_t i,uint16_t fallback)const{return theme.active()?theme.color(i):fallback;}
 void Display::clear(){surface().fillRect(OX,OY,160,128,bg);}
 void Display::startFrame(){inFrame=(buffer && buffer->getBuffer());}
 void Display::endFrame(){
@@ -133,7 +134,7 @@ void Display::wifiSignal(uint8_t bars){
   if(bars>3)bars=3;
   for(uint8_t i=0;i<bars;i++){
     const int height=3+3*i;
-    surface().fillRect(OX+3+5*i,OY+15-height,3,height,fg);
+    surface().fillRect(OX+3+5*i,OY+15-height,3,height,themed(9,fg));
   }
 }
 String Display::fittedTitle(const String& title, int width) const {
@@ -161,32 +162,32 @@ void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars
   const String fitted=fittedTitle(title,94);
   const int w=textWidth(fitted,false);
   const int x=(160-w)/2;
-  drawString(x,3,fitted,fg,bg,false,0,134);
+  drawString(x,3,fitted,themed(8,fg),bg,false,0,134);
   batteryIcon();
-  surface().drawFastHLine(OX,OY+19,160,fg);
+  surface().drawFastHLine(OX,OY+19,160,themed(11,fg));
 }
 void Display::footer(const String& s){
   if(s.isEmpty())return;
-  surface().drawFastHLine(OX,OY+114,160,fg);
+  surface().drawFastHLine(OX,OY+114,160,themed(11,fg));
   surface().fillRect(OX,OY+115,160,13,bg);
   smallText(5,115,s,fg,bg);
 }
 void Display::listRow(uint8_t row,const String& s,bool selected,bool submenu){
   if(row>=ROW_COUNT)return;
   int y=21+row*18;
-  uint16_t back=selected?hi:bg,front=selected?bg:fg;
+  uint16_t back=selected?hi:bg,front=selected?themed(4,bg):fg;
   surface().fillRect(OX+2,OY+y,156,18,back);
   const int maxWidth=submenu?137:149;
   String rendered=s;
   if(textWidth(rendered)>maxWidth)rendered=fittedTitle(rendered,maxWidth);
   text(6,y+1,rendered,front,back);
-  if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,front);}
+  if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,themed(selected?6:5,front));}
 }
 void Display::progress(int x,int y,int w,int percent){
   percent=constrain(percent,0,100);
-  surface().drawRect(OX+x,OY+y,w,8,fg);
+  surface().drawRect(OX+x,OY+y,w,8,themed(11,fg));
   surface().fillRect(OX+x+2,OY+y+2,w-4,4,bg);
-  if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,fg);
+  if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,themed(10,fg));
 }
 void Display::syncScreen(bool wifi,bool transferring,const String& address){
   clear();
@@ -194,23 +195,23 @@ void Display::syncScreen(bool wifi,bool transferring,const String& address){
   const int cx=80;
   if(wifi){
     // Three circular Wi-Fi arcs (show upper half only), plus center dot.
-    for(int r=23;r>=9;r-=7)surface().drawCircle(OX+cx,OY+37,r,fg);
+    for(int r=23;r>=9;r-=7)surface().drawCircle(OX+cx,OY+37,r,themed(5,fg));
     surface().fillRect(OX+51,OY+38,58,30,bg);
-    surface().fillCircle(OX+cx,OY+38,3,fg);
+    surface().fillCircle(OX+cx,OY+38,3,themed(5,fg));
   }else{
     // USB trident icon: stem, square/circle/triangle tips.
-    surface().drawLine(OX+cx,OY+41,OX+cx,OY+13,fg);
-    surface().drawLine(OX+cx,OY+24,OX+65,OY+24,fg);
-    surface().drawLine(OX+65,OY+24,OX+65,OY+17,fg);
-    surface().fillRect(OX+62,OY+12,7,7,fg);
-    surface().drawLine(OX+cx,OY+32,OX+95,OY+32,fg);
-    surface().drawLine(OX+95,OY+32,OX+95,OY+23,fg);
-    surface().fillCircle(OX+95,OY+22,4,fg);
-    surface().fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,fg);
-    surface().fillCircle(OX+cx,OY+41,3,fg);
+    surface().drawLine(OX+cx,OY+41,OX+cx,OY+13,themed(5,fg));
+    surface().drawLine(OX+cx,OY+24,OX+65,OY+24,themed(5,fg));
+    surface().drawLine(OX+65,OY+24,OX+65,OY+17,themed(5,fg));
+    surface().fillRect(OX+62,OY+12,7,7,themed(5,fg));
+    surface().drawLine(OX+cx,OY+32,OX+95,OY+32,themed(5,fg));
+    surface().drawLine(OX+95,OY+32,OX+95,OY+23,themed(5,fg));
+    surface().fillCircle(OX+95,OY+22,4,themed(5,fg));
+    surface().fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,themed(5,fg));
+    surface().fillCircle(OX+cx,OY+41,3,themed(5,fg));
   }
   // Adafruit 5x7 bitmap scaled to ~18x24. Duplicate by 1px for boldness.
-  surface().setTextSize(3);surface().setTextColor(fg);
+  surface().setTextSize(3);surface().setTextColor(themed(7,fg));
   surface().setCursor(OX+44,OY+49);surface().print("SYNC");
   surface().setCursor(OX+45,OY+49);surface().print("SYNC");
   surface().setTextSize(1);
@@ -236,14 +237,14 @@ uint8_t Display::batteryBand()const {
 void Display::batteryIcon(){
   const int bx=136,by=6;
   surface().fillRect(OX+bx,OY+by,22,10,bg);
-  surface().drawRect(OX+bx,OY+by,19,9,fg);
-  surface().fillRect(OX+bx+19,OY+by+3,2,3,fg);
+  surface().drawRect(OX+bx,OY+by,19,9,themed(9,fg));
+  surface().fillRect(OX+bx+19,OY+by+3,2,3,themed(9,fg));
   int b=batteryBand();
   if(b==255){
-    surface().fillRect(OX+bx+8,OY+by+2,2,3,fg);
-    surface().drawPixel(OX+bx+8,OY+by+6,fg);
+    surface().fillRect(OX+bx+8,OY+by+2,2,3,themed(9,fg));
+    surface().drawPixel(OX+bx+8,OY+by+6,themed(9,fg));
   }else if(b){
-    surface().fillRect(OX+bx+2,OY+by+2,(15*b)/4,5,fg);
+    surface().fillRect(OX+bx+2,OY+by+2,(15*b)/4,5,themed(9,fg));
   }
 }
 void Display::nowPlaying(const String& title,const String& artist,const String& album,bool paused,uint32_t trackNumber,uint32_t trackCount){
@@ -256,7 +257,7 @@ void Display::nowPlaying(const String& title,const String& artist,const String& 
 void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration){
   // Update only the bottom region; never erase the header and metadata lines.
   surface().fillRect(OX,OY+96,160,32,bg);
-  surface().drawRoundRect(OX+13,OY+96,134,10,5,fg);
+  surface().drawRoundRect(OX+13,OY+96,134,10,5,themed(11,fg));
   const int percent=mode==1?volume:mode==2?scrub:progress;
   if(mode==2){
     int px=16+125*constrain(percent,0,100)/100;
@@ -267,7 +268,7 @@ void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,ui
       String right="-"+timeLabel(total-at);smallText(154-textWidth(right,true),112,right,fg,bg);
     }
   }else if(mode==1){
-    surface().fillRect(OX+15,OY+99,129*constrain(percent,0,100)/100,4,fg);
+    surface().fillRect(OX+15,OY+99,129*constrain(percent,0,100)/100,4,themed(7,fg));
     // Small / big speaker pictograms as on the iPod volume overlay.
     surface().fillRect(OX+10,OY+114,3,6,fg);
     surface().fillTriangle(OX+13,OY+113,OX+17,OY+110,OX+17,OY+123,fg);
@@ -275,7 +276,7 @@ void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,ui
     surface().fillTriangle(OX+143,OY+113,OX+148,OY+110,OX+148,OY+123,fg);
     smallText(69,112,String(volume)+"%",fg,bg);
   }else{
-    surface().fillRoundRect(OX+15,OY+98,129*constrain(percent,0,100)/100,6,3,fg);
+    surface().fillRoundRect(OX+15,OY+98,129*constrain(percent,0,100)/100,6,3,themed(10,fg));
     smallText(6,112,timeLabel(elapsed),fg,bg);
     String right=knownDuration?"-"+timeLabel(remaining):"--:--";
     const int w=textWidth(right,true);

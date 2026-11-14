@@ -1,236 +1,66 @@
 #include "UsbSync.h"
+#include "SyncFiles.h"
 #include "Library.h"
-#include "AudioEngine.h"
-#include "WiFiSync.h"
 #include "UI.h"
+#include "Settings.h"
 #include "IpodIdentity.h"
-#include "SyncMode.h"
-#include <stdlib.h>
-#include <ctype.h>
-
+#include "WiFiSync.h"
+#include <errno.h>
 UsbSyncService usbSync;
 #if FEATURE_USB_SYNC
 namespace {
-constexpr uint32_t MAX_FILE_BYTES=1024UL*1024UL*1024UL;
-constexpr uint16_t CHUNK_BYTES=1024;
-constexpr uint32_t RECEIVE_TIMEOUT_MS=15000;
-constexpr char PART_PATH[]="/Music/.monopod-upload.part";
-constexpr char BACKUP_PATH[]="/Music/.monopod-previous.bak";
-constexpr char JOURNAL_PATH[]="/Music/.monopod-target.txt";
-
-uint32_t crc32Step(uint32_t crc, uint8_t byte) {
-  crc^=byte;
-  for(uint8_t i=0;i<8;i++) crc=(crc>>1)^((crc&1)?0xEDB88320UL:0);
-  return crc;
+bool uintArg(const String& s,uint32_t& v,int base=10){if(s.isEmpty()||s.length()>10)return false;for(size_t i=0;i<s.length();i++)if(base==10? !isdigit((unsigned char)s[i]):!isxdigit((unsigned char)s[i]))return false;errno=0;char* end;unsigned long n=strtoul(s.c_str(),&end,base);if(errno||*end)return false;v=n;return true;}
+String token(const String& s,int& i){if(i>=(int)s.length())return "";int end=s.indexOf(' ',i);if(end<0)end=s.length();String t=s.substring(i,end);i=end+1;return t;}
 }
-bool parseUint(const String& s, uint32_t& output, int base) {
-  if(s.isEmpty())return false;
-  for(unsigned i=0;i<s.length();i++){
-    const char c=s[i];
-    if(base==10 && (c<'0'||c>'9'))return false;
-    if(base==16 && !isxdigit((unsigned char)c))return false;
-  }
-  char *end=nullptr;
-  unsigned long v=strtoul(s.c_str(),&end,base);
-  if(*end || (base==16 && s.length()!=8))return false;
-  output=(uint32_t)v;
-  return true;
-}
-bool validName(const String& name) {
-  if(name.length()<5||name.length()>90||name[0]=='.'||name.endsWith("."))return false;
-  if(name.indexOf("..")>=0)return false;
-  for(unsigned i=0;i<name.length();i++){
-    uint8_t c=(uint8_t)name[i];
-    if(c<32||c==127||c=='/'||c=='\\'||c==':'||c=='<'||c=='>'||c=='"'||c=='|'||c=='*'||c=='?')return false;
-  }
-  return MediaLibrary::isAudio(name);
-}
-String destPath(const String& name){return String("/Music/")+name;}
-// Startup recovery for power-loss between original->backup and upload->original.
-void recoverReplacement(){
-  if(!SD.exists(JOURNAL_PATH))return;
-  File j=SD.open(JOURNAL_PATH,FILE_READ);
-  String name=j?j.readStringUntil('\n'):String();
-  if(j)j.close();name.trim();
-  if(!validName(name))return; // do not touch unknown paths
-  String dest=destPath(name);
-  if(SD.exists(BACKUP_PATH)){
-    if(SD.exists(dest.c_str()))SD.remove(BACKUP_PATH); // new file committed
-    else SD.rename(BACKUP_PATH,dest.c_str());          // old file restored
-  }
-  if(!SD.exists(BACKUP_PATH))SD.remove(JOURNAL_PATH);
-}
-}
-void UsbSyncService::begin(){
-  line.reserve(180);
-  if(media.sdOK()){
-    const bool interrupted=SD.exists(JOURNAL_PATH);
-    recoverReplacement();
-    SD.remove(PART_PATH);
-    if(interrupted)media.rescan();
-  }
-}
-void UsbSyncService::reply(const String& payload){Serial.print("MPOD1 ");Serial.println(payload);}
-void UsbSyncService::reset(bool removePart){
-  if(upload)upload.close();
-  if(removePart && media.sdOK())SD.remove(PART_PATH);
-  sending=false;replacing=false;size=received=0;chunkRemaining=buffered=0;
-  fileName="";expectedCrc=0;receivedCrc=0xFFFFFFFFUL;
-}
-void UsbSyncService::fail(const char* reason){reset(true);reply(String("ERR ")+reason);}
-bool UsbSyncService::flushBuffer(){
-  if(!buffered)return true;
-  const size_t written=upload.write(buffer,buffered);
-  if(written!=buffered)return false;
-  buffered=0;return true;
-}
-void UsbSyncService::finish(){
-  if(!flushBuffer()){fail("SD_WRITE");return;}
-  upload.flush();upload.close();
-  if((receivedCrc^0xFFFFFFFFUL)!=expectedCrc){fail("CRC_MISMATCH");return;}
-  const String dest=destPath(fileName);
-  const bool exists=SD.exists(dest.c_str());
-  if(exists && !replacing){fail("ALREADY_EXISTS");return;}
-  if(exists){
-    if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){
-      fail("BACKUP_PENDING");return;
-    }
-    File j=SD.open(JOURNAL_PATH,FILE_WRITE);
-    if(!j){fail("JOURNAL_WRITE");return;}
-    j.println(fileName);j.flush();j.close();
-    if(!SD.rename(dest.c_str(),BACKUP_PATH)){
-      SD.remove(JOURNAL_PATH);fail("BACKUP_RENAME");return;
-    }
-  }
-  if(!SD.rename(PART_PATH,dest.c_str())){
-    if(exists){SD.rename(BACKUP_PATH,dest.c_str());
-      if(!SD.exists(BACKUP_PATH))SD.remove(JOURNAL_PATH);}
-    fail("COMMIT_FAILED");return;
-  }
-  if(exists){SD.remove(BACKUP_PATH);SD.remove(JOURNAL_PATH);}
-  reset(false);
-  reply(exists?"OK REPLACED":"OK SAVED");
-}
+void UsbSyncService::begin(){line.reserve(700);SyncFiles::recover();}
+void UsbSyncService::reply(const String& s){Serial.print("MPOD1 ");Serial.println(s);}
+void UsbSyncService::fail(const char* why){SyncFiles::abort();sending=false;buffered=chunkRemaining=0;line="";discard=true;quietUntil=millis()+1500;reply(String("ERR ")+why);}
+void UsbSyncService::finish(){if(buffered&&!SyncFiles::write(buffer,buffered)){fail(SyncFiles::error.c_str());return;}buffered=0;sending=false;if(!SyncFiles::commit()){String error=SyncFiles::error;SyncFiles::abort();reply("ERR "+error);return;}reply("OK SAVED");}
 void UsbSyncService::command(const String& cmd){
-  if(cmd=="MPOD1 HELLO"){
-    if(!media.sdOK())ui.notify("No microSD card");
-    reply(String("READY 3 ")+(media.sdOK()?"SD=1":"SD=0"));return;
+ if(cmd=="MPOD1 HELLO"){reply(String("READY 4 SD=")+(media.sdOK()?"1":"0"));return;}
+ if(cmd=="MPOD1 X INFO"||cmd=="MPOD1 X STORAGE"){reply("OK "+SyncFiles::info());return;}
+ if(cmd=="MPOD1 INFO"){char a[24],b[24];snprintf(a,sizeof(a),"%llu",(unsigned long long)media.totalBytes());snprintf(b,sizeof(b),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));reply(String("OK INFO SD=")+(media.sdOK()?"1":"0")+" TRACKS="+String((unsigned)media.size())+" TOTAL_BYTES="+a+" FREE_BYTES="+b+" GUID="+IpodIdentity::guid()+" FW=0.10.0 PROTOCOL=4");return;}
+ if(cmd=="MPOD1 SYNC START"){if(!media.sdOK()){reply("ERR NO_SD");return;}reply(syncMode.enter(SyncTransport::UsbCdc)?"OK SYNC_STARTED":"ERR SYNC_BUSY");return;}
+ if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
+ if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
+ if(cmd=="MPOD1 SCAN"){if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}media.rescan();reply("OK SCANNED "+String((unsigned)media.size()));return;}
+ if(cmd.startsWith("MPOD1 X ")){
+  int i=8;String op=token(cmd,i),path=SyncFiles::fromHex(token(cmd,i));
+  if(op=="SMOOTH"){String value=cmd.substring(15);if(value!="0" && value!="1"){reply("ERR ARGUMENTS");return;}settings.data.fontSmoothing=(value=="1");settings.markDirty();reply("OK SMOOTHING");return;}
+  if(op=="LIST"){uint32_t off=0,limit=0;if(!uintArg(token(cmd,i),off)||!uintArg(token(cmd,i),limit)||limit>32){reply("ERR ARGUMENTS");return;}String result=SyncFiles::list(path,off,limit,SyncTransport::UsbCdc);reply(result.length()?"OK "+result:"ERR "+SyncFiles::error);return;}
+  if(op=="STAT"||op=="META"||op=="THEMEINFO"){String result=SyncFiles::stat(op=="THEMEINFO"?"/MonoPod/theme.mpt":path,SyncTransport::UsbCdc);reply(result.length()?"OK "+result:"ERR "+SyncFiles::error);return;}
+  if(op=="READ"||op=="GET"){uint32_t off=0,count=0;if(!uintArg(token(cmd,i),off)||!uintArg(token(cmd,i),count)||count>1024){reply("ERR ARGUMENTS");return;}size_t got=0;if(!SyncFiles::read(path,off,buffer,count,got,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}char crc[9];snprintf(crc,sizeof(crc),"%08lX",(unsigned long)~SyncFiles::crcStep(~0u,buffer,got));reply("DATA "+String(got)+" "+crc);Serial.write(buffer,got);return;}
+  if(op=="MKDIR"||op=="DELETE"||op=="RMDIR"||op=="RENAME"){
+   bool ok=op=="MKDIR"?SyncFiles::mkdir(path,SyncTransport::UsbCdc):op=="RENAME"?SyncFiles::rename(path,SyncFiles::fromHex(token(cmd,i)),SyncTransport::UsbCdc):SyncFiles::remove(path,op=="RMDIR",SyncTransport::UsbCdc);reply(ok?"OK DONE":"ERR "+SyncFiles::error);return;
   }
-  if(cmd=="MPOD1 INFO"){
-    char totalDec[24],freeDec[24];
-    snprintf(totalDec,sizeof(totalDec),"%llu",(unsigned long long)media.totalBytes());
-    snprintf(freeDec,sizeof(freeDec),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));
-    String answer=String("OK INFO SD=")+(media.sdOK()?"1":"0")+
-      " TRACKS="+String((unsigned)media.size())+
-      " TOTAL_BYTES="+String(totalDec)+
-      " FREE_BYTES="+String(freeDec)+
-      " GUID="+String(IpodIdentity::guid());
-    reply(answer);return;
+  if(op=="PUT"||op=="THEME"){
+   uint32_t n=0,crc=0,replace=0;String len=token(cmd,i),crcText=token(cmd,i),rep=token(cmd,i);
+   if(!uintArg(len,n)||crcText.length()!=8||!uintArg(crcText,crc,16)||!uintArg(rep,replace)||replace>1){reply("ERR ARGUMENTS");return;}
+   if(!SyncFiles::begin(path,n,crc,replace,op=="THEME",SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
+   size=n;received=0;buffered=0;sending=true;lastByteAt=millis();chunkRemaining=min((uint32_t)sizeof(buffer),size);if(!size){finish();return;}reply("NEXT "+String(chunkRemaining));return;
   }
-  if(cmd=="MPOD1 SYNC START"){
-    if(!media.sdOK()){
-      ui.notify("No microSD card");reply("ERR NO_SD");return;
-    }
-    if(syncMode.active() && !syncMode.is(SyncTransport::UsbCdc)){
-      reply("ERR SYNC_BUSY");return;
-    }
-    if(!syncMode.enter(SyncTransport::UsbCdc)){
-      reply("ERR SYNC_BUSY");return;
-    }
-    reply("OK SYNC_STARTED");return;
-  }
-  if(cmd=="MPOD1 SYNC END"){
-    if(!syncMode.is(SyncTransport::UsbCdc)){
-      reply("ERR NO_USB_SYNC");return;
-    }
-    if(sending){reply("ERR TRANSFER_ACTIVE");return;}
-    media.rescan();
-    syncMode.leave(SyncTransport::UsbCdc);
-    ui.begin();
-    reply("OK SYNC_ENDED");return;
-  }
-  // USB connection and INFO requests are not permission to touch the SD.
-  if(!syncMode.canWrite(SyncTransport::UsbCdc)){
-    reply("ERR SYNC_REQUIRED");return;
-  }
-  if(cmd=="MPOD1 SCAN"){
-    if(!media.sdOK()){reply("ERR NO_SD");return;}
-    if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
-    media.rescan();ui.redraw();
-    reply(String("OK SCANNED ")+(unsigned)media.size());return;
-  }
-  if(cmd.startsWith("MPOD1 DELETE ")){
-    if(!media.sdOK()){reply("ERR NO_SD");return;}
-    if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
-    const String name=cmd.substring(13);
-    if(!validName(name)){reply("ERR INVALID_FILE");return;}
-    const String target=destPath(name);
-    if(!SD.exists(target.c_str())){reply("ERR NOT_FOUND");return;}
-    player.stop();
-    if(!SD.remove(target.c_str())){reply("ERR DELETE_FAILED");return;}
-    reply("OK DELETED");return;
-  }
-  const bool replace=cmd.startsWith("MPOD1 REPLACE ");
-  if(!replace && !cmd.startsWith("MPOD1 PUT ")){reply("ERR UNKNOWN_COMMAND");return;}
-  if(!media.sdOK()){reply("ERR NO_SD");return;}
-  if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
-  // MPOD1 PUT|REPLACE <decimal-size> <8-char-hex-crc32> <filename>
-  const int prefix=replace?14:10;
-  const int p1=cmd.indexOf(' ',prefix),p2=p1>=0?cmd.indexOf(' ',p1+1):-1;
-  if(p1<0||p2<0){reply("ERR ARGUMENTS");return;}
-  const String lenStr=cmd.substring(prefix,p1);
-  const String crcStr=cmd.substring(p1+1,p2);
-  const String name=cmd.substring(p2+1);
-  uint32_t n=0,crc=0;
-  if(!parseUint(lenStr,n,10)||!parseUint(crcStr,crc,16)||n==0||n>MAX_FILE_BYTES||!validName(name)){
-    reply("ERR INVALID_FILE");return;
-  }
-  if(SD.exists(destPath(name).c_str())&&!replace){reply("ERR ALREADY_EXISTS");return;}
-  if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){
-    recoverReplacement();
-    if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){reply("ERR BACKUP_PENDING");return;}
-  }
-  uint64_t freeBytes=media.totalBytes()-media.usedBytes();
-  // Replacement needs free space for the NEW file while the old one is intact.
-  // Small filesystem safety margin avoids writing through the last clusters.
-  if(freeBytes<(uint64_t)n+4096ULL){reply("ERR NO_SPACE");return;}
-  player.stop();
-  if(!SD.exists("/Music") && !SD.mkdir("/Music")){reply("ERR MKDIR");return;}
-  SD.remove(PART_PATH);
-  upload=SD.open(PART_PATH,FILE_WRITE);
-  if(!upload){reply("ERR OPEN_FAILED");return;}
-  fileName=name;size=n;expectedCrc=crc;received=0;receivedCrc=0xFFFFFFFFUL;
-  buffered=0;sending=true;replacing=replace;lastByteAt=millis();
-  chunkRemaining=(uint16_t)min((uint32_t)CHUNK_BYTES,size);
-  reply(String("NEXT ")+chunkRemaining);
+  reply("ERR UNKNOWN_COMMAND");return;
+ }
+ // Legacy v1-v3 commands remain byte-compatible and target /Music only.
+ if(cmd.startsWith("MPOD1 DELETE ")){String name=cmd.substring(13),path="/Music/"+name;if(name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}reply(SyncFiles::remove(path,false,SyncTransport::UsbCdc)?"OK DELETED":"ERR "+SyncFiles::error);return;}
+ bool replace=cmd.startsWith("MPOD1 REPLACE ");if(replace||cmd.startsWith("MPOD1 PUT ")){
+  int i=replace?14:10;uint32_t n=0,crc=0;String len=token(cmd,i),crcText=token(cmd,i),name=cmd.substring(i);
+  if(!uintArg(len,n)||!n||crcText.length()!=8||!uintArg(crcText,crc,16)||name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}
+  if(!SD.exists("/Music"))SD.mkdir("/Music");if(!SyncFiles::begin("/Music/"+name,n,crc,replace,false,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
+  size=n;received=0;buffered=0;sending=true;chunkRemaining=min((uint32_t)sizeof(buffer),size);lastByteAt=millis();reply("NEXT "+String(chunkRemaining));return;
+ }
+ reply("ERR UNKNOWN_COMMAND");
 }
 void UsbSyncService::loop(){
-  if(sending && millis()-lastByteAt>RECEIVE_TIMEOUT_MS){fail("TIMEOUT");return;}
-  uint16_t budget=256;
-  while(budget-- && Serial.available()>0){
-    const int v=Serial.read();if(v<0)break;
-    if(sending){
-      const uint8_t byte=(uint8_t)v;
-      buffer[buffered++]=byte;
-      receivedCrc=crc32Step(receivedCrc,byte);
-      received++;chunkRemaining--;lastByteAt=millis();
-      if(buffered==sizeof(buffer)&&!flushBuffer()){fail("SD_WRITE");return;}
-      if(chunkRemaining==0){
-        if(!flushBuffer()){fail("SD_WRITE");return;}
-        if(received>=size)finish();
-        else {chunkRemaining=(uint16_t)min((uint32_t)CHUNK_BYTES,size-received);
-          reply(String("NEXT ")+chunkRemaining);}
-        return;
-      }
-    }else{
-      if(v=='\n'){
-        String cmd=line;line="";cmd.trim();
-        if(!cmd.isEmpty())command(cmd);
-        return;
-      }else if(v=='\r')continue;
-      else if(line.length()<175 && v>=32 && v<256)line+=(char)v;
-      else {line="";reply("ERR LINE_TOO_LONG");return;}
-    }
-  }
+ if(sending && (!Serial || (uint32_t)(millis()-lastByteAt)>15000)){fail("TIMEOUT_OR_DISCONNECT");return;}
+ uint16_t budget=1024;while(budget-- && Serial.available()){
+  int c=Serial.read();if(c<0)break;
+  if(discard){quietUntil=millis()+1500;continue;}
+  if(sending){buffer[buffered++]=(uint8_t)c;received++;chunkRemaining--;lastByteAt=millis();if(!chunkRemaining){if(!SyncFiles::write(buffer,buffered)){fail(SyncFiles::error.c_str());return;}buffered=0;if(received==size)finish();else{chunkRemaining=min((uint32_t)sizeof(buffer),size-received);reply("NEXT "+String(chunkRemaining));}}}
+  else if(c=='\n'){String cmd=line;line="";if(cmd.startsWith("MPOD1 "))command(cmd);}
+  else if(c!='\r'){if(line.length()>=700){line="";discard=true;quietUntil=millis()+1500;reply("ERR LINE_TOO_LONG");}else line+=(char)c;}
+ }
+ if(discard && (int32_t)(millis()-quietUntil)>=0){discard=false;line="";}
 }
 #endif
+

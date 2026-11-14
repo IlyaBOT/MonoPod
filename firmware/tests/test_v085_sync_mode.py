@@ -25,9 +25,10 @@ def test_sync_controller_both_board_profiles():
 def test_usb_gated_transfers_and_explicit_handshake():
     src=(ROOT/'DIY_iPod_Mono/UsbSync.cpp').read_text()
     assert 'MPOD1 SYNC START' in src and 'MPOD1 SYNC END' in src
-    assert 'ERR SYNC_REQUIRED' in src
+    fs=(ROOT/'DIY_iPod_Mono/SyncFiles.cpp').read_text()
+    assert 'SYNC_REQUIRED' in fs and 'SyncFiles::gate(SyncTransport::UsbCdc)' in src
     assert 'ERR TRANSFER_ACTIVE' in src
-    assert src.index('ERR SYNC_REQUIRED') < src.index('MPOD1 DELETE')
+    assert src.index('SyncFiles::gate(SyncTransport::UsbCdc)') < src.index('MPOD1 DELETE')
     client=(ROOT/'Studio/usb_sync.py').read_text()
     assert "self.send('SYNC START')" in client
     assert "self.send('SYNC END')" in client
@@ -36,12 +37,13 @@ def test_usb_gated_transfers_and_explicit_handshake():
 def test_wifi_session_started_before_ap_and_no_exit_during_upload():
     src=(ROOT/'DIY_iPod_Mono/WiFiSync.cpp').read_text()
     assert src.index('syncMode.enter(SyncTransport::WiFi)') < src.index('WiFi.softAP(')
-    assert 'if(!running || busy())return;' in src
+    assert 'if(!running||busy())return;' in src
     assert 'uploadActive=false;' in src
-    assert '"/Music/.monopod-wifi.target"' in src
-    assert 'SD.rename(part,dest.c_str())' in src
+    fs=(ROOT/'DIY_iPod_Mono/SyncFiles.cpp').read_text()
+    assert '"/Music/.monopod-wifi.target"' in fs
+    assert 'SD.rename(PART,dest.c_str())' in fs and 'SyncFiles::commit()' in src
     assert 'syncMode.leave(SyncTransport::WiFi)' in src
-    assert 'if(apMode)' in src
+    assert 'if(!usingSta)' in src
 
 def test_usb_connection_info_does_not_enter_sync():
     class Port:

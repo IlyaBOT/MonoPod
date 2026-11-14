@@ -35,5 +35,5 @@ def test_config_keeps_serial_channels_separate():
     assert '#define MONOPOD_LOG Serial0' in cfg
     assert '#define MONOPOD_LOG Serial' in cfg
     usb=(ROOT/'DIY_iPod_Mono/UsbSync.cpp').read_text()
-    assert 'Serial.available()>0' in usb
+    assert 'Serial.available()' in usb
     assert 'MONOPOD_LOG' not in usb
