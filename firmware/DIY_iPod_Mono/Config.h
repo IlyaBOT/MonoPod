@@ -126,7 +126,9 @@ constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
 constexpr uint16_t PIEZO_ACTION_HZ = 2700;
 constexpr uint16_t FEEDBACK_SCROLL_MIN_MS = 45;
 constexpr uint16_t FEEDBACK_ACTION_MIN_MS = 60;
-constexpr uint32_t SPI_SD_HZ = 10000000;
+// Single SD SPI frequency, no diagnostic probing or speed fallback.
+// Conservative starting speed for breadboard wiring; tune after real testing.
+constexpr uint32_t SPI_SD_HZ = 4000000;
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.

@@ -28,8 +28,8 @@ int main(){
   mute=parse("$CLICKER_MUTE=0");
   assert(mute.type==Type::ClickerMute && !mute.muteClicker);
   assert(parse("$CLICKER_MUTE=2").type==Type::Invalid);
-  assert(parse("$SD_RETRY").type==Type::SdRetry);
-  assert(parse("$ADC_DIAG").type==Type::AdcDiag);
+  assert(parse("$SD_RETRY").type==Type::Invalid);
+  assert(parse("$ADC_DIAG").type==Type::Invalid);
   assert(parse("$WIFI_STATUS").type==Type::WifiStatus);
   mute=parse("$CLICKER=1");assert(mute.type==Type::ClickerMute && !mute.muteClicker);
   mute=parse("$CLICKER=0");assert(mute.type==Type::ClickerMute && mute.muteClicker);

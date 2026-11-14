@@ -5,7 +5,7 @@
 #include <string.h>
 
 namespace DevConsoleProtocol {
-enum class Type : uint8_t { Invalid, SetHardwareDisabled, Key, Scroll, Help, Status, Battery, Sd, SdRetry, ClickerMute, ClickerStatus, AdcDiag, WifiStatus };
+enum class Type : uint8_t { Invalid, SetHardwareDisabled, Key, Scroll, Help, Status, Battery, Sd, ClickerMute, ClickerStatus, WifiStatus };
 enum class Button : uint8_t { None, Up, Down, Menu, Select, SelectLong, Previous, Next, PlayPause };
 struct Command {
   Type type=Type::Invalid;
@@ -43,10 +43,8 @@ inline Command parse(const char* line) {
   if(!strcmp(body,"HELP")){c.type=Type::Help;return c;}
   if(!strcmp(body,"STATUS")){c.type=Type::Status;return c;}
   if(!strcmp(body,"BATTERY")){c.type=Type::Battery;return c;}
-  if(!strcmp(body,"ADC_DIAG")){c.type=Type::AdcDiag;return c;}
   if(!strcmp(body,"WIFI_STATUS")){c.type=Type::WifiStatus;return c;}
   if(!strcmp(body,"SD")){c.type=Type::Sd;return c;}
-  if(!strcmp(body,"SD_RETRY")){c.type=Type::SdRetry;return c;}
   if(!strcmp(body,"CLICKER_STATUS")){c.type=Type::ClickerStatus;return c;}
   if(!strcmp(body,"CLICKER=1")||!strcmp(body,"CLICKER=0")){
     c.type=Type::ClickerMute;c.muteClicker=body[strlen(body)-1]=='0';return c;

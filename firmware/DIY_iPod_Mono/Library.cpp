@@ -36,21 +36,20 @@ bool MediaLibrary::begin() {
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
   activeSpiHz=0;
-  const uint32_t rates[]={4000000,1000000,400000};
-  for(const uint32_t hz:rates){
-    digitalWrite(Config::PIN_TFT_CS,HIGH);
-    MONOPOD_LOG.printf("SD: mount SPI %lu Hz...\n",(unsigned long)hz);
-    mounted=SD.begin(Config::PIN_SD_CS,SPI,hz);
-    if(mounted){
-      activeSpiHz=hz;
-      MONOPOD_LOG.printf("SD: mounted type=%u size=%llu B\n",(unsigned)SD.cardType(),
-        (unsigned long long)SD.cardSize());
-      rescan();return true;
-    }
-    SD.end();
-    delay(30);
+  // Hardware wiring confirmed; mount once at the configured SPI rate.
+  // Keep the SD-before-TFT initialization order on the shared bus.
+  mounted=SD.begin(Config::PIN_SD_CS,SPI,Config::SPI_SD_HZ);
+  if(mounted){
+    activeSpiHz=Config::SPI_SD_HZ;
+    error="";
+    MONOPOD_LOG.printf("SD: OK type=%u size=%llu B SPI=%lu Hz\n",
+      (unsigned)SD.cardType(),(unsigned long long)SD.cardSize(),
+      (unsigned long)activeSpiHz);
+    rescan();
+    return true;
   }
-  error="microSD mount failed (SPI 4M/1M/400k; inspect MISO, CS, power, filesystem)";
+  SD.end();
+  error="microSD mount failed (check CS GPIO, MISO, wiring and filesystem)";
   return false;
 }
 void MediaLibrary::rescan() {

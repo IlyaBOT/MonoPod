@@ -1,3 +1,5 @@
+> **v0.8.9.1 hotfix:** Arduino build integration: include WiFiNetworks.h in the physical sketch and implement hasSavedNetwork() in both board/simulator headers. No NVS wipe required.
+
 # MonoPod v0.8.9 — ESP32-S3 Wi-Fi auto-reconnect, signal indicator, UART improvements
 
 See `CHANGELOG_v0.8.9.md` and `docs/MonoPod_v0.8.9_WiFi_and_UART_Diagnostics_RU.md`.
@@ -35,4 +37,12 @@ While Click Wheel hardware is under construction, send `$DISABLE_HARDWARE_CONTRO
 
 ## v0.8.8 (ESP32-S3 hardware troubleshooting)
 
-See `docs/MonoPod_v0.8.8_Hardware_Diagnostics_RU.md`. Runtime `$DISABLE_HARDWARE_CONTROL=1` now mutes active click outputs; new `$CLICKER_MUTE=1|0`, `$CLICKER_STATUS`, `$SD_RETRY`. SD is initialized before the display and retried at lower SPI speeds. No automatic formatting. ADC GPIO4 now reports `RAW` as well as calibrated millivolts. For 100k/100k battery divider add **100nF GPIO4 to ground** near MCU.
+ADC and SD wiring faults are resolved. Production firmware mounts microSD **once**, before TFT, at `Config::SPI_SD_HZ` (currently 4 MHz); no automatic format and no 4M/1M/400k fallback. The one-off `$ADC_DIAG` / `$SD_RETRY` diagnostics were removed. Regular battery display and `$BATTERY` / `$SD` status commands remain. For 100k/100k divider, 100 nF GPIO4-to-GND remains recommended.
+
+
+### v0.8.9.2 production cleanup
+
+- GPIO4 battery: regular ADC voltage/percentage updates remain; fault was disconnected battery ground.
+- SD: GPIO14 CS wiring fixed; one mount at 4 MHz via `Config::SPI_SD_HZ` before TFT initialization. No fallback/probing or periodic remounts.
+- Removed `$ADC_DIAG` and `$SD_RETRY`; `$BATTERY` and `$SD` are lightweight read-only status commands.
+- The separate `MonoPod_S3_DevTest_v1` project remains an independent tool and is not included in the production firmware.
