@@ -1,0 +1,49 @@
+{
+  "desktop_version": "1.1.1",
+  "desktop_tests": {
+    "total": "116",
+    "executed": "116",
+    "passed": "116",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "physical_test": {
+    "passed": true,
+    "remote": "/Desktop_USB_test_20261031.bin",
+    "bytes": 32768,
+    "crc": "EE1EBC69",
+    "sha256": "A06FA47C2671DEF27679FE048A287AEB2823C07A1E15D6395E02B3CEC681C73D",
+    "deleted": true,
+    "elapsed_seconds": 10.5163719,
+    "bav_stat_unchanged": true,
+    "sync_mode": "none",
+    "firmware": "0.10.6"
+  },
+  "same_core_binary_used_by_probe_and_gui": true,
+  "core_sha256": "2e543caf83ffa91a99faaa69e8cc88a3ec970d5ff473fbe7744c890b876e1785",
+  "device": {
+    "port": "COM18",
+    "vid": "303A",
+    "pid": "1001",
+    "firmware": "0.10.6"
+  },
+  "driver_default_rx_bytes": 256,
+  "logical_block_bytes": 1024,
+  "write_packet_bytes": 64,
+  "inter_packet_ms": 8,
+  "receive_overflow_cause": "Source-confirmed mismatch; original lost bytes were not captured on the USB bus.",
+  "firmware_changed": false,
+  "physical_failure_injection_performed": false,
+  "physical_test_authorization": "User explicitly approved the single new 32 KiB test file, readback, cleanup and End Sync."
+}

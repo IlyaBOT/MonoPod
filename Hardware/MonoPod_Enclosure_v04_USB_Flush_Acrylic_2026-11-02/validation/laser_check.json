@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "version": "0.4",
+  "units": "mm",
+  "sheet_mm": [
+    200.0,
+    100.0,
+    1.0
+  ],
+  "lens_mm": [
+    42.0,
+    35.0,
+    1.0
+  ],
+  "radius_mm": 2.0,
+  "one_part_file": "acrylic_screen_lens_1to1.dxf",
+  "optional_sheet_parts": 8,
+  "stock_margin_mm": 5.0,
+  "part_gap_mm": 3.0,
+  "kerf_compensation_applied": false,
+  "kerf_note": "Apply measured outside compensation in CAM; do not apply it twice.",
+  "cad_area_mm2": 1466.5663706143594,
+  "svg_area_mm2": 1466.5698893306262,
+  "files": {
+    "acrylic_screen_lens_1to1.dxf": {
+      "passed": true,
+      "closed_cut_contours": 1,
+      "units": "mm",
+      "outline_size_mm": [
+        42.0,
+        35.0
+      ],
+      "corner_radius_mm": 2.0,
+      "stock_outline_present": false,
+      "sha256": "be514f3e407618670e782081f6b202d549bd71b24f471b175c3c15c13448e7e6"
+    },
+    "acrylic_screen_lens_1to1.svg": {
+      "passed": true,
+      "closed_cut_contours": 1,
+      "units": "mm",
+      "text_or_stock_outline_present": false,
+      "sha256": "6af2e087d6c9572631f1f5e44850b6be266fcdff45b930c709d855b1a6bde30f"
+    },
+    "acrylic_stock_layout_1to1.dxf": {
+      "passed": true,
+      "closed_cut_contours": 8,
+      "units": "mm",
+      "outline_size_mm": [
+        42.0,
+        35.0
+      ],
+      "corner_radius_mm": 2.0,
+      "stock_outline_present": false,
+      "sha256": "fd14ea46a72ab668bbc968ef809597a80800986f979c259dbbe968cbac002218"
+    },
+    "acrylic_stock_layout_1to1.svg": {
+      "passed": true,
+      "closed_cut_contours": 8,
+      "units": "mm",
+      "text_or_stock_outline_present": false,
+      "sha256": "eda18c18e2fba03b4aa30746117046d2094962acef92796506cf46397aa261ee"
+    }
+  },
+  "preview_sha256": "02a2f9b64bb1a9ba84d6b7872c90f9f4c54367a6fbac1499ffcc8c73a05f7241",
+  "parameters_sha256": "cb38dc0024b650240416a5355e9757d352c1c9eadeb9236c2d09487b2415f60b",
+  "generator_sha256": "8751b5befecce9379a49001fdfbfa714d6050b4be949acbfa72fdc5dcf22e533",
+  "laser_script_sha256": "0dd0087704fe2614f338af15b3b3201a120cd071cb9de3d1e83d546c2d2a7fda",
+  "physical_cut_or_glue_test_performed": false
+}

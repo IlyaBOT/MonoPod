@@ -1,0 +1,11 @@
+{
+  "elf_path": "C:\\Users\\IlyaBOT\\AppData\\Local\\arduino\\sketches\\1FDC6AE6386A315C1F7B9BA40EB8C704\\DIY_iPod_Mono.ino.elf",
+  "sha256": "3f759dc291828a9eac802101bd34dfa931185a0d23b182c986e82f844ddb44ad",
+  "log_sha256_prefix": "3f759dc29",
+  "match": true,
+  "fqbn": "esp32:esp32:esp32s3:UploadSpeed=921600,USBMode=hwcdc,CDCOnBoot=cdc,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,CPUFreq=240,FlashMode=qio,FlashSize=16M,PartitionScheme=app3M_fat9M_16MB,DebugLevel=none,PSRAM=opi,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default",
+  "recursive_scan_frame_bytes": 4416,
+  "loop_task_stack_bytes": 8192,
+  "two_scan_frames_bytes": 8832,
+  "fault_before_tft_init": true
+}

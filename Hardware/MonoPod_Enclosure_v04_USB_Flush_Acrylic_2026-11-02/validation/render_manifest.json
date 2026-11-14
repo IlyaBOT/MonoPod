@@ -1,0 +1,24 @@
+{
+  "source": "Actual CadQuery geometry; software depth-buffer rendering",
+  "parameters_sha256": "cb38dc0024b650240416a5355e9757d352c1c9eadeb9236c2d09487b2415f60b",
+  "generator_sha256": "8751b5befecce9379a49001fdfbfa714d6050b4be949acbfa72fdc5dcf22e533",
+  "render_script_sha256": "82ecd96652a5ac2306d3b38878f87756dde9e0a8f356f85cc930a335e310919b",
+  "detail_script_sha256": "3af828ae7eb43658f58145af6d0452c133914e2d92254142e6a4a28c23fb68b2",
+  "images": {
+    "acrylic_mount.png": "e8831bd1e0acb2044ca7703e545dbbb07cd1877bbd34d31e46868192f99aace1",
+    "back_interior.png": "57fa74b5e6e6e9eb1b97ed9b972b6d58620eee384ff0ce401c2e05849eec5e86",
+    "bottom_connectors.png": "0c5e039014ab8f05fc15468d775165f7f8311a60d535dc14b8fbb60c9ec8ad76",
+    "coupon_sheet.png": "5c886937a8191218d52be35bf76941ca72227e56fc93e74b649cd678e84a73b6",
+    "display_lens_carrier.png": "b70acb67a05a2a5414210bdf3bf5c094b2b3b4bb5eadae49682a239771eb6805",
+    "exploded.png": "072970b4fe37b3d0e78cc106b22ed812b8480ef2f977f8b45d17a44b269c2a02",
+    "front_variants.png": "ea69bc13a31bd35c1b977f5d030e56f74ef8761472ae60fc98780099cbf5dc56",
+    "hold_detail.png": "b2ce508c2ed71c7c3816814576f2a443189edc48f137fcc0179618cc213f51bc",
+    "installation_sequence.png": "5eada6b3c3c976523253dc0a4b71578448ccc84b43bcd0e045de6ce56cccc51e",
+    "overall.png": "63d25d91fe8c4a43b8a119641dec74ca100d1426f4e4a553f261cfb75ad265f1",
+    "overview.png": "dcf7742f679d7e7aaab7c407997ef2b57b8c9f0d31de8683b3a6bd1850ab89d7",
+    "soldered_electronics.png": "316596689cbdd3a4eba238c1a6f811286f6ee422b31bd1bbde10f721eab2a9be",
+    "usb_cable_well.png": "0dbe05099b5d8e51ecd39c2a00b4994e45d0e7cfa18245f2b4f797f52f5d14d6",
+    "wheel_interface_section.png": "777c7be8dca872e45526a2e40ddf520d81db927e758b8898242f9c5f04becbf1"
+  },
+  "physical_fit_verified": false
+}

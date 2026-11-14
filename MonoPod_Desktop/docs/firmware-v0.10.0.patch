@@ -1,0 +1,2629 @@
+--- v0.9.1.1/CHANGELOG_v0.10.0.md
++++ v0.10.0/CHANGELOG_v0.10.0.md
+@@ -0,0 +1,28 @@
++# MonoPod v0.10.0 — Desktop integration
++
++Base: the verified v0.9.1.1 tree. This revision is separate; all previous revisions are preserved.
++
++- Shared SyncFiles SD operations with explicit USB/Wi-Fi ownership, paginated LIST, STAT/META, bounded READ with CRC, upload, mkdir, empty-only rmdir, rename, delete and 64-bit storage values.
++- MPOD1 v4 adds capability negotiation and hexadecimal UTF-8 paths while retaining legacy HELLO/INFO/SYNC/PUT/REPLACE/DELETE/SCAN. Native CDC stays separate from the UART console.
++- Wi-Fi adds matching `/api/fs/*` operations, strict size/CRC multipart uploads and bounded downloads with X-CRC32. Existing STA/AP behavior and old Studio routes remain.
++- Streaming temporary file, length/CRC validation, backup/target journal, rollback on recoverable failures and boot recovery. Index refresh follows recovery when required. No claim of arbitrary physical FAT power-loss atomicity is made.
++- USB and Wi-Fi install/read themes. MPT2 extends the palette to 12 RGB565 colors; MPT1 stays supported. Strict length/version/scalar/glyph/CRC validation precedes activation. Smoothing remains runtime-selectable.
++- Main and Wokwi shared source variants updated. Stock v0.9.1 font/geometry and v0.9.1.1 LAN reconnect retained. GPIO, AudioEngine, Input and Backlight remain unchanged from the baseline.
++
++## Build and evidence
++
++Arduino-ESP32 3.3.12, both profiles successful:
++
++| Board | Program bytes | Static RAM bytes |
++|---|---:|---:|
++| ESP32-S3 N16R8 | 1,454,610 | 63,020 |
++| ESP32 Classic / huge_app | 1,455,019 | 58,428 |
++
++S3 excludes Bluetooth Classic at compile time. Classic ESP32 uses Wi-Fi, since it has no native USB CDC. Firmware artifacts and individual SHA-256 manifests: `../MonoPod_Desktop/firmware-builds/`.
++
++Desktop and native software tests are documented in `../MonoPod_Desktop/docs/VALIDATION_RU.md`. Physical USB, playback, SD card, heap, theme appearance and power interruption tests remain UNVERIFIED. No flashing, formatting or partition changes were performed.
++
++
++## Boot regression fix inherited from v0.9.0
++
++Moved the 4096-byte MP3 probe window from recursive stack to bounded RAII heap allocation, with a safe unknown-duration fallback on allocation failure. Exact crash ELF showed 4416-byte recursive frames on an 8192-byte loop stack; final S3/classic frames are 352 bytes. Added UART boot stages and stack low-water reporting after indexing. Both profiles rebuilt; real boot remains UNVERIFIED. Details: `../MonoPod_Desktop/docs/BOOT_REGRESSION_RU.md`.
+--- v0.9.1.1/DIY_iPod_Mono/Display.cpp
++++ v0.10.0/DIY_iPod_Mono/Display.cpp
+@@ -36,6 +36,7 @@
+   default:bg=0xbdf7;fg=0;hi=0x18a3;low=0x7390;break;
+   }
+ }
++uint16_t Display::themed(uint8_t i,uint16_t fallback)const{return theme.active()?theme.color(i):fallback;}
+ void Display::clear(){surface().fillRect(OX,OY,160,128,bg);}
+ void Display::startFrame(){inFrame=(buffer && buffer->getBuffer());}
+ void Display::endFrame(){
+@@ -133,7 +134,7 @@
+   if(bars>3)bars=3;
+   for(uint8_t i=0;i<bars;i++){
+     const int height=3+3*i;
+-    surface().fillRect(OX+3+5*i,OY+15-height,3,height,fg);
++    surface().fillRect(OX+3+5*i,OY+15-height,3,height,themed(9,fg));
+   }
+ }
+ String Display::fittedTitle(const String& title, int width) const {
+@@ -161,32 +162,32 @@
+   const String fitted=fittedTitle(title,94);
+   const int w=textWidth(fitted,false);
+   const int x=(160-w)/2;
+-  drawString(x,3,fitted,fg,bg,false,0,134);
++  drawString(x,3,fitted,themed(8,fg),bg,false,0,134);
+   batteryIcon();
+-  surface().drawFastHLine(OX,OY+19,160,fg);
++  surface().drawFastHLine(OX,OY+19,160,themed(11,fg));
+ }
+ void Display::footer(const String& s){
+   if(s.isEmpty())return;
+-  surface().drawFastHLine(OX,OY+114,160,fg);
++  surface().drawFastHLine(OX,OY+114,160,themed(11,fg));
+   surface().fillRect(OX,OY+115,160,13,bg);
+   smallText(5,115,s,fg,bg);
+ }
+ void Display::listRow(uint8_t row,const String& s,bool selected,bool submenu){
+   if(row>=ROW_COUNT)return;
+   int y=21+row*18;
+-  uint16_t back=selected?hi:bg,front=selected?bg:fg;
++  uint16_t back=selected?hi:bg,front=selected?themed(4,bg):fg;
+   surface().fillRect(OX+2,OY+y,156,18,back);
+   const int maxWidth=submenu?137:149;
+   String rendered=s;
+   if(textWidth(rendered)>maxWidth)rendered=fittedTitle(rendered,maxWidth);
+   text(6,y+1,rendered,front,back);
+-  if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,front);}
++  if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,themed(selected?6:5,front));}
+ }
+ void Display::progress(int x,int y,int w,int percent){
+   percent=constrain(percent,0,100);
+-  surface().drawRect(OX+x,OY+y,w,8,fg);
++  surface().drawRect(OX+x,OY+y,w,8,themed(11,fg));
+   surface().fillRect(OX+x+2,OY+y+2,w-4,4,bg);
+-  if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,fg);
++  if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,themed(10,fg));
+ }
+ void Display::syncScreen(bool wifi,bool transferring,const String& address){
+   clear();
+@@ -194,23 +195,23 @@
+   const int cx=80;
+   if(wifi){
+     // Three circular Wi-Fi arcs (show upper half only), plus center dot.
+-    for(int r=23;r>=9;r-=7)surface().drawCircle(OX+cx,OY+37,r,fg);
++    for(int r=23;r>=9;r-=7)surface().drawCircle(OX+cx,OY+37,r,themed(5,fg));
+     surface().fillRect(OX+51,OY+38,58,30,bg);
+-    surface().fillCircle(OX+cx,OY+38,3,fg);
++    surface().fillCircle(OX+cx,OY+38,3,themed(5,fg));
+   }else{
+     // USB trident icon: stem, square/circle/triangle tips.
+-    surface().drawLine(OX+cx,OY+41,OX+cx,OY+13,fg);
+-    surface().drawLine(OX+cx,OY+24,OX+65,OY+24,fg);
+-    surface().drawLine(OX+65,OY+24,OX+65,OY+17,fg);
+-    surface().fillRect(OX+62,OY+12,7,7,fg);
+-    surface().drawLine(OX+cx,OY+32,OX+95,OY+32,fg);
+-    surface().drawLine(OX+95,OY+32,OX+95,OY+23,fg);
+-    surface().fillCircle(OX+95,OY+22,4,fg);
+-    surface().fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,fg);
+-    surface().fillCircle(OX+cx,OY+41,3,fg);
++    surface().drawLine(OX+cx,OY+41,OX+cx,OY+13,themed(5,fg));
++    surface().drawLine(OX+cx,OY+24,OX+65,OY+24,themed(5,fg));
++    surface().drawLine(OX+65,OY+24,OX+65,OY+17,themed(5,fg));
++    surface().fillRect(OX+62,OY+12,7,7,themed(5,fg));
++    surface().drawLine(OX+cx,OY+32,OX+95,OY+32,themed(5,fg));
++    surface().drawLine(OX+95,OY+32,OX+95,OY+23,themed(5,fg));
++    surface().fillCircle(OX+95,OY+22,4,themed(5,fg));
++    surface().fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,themed(5,fg));
++    surface().fillCircle(OX+cx,OY+41,3,themed(5,fg));
+   }
+   // Adafruit 5x7 bitmap scaled to ~18x24. Duplicate by 1px for boldness.
+-  surface().setTextSize(3);surface().setTextColor(fg);
++  surface().setTextSize(3);surface().setTextColor(themed(7,fg));
+   surface().setCursor(OX+44,OY+49);surface().print("SYNC");
+   surface().setCursor(OX+45,OY+49);surface().print("SYNC");
+   surface().setTextSize(1);
+@@ -236,14 +237,14 @@
+ void Display::batteryIcon(){
+   const int bx=136,by=6;
+   surface().fillRect(OX+bx,OY+by,22,10,bg);
+-  surface().drawRect(OX+bx,OY+by,19,9,fg);
+-  surface().fillRect(OX+bx+19,OY+by+3,2,3,fg);
++  surface().drawRect(OX+bx,OY+by,19,9,themed(9,fg));
++  surface().fillRect(OX+bx+19,OY+by+3,2,3,themed(9,fg));
+   int b=batteryBand();
+   if(b==255){
+-    surface().fillRect(OX+bx+8,OY+by+2,2,3,fg);
+-    surface().drawPixel(OX+bx+8,OY+by+6,fg);
++    surface().fillRect(OX+bx+8,OY+by+2,2,3,themed(9,fg));
++    surface().drawPixel(OX+bx+8,OY+by+6,themed(9,fg));
+   }else if(b){
+-    surface().fillRect(OX+bx+2,OY+by+2,(15*b)/4,5,fg);
++    surface().fillRect(OX+bx+2,OY+by+2,(15*b)/4,5,themed(9,fg));
+   }
+ }
+ void Display::nowPlaying(const String& title,const String& artist,const String& album,bool paused,uint32_t trackNumber,uint32_t trackCount){
+@@ -256,7 +257,7 @@
+ void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration){
+   // Update only the bottom region; never erase the header and metadata lines.
+   surface().fillRect(OX,OY+96,160,32,bg);
+-  surface().drawRoundRect(OX+13,OY+96,134,10,5,fg);
++  surface().drawRoundRect(OX+13,OY+96,134,10,5,themed(11,fg));
+   const int percent=mode==1?volume:mode==2?scrub:progress;
+   if(mode==2){
+     int px=16+125*constrain(percent,0,100)/100;
+@@ -267,7 +268,7 @@
+       String right="-"+timeLabel(total-at);smallText(154-textWidth(right,true),112,right,fg,bg);
+     }
+   }else if(mode==1){
+-    surface().fillRect(OX+15,OY+99,129*constrain(percent,0,100)/100,4,fg);
++    surface().fillRect(OX+15,OY+99,129*constrain(percent,0,100)/100,4,themed(7,fg));
+     // Small / big speaker pictograms as on the iPod volume overlay.
+     surface().fillRect(OX+10,OY+114,3,6,fg);
+     surface().fillTriangle(OX+13,OY+113,OX+17,OY+110,OX+17,OY+123,fg);
+@@ -275,7 +276,7 @@
+     surface().fillTriangle(OX+143,OY+113,OX+148,OY+110,OX+148,OY+123,fg);
+     smallText(69,112,String(volume)+"%",fg,bg);
+   }else{
+-    surface().fillRoundRect(OX+15,OY+98,129*constrain(percent,0,100)/100,6,3,fg);
++    surface().fillRoundRect(OX+15,OY+98,129*constrain(percent,0,100)/100,6,3,themed(10,fg));
+     smallText(6,112,timeLabel(elapsed),fg,bg);
+     String right=knownDuration?"-"+timeLabel(remaining):"--:--";
+     const int w=textWidth(right,true);
+--- v0.9.1.1/DIY_iPod_Mono/Display.h
++++ v0.10.0/DIY_iPod_Mono/Display.h
+@@ -38,6 +38,7 @@
+   void bootLogo();
+   bool streamMonoFrame(const uint8_t* packed, uint16_t white=0xffff, uint16_t black=0x0000);
+   bool streamGray2Frame(const uint8_t* packed,const uint16_t colors[4]);
++  uint16_t themed(uint8_t index,uint16_t fallback)const;
+   uint16_t background()const{return bg;}
+   uint16_t foreground()const{return fg;}
+   uint16_t selectedBackground()const{return hi;}
+--- v0.9.1.1/DIY_iPod_Mono/DIY_iPod_Mono.ino
++++ v0.10.0/DIY_iPod_Mono/DIY_iPod_Mono.ino
+@@ -17,6 +17,7 @@
+ #include "ClockService.h"
+ #include "UsbSync.h"
+ #include "SyncMode.h"
++#include "SyncFiles.h"
+ #include "IpodIdentity.h"
+ #include "Feedback.h"
+ #include "Battery.h"
+@@ -30,7 +31,7 @@
+   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
+ #endif
+   delay(200);
+-  MONOPOD_LOG.printf("\nMonoPod v0.9.1.1 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
++  MONOPOD_LOG.printf("\nMonoPod v0.10.0 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+ #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
+     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
+@@ -46,7 +47,15 @@
+   // Each SPI peripheral MUST have its own CS; both high when idle.
+   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
+   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
++  MONOPOD_LOG.println("Boot: SD mount and library scan");
+   const bool sdMounted=media.begin(); // IMPORTANT: initialize SD SPI mode BEFORE first TFT transaction
++  const bool recoveryNeeded=sdMounted && (SD.exists("/.monopod-transfer.target") || SD.exists("/Music/.monopod-target.txt") || SD.exists("/Music/.monopod-wifi.target"));
++  SyncFiles::recover();
++  if(recoveryNeeded)media.rescan(); // restored files must be present in the initial player index
++#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
++  MONOPOD_LOG.printf("Boot: index complete; loop stack low-water=%u B\n",(unsigned)uxTaskGetStackHighWaterMark(nullptr));
++#endif
++  MONOPOD_LOG.println("Boot: TFT");
+   display.begin();
+   if(!sdMounted)MONOPOD_LOG.println("SD: "+media.lastError());
+   else {MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
+@@ -58,6 +67,7 @@
+   input.begin();
+   feedback.begin();
+ #if FEATURE_AUDIO
++  MONOPOD_LOG.println("Boot: audio");
+   if(!player.begin())MONOPOD_LOG.println("Audio: init failed");
+ #endif
+   clockService.begin();
+@@ -65,6 +75,7 @@
+   MONOPOD_LOG.printf("MonoPod device GUID=%s (%s)\n",IpodIdentity::guid(),IpodIdentity::fromEfuse()?"eFuse MAC":"NVS fallback");
+   usbSync.begin();
+   randomSeed(esp_random());
++  MONOPOD_LOG.println("Boot: Wi-Fi and UI");
+   wifiNetworks.begin(); // restore last successful Wi-Fi connection from NVS at boot
+   ui.begin();
+   if(!media.sdOK())ui.notify("No microSD card");
+--- v0.9.1.1/DIY_iPod_Mono/Library.cpp
++++ v0.10.0/DIY_iPod_Mono/Library.cpp
+@@ -3,6 +3,8 @@
+ #include <SPI.h>
+ #include <algorithm>
+ #include <cstring>
++#include <memory>
++#include <new>
+ #if FEATURE_SD_FORMAT
+ #define DISABLE_FS_H_WARNING
+ #include <SdFat.h>
+@@ -37,7 +39,14 @@
+   }
+   if(start>=f.size()){f.close();return 0;}
+   f.seek(start);
+-  uint8_t b[4096];int n=f.read(b,sizeof(b));
++  // This probe is inlined into recursive scanFolder by -Os. A 4 KiB local
++  // array made EACH recursive frame 4416 bytes and overflowed loopTask's
++  // 8192-byte stack before TFT initialization. Keep the bounded window on
++  // the heap; allocation failure leaves duration unknown without failing boot.
++  constexpr size_t probeBytes=4096;
++  std::unique_ptr<uint8_t[]> b(new(std::nothrow) uint8_t[probeBytes]);
++  if(!b){f.close();return 0;}
++  int n=f.read(b.get(),probeBytes);
+   uint32_t secs=0;
+   for(int i=0;i+4<n;i++){
+     if(b[i]!=0xff || (b[i+1]&0xe0)!=0xe0)continue;
+@@ -55,9 +64,9 @@
+     const int mono=((b[i+3]>>6)&3)==3;
+     const int side=(version==3?(mono?17:32):(mono?9:17));
+     const int off=i+4+((b[i+1]&1)?0:2)+side;
+-    if(off+12<n && (memcmp(b+off,"Xing",4)==0 || memcmp(b+off,"Info",4)==0)){
+-      const uint32_t flags=bigEndian4(b+off+4);
+-      if(flags&1){const uint32_t frames=bigEndian4(b+off+8);
++    if(off+12<n && (memcmp(b.get()+off,"Xing",4)==0 || memcmp(b.get()+off,"Info",4)==0)){
++      const uint32_t flags=bigEndian4(b.get()+off+4);
++      if(flags&1){const uint32_t frames=bigEndian4(b.get()+off+8);
+         if(frames)secs=(uint32_t)(((uint64_t)frames*samplesPerFrame+sampleRate/2)/sampleRate);
+       }
+     }
+--- v0.9.1.1/DIY_iPod_Mono/SyncFiles.cpp
++++ v0.10.0/DIY_iPod_Mono/SyncFiles.cpp
+@@ -0,0 +1,116 @@
++#include "SyncFiles.h"
++#include "Library.h"
++#include "Theme.h"
++#include "Display.h"
++#include "Settings.h"
++#include <WiFi.h>
++namespace SyncFiles {
++String error;
++namespace {
++const char* PART="/.monopod-transfer.part";
++const char* BACKUP="/.monopod-transfer.bak";
++const char* JOURNAL="/.monopod-transfer.target";
++File output;String target;uint32_t expected=0,checksum=0,received=0,runningCRC=~0u,lastWrite=0;
++bool active=false,isTheme=false,unknownLength=false;
++bool fail(const char* text){error=text;return false;}
++bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes";}
++String number(uint64_t n){char buf[24];snprintf(buf,sizeof(buf),"%llu",(unsigned long long)n);return String(buf);}
++String entry(File& f,const String& path){return "{\"name\":"+quote(path.substring(path.lastIndexOf('/')+1))+",\"path\":"+quote(path)+",\"directory\":"+(f.isDirectory()?"true":"false")+",\"size\":"+number(f.size())+",\"modified\":"+number(f.getLastWrite())+"}";}
++}
++uint32_t crcStep(uint32_t c,const uint8_t* b,size_t n){for(size_t i=0;i<n;i++){c^=b[i];for(uint8_t j=0;j<8;j++)c=(c>>1)^((c&1)?0xedb88320UL:0);}return c;}
++String quote(const String& s){String out="\"";for(size_t i=0;i<s.length();i++){uint8_t c=s[i];if(c=='"'||c=='\\'){out+='\\';out+=(char)c;}else if(c<32){char h[7];snprintf(h,sizeof(h),"\\u%04x",c);out+=h;}else out+=(char)c;}return out+'"';}
++bool canonical(const String& in,String& out,bool theme){
++ out="";if(in.isEmpty()||in[0]!='/'||in.length()>240)return fail("INVALID_PATH");
++ int start=1;out="/";
++ while(start<(int)in.length()){
++  int end=in.indexOf('/',start);if(end<0)end=in.length();String part=in.substring(start,end);start=end+1;
++  if(part.isEmpty())continue;
++  if(part=="."||part==".."||part[0]=='.'||part.endsWith(".")||part.endsWith(" ")||part.length()>90)return fail("INVALID_PATH");
++  for(size_t i=0;i<part.length();i++){uint8_t c=part[i];if(c<32||c==127||strchr("\\:<>\"|*?",c))return fail("INVALID_PATH");}
++  if(out.length()>1)out+='/';out+=part;
++ }
++ String low=out;low.toLowerCase();
++ if(theme && low=="/monopod/theme.mpt")return true;
++ if(low=="/monopod"||low.startsWith("/monopod/")||low=="/ipod_control"||low.startsWith("/ipod_control/")||low.startsWith("/system volume information")||low.startsWith("/$recycle.bin")||low.startsWith("/recycler"))return fail("PROTECTED_PATH");
++ return true;
++}
++String fromHex(const String& s){if(s.length()%2||s.length()>480)return "";String out;for(size_t i=0;i<s.length();i+=2){char a=s[i],b=s[i+1];auto digit=[](char c)->int {if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;if(c>='A'&&c<='F')return c-'A'+10;return -1;};int x=digit(a),y=digit(b);if(x<0||y<0||!(x*16+y))return "";out+=(char)(x*16+y);}return out;}
++bool gate(SyncTransport who){error="";if(!media.sdOK())return fail("NO_SD");if(!syncMode.canWrite(who))return fail("SYNC_REQUIRED");return true;}
++String info(){
++ String mode=syncMode.is(SyncTransport::UsbCdc)?"usb":syncMode.is(SyncTransport::WiFi)?"wifi":"none";
++ uint64_t total=media.sdOK()?media.totalBytes():0,used=media.sdOK()?media.usedBytes():0;
++ String formats="[\".mp3\",\".wav\"";
++#if FEATURE_FLAC
++ formats+=",\".flac\"";
++#endif
++#if FEATURE_AAC
++ formats+=",\".aac\"";
++#endif
++ formats+="]";
++ return "{\"firmware\":\"0.10.0\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"audio_formats\":"+formats+",\"capabilities\":[\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\"]}";
++}
++String stat(const String& path,SyncTransport who){String p;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return "";File f=SD.open(p.c_str());if(!f){fail("NOT_FOUND");return "";}String result=entry(f,p);f.close();return result;}
++String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who){
++ String p;if(!gate(who)||!canonical(path,p))return "";if(!limit||limit>32){fail("INVALID_LIMIT");return "";}File d=SD.open(p.c_str());if(!d||!d.isDirectory()){if(d)d.close();fail("NOT_DIRECTORY");return "";}
++ String result="{\"entries\":[";uint32_t seen=0;uint16_t count=0;bool more=false;
++ File f=d.openNextFile();while(f){String name=f.name();name=name.substring(name.lastIndexOf('/')+1);String full=(p=="/"?"/":p+"/")+name,checked;
++  if(canonical(full,checked)){if(seen++>=offset){if(count==limit){more=true;f.close();break;}if(count++)result+=',';result+=entry(f,full);}}
++  f.close();f=d.openNextFile();yield();
++ }d.close();error="";result+="],\"next\":";result+=more?String(offset+count):String("-1");return result+"}";
++}
++bool read(const String& path,uint32_t offset,uint8_t* buffer,size_t count,size_t& got,SyncTransport who){String p;got=0;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return false;if(count>65536)return fail("INVALID_COUNT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()||offset>f.size()){f.close();return fail("INVALID_RANGE");}if(offset==f.size()){f.close();return true;}if(!f.seek(offset)){f.close();return fail("SEEK_FAILED");}size_t n=min(count,(size_t)(f.size()-offset));int actual=f.read(buffer,n);f.close();if(actual<0||(size_t)actual!=n)return fail("SD_READ");got=n;return true;}
++bool mkdir(const String& path,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(SD.exists(p.c_str()))return fail("ALREADY_EXISTS");return SD.mkdir(p.c_str())||fail("MKDIR_FAILED");}
++bool remove(const String& path,bool directory,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(protectedRoot(p))return fail("PROTECTED_ROOT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()!=directory){f.close();return fail("WRONG_TYPE");}if(directory){File child=f.openNextFile();if(child){child.close();f.close();return fail("DIRECTORY_NOT_EMPTY");}}f.close();return (directory?SD.rmdir(p.c_str()):SD.remove(p.c_str()))||fail("DELETE_FAILED");}
++bool rename(const String& path,const String& dest,SyncTransport who){String p,q;if(!gate(who)||active||!canonical(path,p)||!canonical(dest,q))return false;if(protectedRoot(p)||protectedRoot(q))return fail("PROTECTED_ROOT");if(SD.exists(q.c_str()))return fail("ALREADY_EXISTS");if(!SD.exists(p.c_str()))return fail("NOT_FOUND");if(q.startsWith(p+"/"))return fail("INVALID_PATH");return SD.rename(p.c_str(),q.c_str())||fail("RENAME_FAILED");}
++void recover(){
++ if(!media.sdOK()||active)return;
++
++ const char* oldJournals[]={"/Music/.monopod-target.txt","/Music/.monopod-wifi.target"};
++ const char* oldBackups[]={"/Music/.monopod-previous.bak","/Music/.monopod-wifi.bak"};
++ for(int i=0;i<2;i++)if(SD.exists(oldJournals[i])){File j=SD.open(oldJournals[i]);String name=j?j.readStringUntil('\n'):String();if(j)j.close();name.trim();String dest="/Music/"+name,checked;
++  if(name.indexOf('/')<0&&canonical(dest,checked)){if(SD.exists(oldBackups[i])){if(SD.exists(dest.c_str()))SD.remove(oldBackups[i]);else SD.rename(oldBackups[i],dest.c_str());}if(!SD.exists(oldBackups[i]))SD.remove(oldJournals[i]);}
++ }
++ if(SD.exists("/MonoPod/theme.bak")&&!SD.exists("/MonoPod/theme.mpt"))SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
++ SD.remove("/Music/.monopod-upload.part");SD.remove("/Music/.monopod-wifi.part");
++ if(SD.exists(JOURNAL)){File j=SD.open(JOURNAL);String p=j?j.readStringUntil('\n'):String();if(j)j.close();p.trim();String checked;if(!canonical(p,checked,p=="/MonoPod/theme.mpt"))return;
++  if(SD.exists(BACKUP)){if(SD.exists(p.c_str())){if(!SD.remove(BACKUP))return;}else if(!SD.rename(BACKUP,p.c_str()))return;}
++  if(!SD.exists(BACKUP))SD.remove(JOURNAL);
++ }
++ SD.remove(PART);
++}
++bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who,bool legacy){
++ if(!gate(who))return false;if(active)return fail("TRANSFER_ACTIVE");String p;if(!canonical(path,p,theme))return false;
++ if(theme && p!="/MonoPod/theme.mpt")return fail("INVALID_THEME_PATH");if(p=="/"||size>1073741824UL|| (theme&&size>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
++ recover();if(SD.exists(BACKUP)||SD.exists(JOURNAL))return fail("RECOVERY_PENDING");
++ if(SD.exists(p.c_str())){File f=SD.open(p.c_str());bool dir=f&&f.isDirectory();if(f)f.close();if(dir)return fail("IS_DIRECTORY");if(!replace)return fail("ALREADY_EXISTS");}
++ uint64_t total=media.totalBytes(),used=media.usedBytes();if(total<used||total-used<(uint64_t)size+4096)return fail("NO_SPACE");
++ int slash=p.lastIndexOf('/');String parent=slash>0?p.substring(0,slash):"/";
++ if(theme && !SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
++ if(!SD.exists(parent.c_str()))return fail("PARENT_NOT_FOUND");
++ SD.remove(PART);output=SD.open(PART,FILE_WRITE);if(!output)return fail("OPEN_FAILED");
++ target=p;expected=size;checksum=crc;received=0;runningCRC=~0u;active=true;isTheme=theme;unknownLength=legacy;lastWrite=millis();return true;
++}
++bool write(const uint8_t* data,size_t n){if(!active)return fail("NO_TRANSFER");if(n>1073741824UL-received||(!unknownLength && n>expected-received)|| (isTheme && received+n>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
++ if(unknownLength && media.totalBytes()-media.usedBytes()<n+4096)return fail("NO_SPACE");
++ if(output.write(data,n)!=n)return fail("SD_WRITE");runningCRC=crcStep(runningCRC,data,n);received+=n;lastWrite=millis();return true;}
++void abort(){if(output)output.close();if(active)SD.remove(PART);active=false;target="";}
++bool busy(){return active;}
++void tick(){if(active && (uint32_t)(millis()-lastWrite)>15000){abort();error="TIMEOUT";}}
++bool commit(){
++ if(!active)return fail("NO_TRANSFER");output.flush();output.close();
++ File verified=SD.open(PART,FILE_READ);bool validSize=verified && verified.size()==received;if(verified)verified.close();if(!validSize){abort();return fail("SD_SIZE_MISMATCH");}
++ if(!unknownLength && (received!=expected || ~runningCRC!=checksum)){abort();return fail("SIZE_OR_CRC_MISMATCH");}
++ if(isTheme&&!ThemeManager::validate(PART)){abort();return fail("INVALID_THEME_OR_CRC");}
++ String dest=target;bool old=SD.exists(dest.c_str()),installTheme=isTheme;
++ File j=SD.open(JOURNAL,FILE_WRITE);if(!j){abort();return fail("JOURNAL_WRITE");}j.println(dest);j.flush();j.close();
++ if(old&&!SD.rename(dest.c_str(),BACKUP)){SD.remove(JOURNAL);abort();return fail("BACKUP_RENAME");}
++ if(!SD.rename(PART,dest.c_str())){if(old)SD.rename(BACKUP,dest.c_str());if(!SD.exists(BACKUP))SD.remove(JOURNAL);abort();return fail("COMMIT_FAILED");}
++ active=false;target="";
++ if(installTheme&&!display.reloadTheme()){
++  SD.remove(dest.c_str());if(old)SD.rename(BACKUP,dest.c_str());display.reloadTheme();if(!SD.exists(BACKUP))SD.remove(JOURNAL);return fail("THEME_ACTIVATION_FAILED");
++ }
++ if(old&&!SD.remove(BACKUP))return fail("BACKUP_CLEANUP_PENDING");
++ if(!SD.remove(JOURNAL))return fail("JOURNAL_CLEANUP_PENDING");return true;
++}
++}
++
+--- v0.9.1.1/DIY_iPod_Mono/SyncFiles.h
++++ v0.10.0/DIY_iPod_Mono/SyncFiles.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include "Config.h"
++#include "SyncMode.h"
++#include <SD.h>
++namespace SyncFiles {
++extern String error;
++bool canonical(const String& input,String& output,bool theme=false);
++String fromHex(const String& hex);
++String quote(const String& s);
++String info();
++String stat(const String& path,SyncTransport who);
++String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who);
++bool gate(SyncTransport who);
++bool read(const String& path,uint32_t offset,uint8_t* buffer,size_t count,size_t& got,SyncTransport who);
++bool mkdir(const String& path,SyncTransport who);
++bool remove(const String& path,bool directory,SyncTransport who);
++bool rename(const String& path,const String& dest,SyncTransport who);
++void recover();
++bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who,bool legacy=false);
++bool write(const uint8_t* data,size_t count);
++bool commit();
++void abort();
++bool busy();
++void tick();
++uint32_t crcStep(uint32_t crc,const uint8_t* data,size_t count);
++}
+--- v0.9.1.1/DIY_iPod_Mono/SyncMode.cpp
++++ v0.10.0/DIY_iPod_Mono/SyncMode.cpp
+@@ -3,6 +3,7 @@
+ #include "AudioEngine.h"
+ #include "Feedback.h"
+ #include "UI.h"
++#include "SyncFiles.h"
+ SyncController syncMode;
+ bool SyncController::enter(SyncTransport wanted) {
+   if(wanted==SyncTransport::None || !media.sdOK()) return false;
+@@ -14,6 +15,7 @@
+   return true;
+ }
+ bool SyncController::leave(SyncTransport expected) {
++  if(SyncFiles::busy())return false;
+   if(current!=expected || expected==SyncTransport::None) return false;
+   current=SyncTransport::None;
+   ui.redraw();
+--- v0.9.1.1/DIY_iPod_Mono/Theme.cpp
++++ v0.10.0/DIY_iPod_Mono/Theme.cpp
+@@ -20,14 +20,16 @@
+   File f=SD.open(path,FILE_READ);
+   if(!f)return false;
+   const size_t fileSize=f.size();
+-  if(fileSize<28 || fileSize>MAX_BYTES+28){f.close();return false;}
+-  uint8_t h[28];
+-  if(f.read(h,sizeof(h))!=sizeof(h) || memcmp(h,"MPT1",4)!=0 || h[4]!=1 || h[5]!=1){f.close();return false;}
+-  const uint8_t bh=h[6],sh=h[7];
+-  const uint16_t bc=rd16(h+8),sc=rd16(h+10);
+-  if(bh<8||bh>24||sh<8||sh>24||bc>256||sc>256||bc==0||sc==0){f.close();return false;}
+-  const uint32_t size=rd32(h+20),checksum=rd32(h+24);
+-  if(size!=fileSize-28 || size>MAX_BYTES){f.close();return false;}
++  if(fileSize<28 || fileSize>MAX_BYTES+44){f.close();return false;}
++  uint8_t h[44]={};
++  if(f.read(h,28)!=28){f.close();return false;}
++  bool v2=memcmp(h,"MPT2",4)==0 && h[4]==2;
++  if((!v2 && (memcmp(h,"MPT1",4)!=0||h[4]!=1))||h[5]!=1){f.close();return false;}
++  size_t header=v2?44:28;if(v2&&f.read(h+28,16)!=16){f.close();return false;}
++  const uint8_t bh=h[6],sh=h[7];const uint16_t bc=rd16(h+8),sc=rd16(h+10);
++  if(bh!=16||sh!=12||bc>256||sc>256||!bc||!sc){f.close();return false;}
++  const uint32_t size=rd32(h+header-8),checksum=rd32(h+header-4);
++  if(size!=fileSize-header||size>MAX_BYTES){f.close();return false;}
+   uint8_t *raw=(uint8_t*)heap_caps_malloc(size,MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);
+   if(!raw)raw=(uint8_t*)malloc(size);
+   if(!raw){f.close();return false;}
+@@ -47,7 +49,7 @@
+       if(pos+7>size){free(raw);free(decoded);return false;}
+       const uint32_t cp=rd32(raw+pos);
+       const uint8_t width=raw[pos+4],advance=raw[pos+5],reserved=raw[pos+6];pos+=7;
+-      if((i&&cp<=prior)||!width||width>24||!advance||advance>32||reserved){free(raw);free(decoded);return false;}
++      if(cp>0x10ffff || (cp>=0xd800&&cp<=0xdfff) || (i&&cp<=prior)||!width||width>24||!advance||advance>32||reserved){free(raw);free(decoded);return false;}
+       const size_t pixelBytes=((size_t)width*height+1)/2;
+       if(pos+pixelBytes>size){free(raw);free(decoded);return false;}
+       dest[i]={cp,(uint32_t)pos,width,advance};pos+=pixelBytes;prior=cp;
+@@ -58,6 +60,9 @@
+   unload();bytes=raw;length=size;bigCount=bc;smallCount=sc;bigHeight=bh;smallHeight=sh;
+   memcpy(big,newBig,bc*sizeof(Glyph));memcpy(tiny,newSmall,sc*sizeof(Glyph));free(decoded);
+   for(int i=0;i<4;i++)colors[i]=rd16(h+12+i*2);
++  colors[4]=colors[0]; // MPT1 inheritance: selected foreground
++  colors[5]=colors[6]=colors[7]=colors[8]=colors[9]=colors[10]=colors[11]=colors[1];
++  if(v2)for(int i=4;i<12;i++)colors[i]=rd16(h+12+i*2);
+   return true;
+ }
+ bool ThemeManager::glyph(uint32_t cp,bool small,Glyph& out) const {
+@@ -73,3 +78,19 @@
+   const uint32_t p=(uint32_t)y*g.width+x;
+   const uint8_t b=bytes[g.offset+p/2];return (p&1)?(b&15):(b>>4);
+ }
++
++bool ThemeManager::validate(const char* path){
++ File f=SD.open(path,FILE_READ);if(!f)return false;size_t length=f.size();uint8_t h[44]={};
++ if(length<28||length>MAX_BYTES+44||f.read(h,28)!=28){f.close();return false;}
++ bool v2=!memcmp(h,"MPT2",4)&&h[4]==2;size_t header=v2?44:28;
++ if((!v2&&(memcmp(h,"MPT1",4)||h[4]!=1))||h[5]!=1||h[6]!=16||h[7]!=12||(v2&&f.read(h+28,16)!=16)){f.close();return false;}
++ uint16_t bc=rd16(h+8),sc=rd16(h+10);uint32_t size=rd32(h+header-8),expected=rd32(h+header-4);
++ if(!bc||!sc||bc>256||sc>256||length!=header+size||size>MAX_BYTES){f.close();return false;}
++ uint8_t buffer[512];uint32_t crc=~0u;size_t left=size;
++ while(left){size_t n=min(left,sizeof(buffer));if(f.read(buffer,n)!=n){f.close();return false;}for(size_t i=0;i<n;i++){crc^=buffer[i];for(int j=0;j<8;j++)crc=(crc>>1)^((crc&1)?0xedb88320UL:0);}left-=n;}
++ if(~crc!=expected||!f.seek(header)){f.close();return false;}
++ size_t pos=0;for(int table=0;table<2;table++){uint32_t prior=0;for(uint16_t i=0;i<(table?sc:bc);i++){
++  uint8_t g[7];if(pos+7>size||f.read(g,7)!=7){f.close();return false;}pos+=7;uint32_t cp=rd32(g);size_t pixels=((size_t)g[4]*(table?12:16)+1)/2;
++  if(cp>0x10ffff||(cp>=0xd800&&cp<=0xdfff)||(i&&cp<=prior)||!g[4]||g[4]>24||!g[5]||g[5]>32||g[6]||pixels>size-pos){f.close();return false;}pos+=pixels;prior=cp;if(!f.seek(header+pos)){f.close();return false;}
++ }}f.close();return pos==size;
++}
+--- v0.9.1.1/DIY_iPod_Mono/Theme.h
++++ v0.10.0/DIY_iPod_Mono/Theme.h
+@@ -8,12 +8,13 @@
+   struct Glyph {uint32_t codepoint; uint32_t offset; uint8_t width; uint8_t advance;};
+   ThemeManager() = default;
+   ~ThemeManager();
++  static bool validate(const char* path);
+   bool reload(const char* path="/MonoPod/theme.mpt");
+   void unload();
+   bool active() const {return bytes != nullptr;}
+   bool glyph(uint32_t codepoint,bool small,Glyph& out) const;
+   uint8_t alpha(const Glyph& g, bool small, uint8_t x, uint8_t y) const;
+-  uint16_t color(uint8_t index) const{return colors[index&3];}
++  uint16_t color(uint8_t index) const{return colors[index<12?index:1];}
+   static constexpr uint32_t MAX_BYTES = 131072;
+ private:
+   uint8_t *bytes=nullptr;
+@@ -21,6 +22,6 @@
+   Glyph big[256]={},tiny[256]={};
+   uint16_t bigCount=0,smallCount=0;
+   uint8_t bigHeight=16,smallHeight=12;
+-  uint16_t colors[4]={0xce59,0x2104,0x2945,0x8c71};
++  uint16_t colors[12]={0xce59,0x2104,0x2945,0x8c71};
+ };
+ extern ThemeManager theme;
+--- v0.9.1.1/DIY_iPod_Mono/UI.cpp
++++ v0.10.0/DIY_iPod_Mono/UI.cpp
+@@ -688,7 +688,7 @@
+         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
+         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
+           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
+-        case 3:value="0.9.1.1";break;
++        case 3:value="0.10.0";break;
+         case 4:value=String(IpodIdentity::guid());break;
+         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
+         }
+--- v0.9.1.1/DIY_iPod_Mono/UsbSync.cpp
++++ v0.10.0/DIY_iPod_Mono/UsbSync.cpp
+@@ -1,236 +1,66 @@
+ #include "UsbSync.h"
++#include "SyncFiles.h"
+ #include "Library.h"
+-#include "AudioEngine.h"
++#include "UI.h"
++#include "Settings.h"
++#include "IpodIdentity.h"
+ #include "WiFiSync.h"
+-#include "UI.h"
+-#include "IpodIdentity.h"
+-#include "SyncMode.h"
+-#include <stdlib.h>
+-#include <ctype.h>
+-
++#include <errno.h>
+ UsbSyncService usbSync;
+ #if FEATURE_USB_SYNC
+ namespace {
+-constexpr uint32_t MAX_FILE_BYTES=1024UL*1024UL*1024UL;
+-constexpr uint16_t CHUNK_BYTES=1024;
+-constexpr uint32_t RECEIVE_TIMEOUT_MS=15000;
+-constexpr char PART_PATH[]="/Music/.monopod-upload.part";
+-constexpr char BACKUP_PATH[]="/Music/.monopod-previous.bak";
+-constexpr char JOURNAL_PATH[]="/Music/.monopod-target.txt";
+-
+-uint32_t crc32Step(uint32_t crc, uint8_t byte) {
+-  crc^=byte;
+-  for(uint8_t i=0;i<8;i++) crc=(crc>>1)^((crc&1)?0xEDB88320UL:0);
+-  return crc;
++bool uintArg(const String& s,uint32_t& v,int base=10){if(s.isEmpty()||s.length()>10)return false;for(size_t i=0;i<s.length();i++)if(base==10? !isdigit((unsigned char)s[i]):!isxdigit((unsigned char)s[i]))return false;errno=0;char* end;unsigned long n=strtoul(s.c_str(),&end,base);if(errno||*end)return false;v=n;return true;}
++String token(const String& s,int& i){if(i>=(int)s.length())return "";int end=s.indexOf(' ',i);if(end<0)end=s.length();String t=s.substring(i,end);i=end+1;return t;}
+ }
+-bool parseUint(const String& s, uint32_t& output, int base) {
+-  if(s.isEmpty())return false;
+-  for(unsigned i=0;i<s.length();i++){
+-    const char c=s[i];
+-    if(base==10 && (c<'0'||c>'9'))return false;
+-    if(base==16 && !isxdigit((unsigned char)c))return false;
++void UsbSyncService::begin(){line.reserve(700);SyncFiles::recover();}
++void UsbSyncService::reply(const String& s){Serial.print("MPOD1 ");Serial.println(s);}
++void UsbSyncService::fail(const char* why){SyncFiles::abort();sending=false;buffered=chunkRemaining=0;line="";discard=true;quietUntil=millis()+1500;reply(String("ERR ")+why);}
++void UsbSyncService::finish(){if(buffered&&!SyncFiles::write(buffer,buffered)){fail(SyncFiles::error.c_str());return;}buffered=0;sending=false;if(!SyncFiles::commit()){String error=SyncFiles::error;SyncFiles::abort();reply("ERR "+error);return;}reply("OK SAVED");}
++void UsbSyncService::command(const String& cmd){
++ if(cmd=="MPOD1 HELLO"){reply(String("READY 4 SD=")+(media.sdOK()?"1":"0"));return;}
++ if(cmd=="MPOD1 X INFO"||cmd=="MPOD1 X STORAGE"){reply("OK "+SyncFiles::info());return;}
++ if(cmd=="MPOD1 INFO"){char a[24],b[24];snprintf(a,sizeof(a),"%llu",(unsigned long long)media.totalBytes());snprintf(b,sizeof(b),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));reply(String("OK INFO SD=")+(media.sdOK()?"1":"0")+" TRACKS="+String((unsigned)media.size())+" TOTAL_BYTES="+a+" FREE_BYTES="+b+" GUID="+IpodIdentity::guid()+" FW=0.10.0 PROTOCOL=4");return;}
++ if(cmd=="MPOD1 SYNC START"){if(!media.sdOK()){reply("ERR NO_SD");return;}reply(syncMode.enter(SyncTransport::UsbCdc)?"OK SYNC_STARTED":"ERR SYNC_BUSY");return;}
++ if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
++ if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
++ if(cmd=="MPOD1 SCAN"){if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}media.rescan();reply("OK SCANNED "+String((unsigned)media.size()));return;}
++ if(cmd.startsWith("MPOD1 X ")){
++  int i=8;String op=token(cmd,i),path=SyncFiles::fromHex(token(cmd,i));
++  if(op=="SMOOTH"){String value=cmd.substring(15);if(value!="0" && value!="1"){reply("ERR ARGUMENTS");return;}settings.data.fontSmoothing=(value=="1");settings.markDirty();reply("OK SMOOTHING");return;}
++  if(op=="LIST"){uint32_t off=0,limit=0;if(!uintArg(token(cmd,i),off)||!uintArg(token(cmd,i),limit)||limit>32){reply("ERR ARGUMENTS");return;}String result=SyncFiles::list(path,off,limit,SyncTransport::UsbCdc);reply(result.length()?"OK "+result:"ERR "+SyncFiles::error);return;}
++  if(op=="STAT"||op=="META"||op=="THEMEINFO"){String result=SyncFiles::stat(op=="THEMEINFO"?"/MonoPod/theme.mpt":path,SyncTransport::UsbCdc);reply(result.length()?"OK "+result:"ERR "+SyncFiles::error);return;}
++  if(op=="READ"||op=="GET"){uint32_t off=0,count=0;if(!uintArg(token(cmd,i),off)||!uintArg(token(cmd,i),count)||count>1024){reply("ERR ARGUMENTS");return;}size_t got=0;if(!SyncFiles::read(path,off,buffer,count,got,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}char crc[9];snprintf(crc,sizeof(crc),"%08lX",(unsigned long)~SyncFiles::crcStep(~0u,buffer,got));reply("DATA "+String(got)+" "+crc);Serial.write(buffer,got);return;}
++  if(op=="MKDIR"||op=="DELETE"||op=="RMDIR"||op=="RENAME"){
++   bool ok=op=="MKDIR"?SyncFiles::mkdir(path,SyncTransport::UsbCdc):op=="RENAME"?SyncFiles::rename(path,SyncFiles::fromHex(token(cmd,i)),SyncTransport::UsbCdc):SyncFiles::remove(path,op=="RMDIR",SyncTransport::UsbCdc);reply(ok?"OK DONE":"ERR "+SyncFiles::error);return;
+   }
+-  char *end=nullptr;
+-  unsigned long v=strtoul(s.c_str(),&end,base);
+-  if(*end || (base==16 && s.length()!=8))return false;
+-  output=(uint32_t)v;
+-  return true;
+-}
+-bool validName(const String& name) {
+-  if(name.length()<5||name.length()>90||name[0]=='.'||name.endsWith("."))return false;
+-  if(name.indexOf("..")>=0)return false;
+-  for(unsigned i=0;i<name.length();i++){
+-    uint8_t c=(uint8_t)name[i];
+-    if(c<32||c==127||c=='/'||c=='\\'||c==':'||c=='<'||c=='>'||c=='"'||c=='|'||c=='*'||c=='?')return false;
++  if(op=="PUT"||op=="THEME"){
++   uint32_t n=0,crc=0,replace=0;String len=token(cmd,i),crcText=token(cmd,i),rep=token(cmd,i);
++   if(!uintArg(len,n)||crcText.length()!=8||!uintArg(crcText,crc,16)||!uintArg(rep,replace)||replace>1){reply("ERR ARGUMENTS");return;}
++   if(!SyncFiles::begin(path,n,crc,replace,op=="THEME",SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
++   size=n;received=0;buffered=0;sending=true;lastByteAt=millis();chunkRemaining=min((uint32_t)sizeof(buffer),size);if(!size){finish();return;}reply("NEXT "+String(chunkRemaining));return;
+   }
+-  return MediaLibrary::isAudio(name);
+-}
+-String destPath(const String& name){return String("/Music/")+name;}
+-// Startup recovery for power-loss between original->backup and upload->original.
+-void recoverReplacement(){
+-  if(!SD.exists(JOURNAL_PATH))return;
+-  File j=SD.open(JOURNAL_PATH,FILE_READ);
+-  String name=j?j.readStringUntil('\n'):String();
+-  if(j)j.close();name.trim();
+-  if(!validName(name))return; // do not touch unknown paths
+-  String dest=destPath(name);
+-  if(SD.exists(BACKUP_PATH)){
+-    if(SD.exists(dest.c_str()))SD.remove(BACKUP_PATH); // new file committed
+-    else SD.rename(BACKUP_PATH,dest.c_str());          // old file restored
+-  }
+-  if(!SD.exists(BACKUP_PATH))SD.remove(JOURNAL_PATH);
+-}
+-}
+-void UsbSyncService::begin(){
+-  line.reserve(180);
+-  if(media.sdOK()){
+-    const bool interrupted=SD.exists(JOURNAL_PATH);
+-    recoverReplacement();
+-    SD.remove(PART_PATH);
+-    if(interrupted)media.rescan();
+-  }
+-}
+-void UsbSyncService::reply(const String& payload){Serial.print("MPOD1 ");Serial.println(payload);}
+-void UsbSyncService::reset(bool removePart){
+-  if(upload)upload.close();
+-  if(removePart && media.sdOK())SD.remove(PART_PATH);
+-  sending=false;replacing=false;size=received=0;chunkRemaining=buffered=0;
+-  fileName="";expectedCrc=0;receivedCrc=0xFFFFFFFFUL;
+-}
+-void UsbSyncService::fail(const char* reason){reset(true);reply(String("ERR ")+reason);}
+-bool UsbSyncService::flushBuffer(){
+-  if(!buffered)return true;
+-  const size_t written=upload.write(buffer,buffered);
+-  if(written!=buffered)return false;
+-  buffered=0;return true;
+-}
+-void UsbSyncService::finish(){
+-  if(!flushBuffer()){fail("SD_WRITE");return;}
+-  upload.flush();upload.close();
+-  if((receivedCrc^0xFFFFFFFFUL)!=expectedCrc){fail("CRC_MISMATCH");return;}
+-  const String dest=destPath(fileName);
+-  const bool exists=SD.exists(dest.c_str());
+-  if(exists && !replacing){fail("ALREADY_EXISTS");return;}
+-  if(exists){
+-    if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){
+-      fail("BACKUP_PENDING");return;
+-    }
+-    File j=SD.open(JOURNAL_PATH,FILE_WRITE);
+-    if(!j){fail("JOURNAL_WRITE");return;}
+-    j.println(fileName);j.flush();j.close();
+-    if(!SD.rename(dest.c_str(),BACKUP_PATH)){
+-      SD.remove(JOURNAL_PATH);fail("BACKUP_RENAME");return;
+-    }
+-  }
+-  if(!SD.rename(PART_PATH,dest.c_str())){
+-    if(exists){SD.rename(BACKUP_PATH,dest.c_str());
+-      if(!SD.exists(BACKUP_PATH))SD.remove(JOURNAL_PATH);}
+-    fail("COMMIT_FAILED");return;
+-  }
+-  if(exists){SD.remove(BACKUP_PATH);SD.remove(JOURNAL_PATH);}
+-  reset(false);
+-  reply(exists?"OK REPLACED":"OK SAVED");
+-}
+-void UsbSyncService::command(const String& cmd){
+-  if(cmd=="MPOD1 HELLO"){
+-    if(!media.sdOK())ui.notify("No microSD card");
+-    reply(String("READY 3 ")+(media.sdOK()?"SD=1":"SD=0"));return;
+-  }
+-  if(cmd=="MPOD1 INFO"){
+-    char totalDec[24],freeDec[24];
+-    snprintf(totalDec,sizeof(totalDec),"%llu",(unsigned long long)media.totalBytes());
+-    snprintf(freeDec,sizeof(freeDec),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));
+-    String answer=String("OK INFO SD=")+(media.sdOK()?"1":"0")+
+-      " TRACKS="+String((unsigned)media.size())+
+-      " TOTAL_BYTES="+String(totalDec)+
+-      " FREE_BYTES="+String(freeDec)+
+-      " GUID="+String(IpodIdentity::guid());
+-    reply(answer);return;
+-  }
+-  if(cmd=="MPOD1 SYNC START"){
+-    if(!media.sdOK()){
+-      ui.notify("No microSD card");reply("ERR NO_SD");return;
+-    }
+-    if(syncMode.active() && !syncMode.is(SyncTransport::UsbCdc)){
+-      reply("ERR SYNC_BUSY");return;
+-    }
+-    if(!syncMode.enter(SyncTransport::UsbCdc)){
+-      reply("ERR SYNC_BUSY");return;
+-    }
+-    reply("OK SYNC_STARTED");return;
+-  }
+-  if(cmd=="MPOD1 SYNC END"){
+-    if(!syncMode.is(SyncTransport::UsbCdc)){
+-      reply("ERR NO_USB_SYNC");return;
+-    }
+-    if(sending){reply("ERR TRANSFER_ACTIVE");return;}
+-    media.rescan();
+-    syncMode.leave(SyncTransport::UsbCdc);
+-    ui.begin();
+-    reply("OK SYNC_ENDED");return;
+-  }
+-  // USB connection and INFO requests are not permission to touch the SD.
+-  if(!syncMode.canWrite(SyncTransport::UsbCdc)){
+-    reply("ERR SYNC_REQUIRED");return;
+-  }
+-  if(cmd=="MPOD1 SCAN"){
+-    if(!media.sdOK()){reply("ERR NO_SD");return;}
+-    if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
+-    media.rescan();ui.redraw();
+-    reply(String("OK SCANNED ")+(unsigned)media.size());return;
+-  }
+-  if(cmd.startsWith("MPOD1 DELETE ")){
+-    if(!media.sdOK()){reply("ERR NO_SD");return;}
+-    if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
+-    const String name=cmd.substring(13);
+-    if(!validName(name)){reply("ERR INVALID_FILE");return;}
+-    const String target=destPath(name);
+-    if(!SD.exists(target.c_str())){reply("ERR NOT_FOUND");return;}
+-    player.stop();
+-    if(!SD.remove(target.c_str())){reply("ERR DELETE_FAILED");return;}
+-    reply("OK DELETED");return;
+-  }
+-  const bool replace=cmd.startsWith("MPOD1 REPLACE ");
+-  if(!replace && !cmd.startsWith("MPOD1 PUT ")){reply("ERR UNKNOWN_COMMAND");return;}
+-  if(!media.sdOK()){reply("ERR NO_SD");return;}
+-  if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
+-  // MPOD1 PUT|REPLACE <decimal-size> <8-char-hex-crc32> <filename>
+-  const int prefix=replace?14:10;
+-  const int p1=cmd.indexOf(' ',prefix),p2=p1>=0?cmd.indexOf(' ',p1+1):-1;
+-  if(p1<0||p2<0){reply("ERR ARGUMENTS");return;}
+-  const String lenStr=cmd.substring(prefix,p1);
+-  const String crcStr=cmd.substring(p1+1,p2);
+-  const String name=cmd.substring(p2+1);
+-  uint32_t n=0,crc=0;
+-  if(!parseUint(lenStr,n,10)||!parseUint(crcStr,crc,16)||n==0||n>MAX_FILE_BYTES||!validName(name)){
+-    reply("ERR INVALID_FILE");return;
+-  }
+-  if(SD.exists(destPath(name).c_str())&&!replace){reply("ERR ALREADY_EXISTS");return;}
+-  if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){
+-    recoverReplacement();
+-    if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){reply("ERR BACKUP_PENDING");return;}
+-  }
+-  uint64_t freeBytes=media.totalBytes()-media.usedBytes();
+-  // Replacement needs free space for the NEW file while the old one is intact.
+-  // Small filesystem safety margin avoids writing through the last clusters.
+-  if(freeBytes<(uint64_t)n+4096ULL){reply("ERR NO_SPACE");return;}
+-  player.stop();
+-  if(!SD.exists("/Music") && !SD.mkdir("/Music")){reply("ERR MKDIR");return;}
+-  SD.remove(PART_PATH);
+-  upload=SD.open(PART_PATH,FILE_WRITE);
+-  if(!upload){reply("ERR OPEN_FAILED");return;}
+-  fileName=name;size=n;expectedCrc=crc;received=0;receivedCrc=0xFFFFFFFFUL;
+-  buffered=0;sending=true;replacing=replace;lastByteAt=millis();
+-  chunkRemaining=(uint16_t)min((uint32_t)CHUNK_BYTES,size);
+-  reply(String("NEXT ")+chunkRemaining);
++  reply("ERR UNKNOWN_COMMAND");return;
++ }
++ // Legacy v1-v3 commands remain byte-compatible and target /Music only.
++ if(cmd.startsWith("MPOD1 DELETE ")){String name=cmd.substring(13),path="/Music/"+name;if(name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}reply(SyncFiles::remove(path,false,SyncTransport::UsbCdc)?"OK DELETED":"ERR "+SyncFiles::error);return;}
++ bool replace=cmd.startsWith("MPOD1 REPLACE ");if(replace||cmd.startsWith("MPOD1 PUT ")){
++  int i=replace?14:10;uint32_t n=0,crc=0;String len=token(cmd,i),crcText=token(cmd,i),name=cmd.substring(i);
++  if(!uintArg(len,n)||!n||crcText.length()!=8||!uintArg(crcText,crc,16)||name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}
++  if(!SD.exists("/Music"))SD.mkdir("/Music");if(!SyncFiles::begin("/Music/"+name,n,crc,replace,false,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
++  size=n;received=0;buffered=0;sending=true;chunkRemaining=min((uint32_t)sizeof(buffer),size);lastByteAt=millis();reply("NEXT "+String(chunkRemaining));return;
++ }
++ reply("ERR UNKNOWN_COMMAND");
+ }
+ void UsbSyncService::loop(){
+-  if(sending && millis()-lastByteAt>RECEIVE_TIMEOUT_MS){fail("TIMEOUT");return;}
+-  uint16_t budget=256;
+-  while(budget-- && Serial.available()>0){
+-    const int v=Serial.read();if(v<0)break;
+-    if(sending){
+-      const uint8_t byte=(uint8_t)v;
+-      buffer[buffered++]=byte;
+-      receivedCrc=crc32Step(receivedCrc,byte);
+-      received++;chunkRemaining--;lastByteAt=millis();
+-      if(buffered==sizeof(buffer)&&!flushBuffer()){fail("SD_WRITE");return;}
+-      if(chunkRemaining==0){
+-        if(!flushBuffer()){fail("SD_WRITE");return;}
+-        if(received>=size)finish();
+-        else {chunkRemaining=(uint16_t)min((uint32_t)CHUNK_BYTES,size-received);
+-          reply(String("NEXT ")+chunkRemaining);}
+-        return;
+-      }
+-    }else{
+-      if(v=='\n'){
+-        String cmd=line;line="";cmd.trim();
+-        if(!cmd.isEmpty())command(cmd);
+-        return;
+-      }else if(v=='\r')continue;
+-      else if(line.length()<175 && v>=32 && v<256)line+=(char)v;
+-      else {line="";reply("ERR LINE_TOO_LONG");return;}
+-    }
+-  }
++ if(sending && (!Serial || (uint32_t)(millis()-lastByteAt)>15000)){fail("TIMEOUT_OR_DISCONNECT");return;}
++ uint16_t budget=1024;while(budget-- && Serial.available()){
++  int c=Serial.read();if(c<0)break;
++  if(discard){quietUntil=millis()+1500;continue;}
++  if(sending){buffer[buffered++]=(uint8_t)c;received++;chunkRemaining--;lastByteAt=millis();if(!chunkRemaining){if(!SyncFiles::write(buffer,buffered)){fail(SyncFiles::error.c_str());return;}buffered=0;if(received==size)finish();else{chunkRemaining=min((uint32_t)sizeof(buffer),size-received);reply("NEXT "+String(chunkRemaining));}}}
++  else if(c=='\n'){String cmd=line;line="";if(cmd.startsWith("MPOD1 "))command(cmd);}
++  else if(c!='\r'){if(line.length()>=700){line="";discard=true;quietUntil=millis()+1500;reply("ERR LINE_TOO_LONG");}else line+=(char)c;}
++ }
++ if(discard && (int32_t)(millis()-quietUntil)>=0){discard=false;line="";}
+ }
+ #endif
++
+--- v0.9.1.1/DIY_iPod_Mono/UsbSync.h
++++ v0.10.0/DIY_iPod_Mono/UsbSync.h
+@@ -3,27 +3,12 @@
+ #if FEATURE_USB_SYNC
+ #include <SD.h>
+ class UsbSyncService {
+-public:
+-  void begin();
+-  void loop();
+-  bool busy() const {return sending;}
++public:void begin();void loop();bool busy()const{return sending;}
+ private:
+-  File upload;
+-  String line, fileName;
+-  uint32_t size=0, received=0, receivedCrc=0xFFFFFFFFUL, expectedCrc=0;
+-  uint16_t chunkRemaining=0;
+-  uint8_t buffer[512];
+-  uint16_t buffered=0;
+-  uint32_t lastByteAt=0;
+-  bool sending=false, replacing=false;
+-  void command(const String& command);
+-  void fail(const char* reason);
+-  void reset(bool removePart);
+-  bool flushBuffer();
+-  void finish();
+-  void reply(const String& payload);
++ String line;uint32_t size=0,received=0,lastByteAt=0,quietUntil=0;uint16_t chunkRemaining=0,buffered=0;
++ uint8_t buffer[1024];bool sending=false,discard=false;void command(const String& cmd);void reply(const String& payload);void fail(const char* reason);void finish();
+ };
+ #else
+-class UsbSyncService {public: void begin(){} void loop(){} bool busy()const{return false;} };
++class UsbSyncService {public:void begin(){}void loop(){}bool busy()const{return false;}};
+ #endif
+ extern UsbSyncService usbSync;
+--- v0.9.1.1/DIY_iPod_Mono/WiFiSync.cpp
++++ v0.10.0/DIY_iPod_Mono/WiFiSync.cpp
+@@ -1,257 +1,82 @@
+ #include "WiFiSync.h"
+ #include "UsbSync.h"
++#include "SyncFiles.h"
++#include "WiFiNetworks.h"
+ #include "Library.h"
+-#include "AudioEngine.h"
+-#include <SD.h>
+-#include <WiFi.h>
+-#include "ClockService.h"
+ #include "Display.h"
+ #include "Theme.h"
+ #include "UI.h"
+ #include "Settings.h"
+-#include "SyncMode.h"
+-#include "WiFiNetworks.h"
++#include "ClockService.h"
++#include <WiFi.h>
+ WiFiSyncService wifiSync;
+ #if FEATURE_WIFI_SYNC
+-String WiFiSyncService::ip() const {
+-  if(!running)return "Offline";
+-  return apMode?WiFi.softAPIP().toString():WiFi.localIP().toString();
++namespace {
++bool number(const String& s,uint32_t& value,int base=10){if(s.isEmpty()||s.length()>10)return false;for(size_t i=0;i<s.length();i++)if(base==10?!isdigit((unsigned char)s[i]):!isxdigit((unsigned char)s[i]))return false;unsigned long long v=strtoull(s.c_str(),nullptr,base);if(v>0xffffffffULL)return false;value=v;return true;}
+ }
+-void WiFiSyncService::page(){
+-  server.send(200,"text/html; charset=utf-8",
+-    "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
+-    "<title>MonoPod Sync</title><style>body{max-width:560px;margin:2em auto;padding:1em;"
+-    "font:16px system-ui}button,input{margin:8px 0;padding:8px}</style>"
+-    "<h2>MonoPod Sync</h2><p>Upload MP3, WAV, FLAC or AAC to /Music.</p>"
+-    "<form action='/upload' method='post' enctype='multipart/form-data'>"
+-    "<input type='file' name='track' accept='.mp3,.wav,.flac,.aac'>"
+-    "<button type='submit'>Upload</button></form>"
+-    "<button onclick=\"fetch('/time?unix='+Math.floor(Date.now()/1000)).then(()=>alert('Time set'))\">Set clock from this device</button>"
+-    "<p>Local network or MonoPod AP. HTTP only; no public Internet exposure.</p>");
+-}
+-static String safeName(String s){
+-  int cut=max(s.lastIndexOf('/'),s.lastIndexOf('\\'));if(cut>=0)s=s.substring(cut+1);
+-  String out;
+-  for(unsigned int i=0;i<s.length()&&out.length()<90;i++){
+-    const unsigned char c=(unsigned char)s[i];
+-    if(c<32||c==127||c=='/'||c=='\\'||c==':'||c=='<'||c=='>'||c=='"'||c=='|')continue;
+-    out+=(char)c;
+-  }
+-  if(out.startsWith("."))out="track"+out;
+-  return out;
+-}
++String WiFiSyncService::ip()const{return running?(usingSta?WiFi.localIP():WiFi.softAPIP()).toString():"Offline";}
++bool WiFiSyncService::busy()const{return uploadActive||SyncFiles::busy();}
++bool WiFiSyncService::allowed(){if(!SyncFiles::gate(SyncTransport::WiFi)){server.send(409,"text/plain",SyncFiles::error);return false;}return true;}
++void WiFiSyncService::result(bool ok){if(ok)server.send(200,"application/json","{\"ok\":true}");else{String e=SyncFiles::error;int code=e=="NOT_FOUND"?404:e=="SD_WRITE"||e=="SD_READ"?500:e=="NO_SPACE"?507:409;server.send(code,"text/plain",e);}}
+ void WiFiSyncService::upload(){
+-  HTTPUpload &u=server.upload();
+-  if(u.status==UPLOAD_FILE_START){
+-    uploadActive=true;
+-    uploadSuccess=false;uploadError="";uploadName="";
+-    if(!syncMode.canWrite(SyncTransport::WiFi) || !media.sdOK()){
+-      uploadError="Not in Wi-Fi sync or no SD";return;
+-    }
+-    uploadName=safeName(u.filename);
+-    if(!MediaLibrary::isAudio(uploadName) || uploadName.endsWith(".m4a")){
+-      uploadError="Unsupported file";return;
+-    }
+-    if(!SD.exists("/Music") && !SD.mkdir("/Music")){
+-      uploadError="Cannot create Music directory";return;
+-    }
+-    SD.remove("/Music/.monopod-wifi.part");
+-    uploadFile=SD.open("/Music/.monopod-wifi.part",FILE_WRITE);
+-    if(!uploadFile)uploadError="Cannot open temporary file";
+-  }else if(u.status==UPLOAD_FILE_WRITE){
+-    if(uploadFile && uploadFile.write(u.buf,u.currentSize)!=u.currentSize){
+-      uploadError="Write failed";uploadFile.close();
+-    }
+-  }else if(u.status==UPLOAD_FILE_END){
+-    if(uploadFile){uploadFile.flush();uploadFile.close();uploadSuccess=uploadError.isEmpty();}
+-  }else if(u.status==UPLOAD_FILE_ABORTED){
+-    if(uploadFile)uploadFile.close();uploadError="Aborted";
+-    SD.remove("/Music/.monopod-wifi.part");
+-    uploadActive=false;
+-  }
++ HTTPUpload& u=server.upload();
++ if(u.status==UPLOAD_FILE_START){
++  if(uploadActive){uploadError="Only one multipart file is allowed";SyncFiles::abort();return;}
++  uploadActive=true;uploadOk=false;uploadError="";
++  if(!SyncFiles::gate(SyncTransport::WiFi)){uploadError=SyncFiles::error;return;}
++  bool legacy=server.uri()!="/api/fs/upload",theme=server.uri()=="/api/theme"||server.arg("theme")=="1";
++  String path=theme?"/MonoPod/theme.mpt":legacy?"/Music/"+u.filename:server.arg("path");uint32_t size=0,crc=0;
++  if(!legacy && (!number(server.arg("size"),size)||server.arg("crc").length()!=8||!number(server.arg("crc"),crc,16))){uploadError="INVALID_ARGUMENTS";return;}
++  if(legacy&&!theme){if(u.filename.indexOf('/')>=0||u.filename.indexOf('\\')>=0||!MediaLibrary::isAudio(u.filename)){uploadError="INVALID_FILE";return;}if(!SD.exists("/Music"))SD.mkdir("/Music");}
++  if(!SyncFiles::begin(path,size,crc,legacy||server.arg("replace")=="1",theme,SyncTransport::WiFi,legacy))uploadError=SyncFiles::error;
++ }else if(u.status==UPLOAD_FILE_WRITE){
++  if(uploadError.length())return;if(!SyncFiles::write(u.buf,u.currentSize)){uploadError=SyncFiles::error;SyncFiles::abort();}
++ }else if(u.status==UPLOAD_FILE_END){uploadOk=uploadError.isEmpty()&&SyncFiles::busy();}
++ else if(u.status==UPLOAD_FILE_ABORTED){SyncFiles::abort();uploadError="ABORTED";uploadActive=false;uploadOk=false;}
+ }
+ void WiFiSyncService::finished(){
+-  static const char* part="/Music/.monopod-wifi.part";
+-  static const char* backup="/Music/.monopod-wifi.bak";
+-  static const char* journal="/Music/.monopod-wifi.target";
+-  if(uploadFile)uploadFile.close();
+-  bool ok=uploadSuccess && uploadError.isEmpty() && !uploadName.isEmpty();
+-  if(ok){
+-    String dest="/Music/"+uploadName;
+-    if(SD.exists(backup)||SD.exists(journal)){
+-      ok=false;uploadError="Old backup pending";
+-    }
+-    const bool hadOld=SD.exists(dest.c_str());
+-    if(ok && hadOld){
+-      File j=SD.open(journal,FILE_WRITE);
+-      if(!j){ok=false;uploadError="Cannot write recovery journal";}
+-      else{j.println(uploadName);j.flush();j.close();}
+-    }
+-    if(ok && hadOld && !SD.rename(dest.c_str(),backup)){
+-      SD.remove(journal);ok=false;uploadError="Cannot back up old track";
+-    }
+-    if(ok && !SD.rename(part,dest.c_str())){
+-      if(hadOld)SD.rename(backup,dest.c_str());
+-      ok=false;uploadError="Cannot commit uploaded track";
+-    }
+-    if(ok && hadOld){SD.remove(backup);SD.remove(journal);}
+-    if(!ok && hadOld && SD.exists(backup) && !SD.exists(dest.c_str()))
+-      SD.rename(backup,dest.c_str());
+-    if(!ok && !SD.exists(backup))SD.remove(journal);
+-  }
+-  if(!ok)SD.remove(part);
+-  uploadActive=false;
+-  if(ok){media.rescan();ui.redraw();server.send(200,"text/plain","Track saved or replaced; library updated.");}
+-  else server.send(400,"text/plain",uploadError.isEmpty()?"No file written":uploadError);
+-  uploadName="";
++ bool ok=uploadOk&&uploadError.isEmpty();if(ok&&!SyncFiles::commit()){uploadError=SyncFiles::error;ok=false;}
++ if(!ok)SyncFiles::abort();uploadActive=false;uploadOk=false;
++ if(ok){if(server.uri()=="/upload")media.rescan();server.send(200,"application/json","{\"ok\":true}");ui.redraw();}else server.send(422,"text/plain",uploadError.length()?uploadError:"NO_UPLOAD");
+ }
+-void WiFiSyncService::themeUpload(){
+-  HTTPUpload &u=server.upload();
+-  if(u.status==UPLOAD_FILE_START){
+-    themeUploadActive=true;
+-    themeUploadSuccess=false;themeUploadError="";themeUploadSize=0;
+-    if(themeUploadFile)themeUploadFile.close();
+-    if(!media.sdOK()){themeUploadError="No SD";return;}
+-    if(!SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
+-    SD.remove("/MonoPod/theme.tmp");
+-    themeUploadFile=SD.open("/MonoPod/theme.tmp",FILE_WRITE);
+-    if(!themeUploadFile)themeUploadError="Cannot write theme";
+-  }else if(u.status==UPLOAD_FILE_WRITE){
+-    if(themeUploadError.length())return;
+-    themeUploadSize+=u.currentSize;
+-    if(themeUploadSize>ThemeManager::MAX_BYTES+28){themeUploadError="Theme is too large";themeUploadFile.close();return;}
+-    if(!themeUploadFile||themeUploadFile.write(u.buf,u.currentSize)!=u.currentSize){
+-      themeUploadError="SD write failed";if(themeUploadFile)themeUploadFile.close();
+-    }
+-  }else if(u.status==UPLOAD_FILE_END){
+-    if(themeUploadFile){themeUploadFile.flush();themeUploadFile.close();}
+-    themeUploadSuccess=themeUploadError.isEmpty();
+-  }else if(u.status==UPLOAD_FILE_ABORTED){
+-    if(themeUploadFile)themeUploadFile.close();
+-    SD.remove("/MonoPod/theme.tmp");themeUploadError="Aborted";
+-    themeUploadActive=false;
+-  }
+-}
+-void WiFiSyncService::themeFinished(){
+-  themeUploadActive=false;
+-  if(!themeUploadSuccess){SD.remove("/MonoPod/theme.tmp");server.send(400,"text/plain",themeUploadError.isEmpty()?"No theme data":themeUploadError);return;}
+-  // Parse + CRC-verify before replacing an existing theme.
+-  static ThemeManager probe;
+-  if(!probe.reload("/MonoPod/theme.tmp")){
+-    SD.remove("/MonoPod/theme.tmp");server.send(422,"text/plain","Invalid MPT1 theme or CRC");return;
+-  }
+-  probe.unload();
+-  const bool hadOld=SD.exists("/MonoPod/theme.mpt");
+-  SD.remove("/MonoPod/theme.bak");
+-  if(hadOld && !SD.rename("/MonoPod/theme.mpt","/MonoPod/theme.bak")){
+-    server.send(500,"text/plain","Cannot back up old theme");return;
+-  }
+-  if(!SD.rename("/MonoPod/theme.tmp","/MonoPod/theme.mpt")){
+-    if(hadOld)SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
+-    server.send(500,"text/plain","Cannot install new theme");return;
+-  }
+-  if(!display.reloadTheme()){
+-    SD.remove("/MonoPod/theme.mpt");
+-    if(hadOld)SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
+-    display.reloadTheme();
+-    server.send(500,"text/plain","Failed to activate theme");return;
+-  }
+-  SD.remove("/MonoPod/theme.bak");ui.redraw();
+-  server.send(200,"application/json","{\"ok\":true,\"theme\":\"installed\"}");
++void WiFiSyncService::routes(){
++ server.on("/",HTTP_GET,[this](){server.send(200,"text/html; charset=utf-8","<!doctype html><title>MonoPod Sync</title><h2>MonoPod Wi-Fi Sync</h2><p>Local HTTP. Use MonoPod Desktop for the file manager.</p><form action='/upload' method='post' enctype='multipart/form-data'><input type='file' name='track' accept='.mp3,.wav,.flac,.aac'><button>Upload music</button></form>");});
++ server.on("/api/info",HTTP_GET,[this](){server.send(200,"application/json",SyncFiles::info());});
++ server.on("/api/storage",HTTP_GET,[this](){if(allowed())server.send(200,"application/json",SyncFiles::info());});
++ server.on("/api/fs/list",HTTP_GET,[this](){if(!allowed())return;uint32_t offset=0,limit=32;if((server.hasArg("offset")&&!number(server.arg("offset"),offset))||(server.hasArg("limit")&&!number(server.arg("limit"),limit))||limit>32||!limit){server.send(400,"text/plain","INVALID_ARGUMENTS");return;}String json=SyncFiles::list(server.arg("path"),offset,limit,SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
++ auto stat=[this](){if(!allowed())return;String json=SyncFiles::stat(server.arg("path"),SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);};
++ server.on("/api/fs/stat",HTTP_GET,stat);server.on("/api/fs/metadata",HTTP_GET,stat);
++ server.on("/api/theme/info",HTTP_GET,[this](){if(!allowed())return;String json=SyncFiles::stat("/MonoPod/theme.mpt",SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
++ server.on("/api/fs/download",HTTP_GET,[this](){
++  if(!allowed())return;uint32_t offset=0,count=0;if(!number(server.arg("offset"),offset)||!number(server.arg("count"),count)||count>16384){server.send(400,"text/plain","INVALID_RANGE");return;}
++  // Fixed 1 KiB working buffer; two passes compute CRC before streaming the same range.
++  uint8_t buffer[1024];size_t total=0,got=0;uint32_t crc=~0u;
++  while(total<count){size_t n=min((size_t)1024,(size_t)(count-total));if(!SyncFiles::read(server.arg("path"),offset+total,buffer,n,got,SyncTransport::WiFi)){result(false);return;}crc=SyncFiles::crcStep(crc,buffer,got);total+=got;if(got<n)break;}
++  char text[9];snprintf(text,sizeof(text),"%08lX",(unsigned long)~crc);server.sendHeader("X-CRC32",text);server.setContentLength(total);server.send(200,"application/octet-stream","");size_t sent=0;
++  while(sent<total){size_t n=min((size_t)1024,total-sent);if(!SyncFiles::read(server.arg("path"),offset+sent,buffer,n,got,SyncTransport::WiFi)||!got)break;if(server.client().write(buffer,got)!=got)break;sent+=got;yield();}
++ });
++ server.on("/api/fs/mkdir",HTTP_POST,[this](){if(allowed())result(SyncFiles::mkdir(server.arg("path"),SyncTransport::WiFi));});
++ server.on("/api/fs/rename",HTTP_POST,[this](){if(allowed())result(SyncFiles::rename(server.arg("path"),server.arg("destination"),SyncTransport::WiFi));});
++ server.on("/api/fs/file",HTTP_DELETE,[this](){if(allowed())result(SyncFiles::remove(server.arg("path"),server.arg("directory")=="1",SyncTransport::WiFi));});
++ server.on("/api/fs/upload",HTTP_POST,[this](){finished();},[this](){upload();});
++ server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
++ server.on("/api/theme",HTTP_POST,[this](){finished();},[this](){upload();});
++ server.on("/api/smoothing",HTTP_POST,[this](){if(!allowed())return;if(!server.hasArg("enabled")){server.send(400,"text/plain","Missing enabled");return;}settings.data.fontSmoothing=server.arg("enabled")=="1";settings.markDirty();result(true);});
++ server.on("/api/theme/reset",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}if(SD.exists("/MonoPod/theme.mpt")&&!SD.remove("/MonoPod/theme.mpt")){server.send(500,"text/plain","DELETE_FAILED");return;}theme.unload();display.palette(settings.data.contrast);result(true);});
++ server.on("/api/scan",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}media.rescan();result(true);});
++ server.on("/api/sync/end",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}server.send(200,"application/json","{\"ok\":true}");stopRequested=true;});
++ server.on("/time",HTTP_GET,[this](){if(!allowed())return;time_t epoch=(time_t)strtoll(server.arg("unix").c_str(),nullptr,10);if(epoch<1600000000||epoch>4102444800LL){server.send(400,"text/plain","Invalid time");return;}clockService.setUnix(epoch);result(true);});
++ server.onNotFound([this](){server.send(404,"text/plain","Not found");});
+ }
+ void WiFiSyncService::begin(){
+-  if(running || usbSync.busy() || syncMode.active())return;
+-  if(!media.sdOK()){ui.notify("No microSD card");return;}
+-  // Recover an interrupted rename before opening the network writer.
+-  const char* journal="/Music/.monopod-wifi.target";
+-  const char* backup="/Music/.monopod-wifi.bak";
+-  if(SD.exists(journal)){
+-    File j=SD.open(journal,FILE_READ);
+-    String name=j?j.readStringUntil('\n'):String();
+-    if(j)j.close();name.trim();
+-    if(!name.isEmpty() && safeName(name)==name && MediaLibrary::isAudio(name)){
+-      String dest="/Music/"+name;
+-      if(SD.exists(backup)){
+-        if(SD.exists(dest.c_str()))SD.remove(backup);
+-        else SD.rename(backup,dest.c_str());
+-      }
+-      if(!SD.exists(backup))SD.remove(journal);
+-    }
+-  }
+-  SD.remove("/Music/.monopod-wifi.part");
+-  // The moment the user explicitly starts Wi-Fi Sync, audio and UI are locked.
+-  // Reuse an existing station connection; never disconnect it merely to enable Sync.
+-  const bool staReady=(WiFi.status()==WL_CONNECTED);
+-  if(!staReady && wifiNetworks.connecting()){
+-    ui.notify("Wi-Fi connecting...");return;
+-  }
+-  if(!syncMode.enter(SyncTransport::WiFi))return;
+-  apMode=!staReady;
+-  if(apMode){
+-    // Offline fallback only: give the PC a dedicated MonoPod-Sync access point.
+-    wifiNetworks.suspendForSync();
+-    WiFi.mode(WIFI_AP);
+-    if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){
+-      WiFi.mode(WIFI_OFF);
+-      syncMode.leave(SyncTransport::WiFi);
+-      wifiNetworks.resumeAfterSync();
+-      apMode=false;
+-      ui.notify("Wi-Fi AP failed");return;
+-    }
+-  }
+-  server.on("/",HTTP_GET,[this](){page();});
+-  server.on("/time",HTTP_GET,[this](){
+-    if(!server.hasArg("unix")){server.send(400,"text/plain","Missing unix");return;}
+-    time_t epoch=(time_t)strtoll(server.arg("unix").c_str(),nullptr,10);
+-    if(epoch<1600000000 || epoch>4102444800LL){server.send(400,"text/plain","Invalid time");return;}
+-    clockService.setUnix(epoch);server.send(200,"text/plain","Clock updated");
+-  });
+-  server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
+-  server.on("/api/theme",HTTP_POST,[this](){themeFinished();},[this](){themeUpload();});
+-  server.on("/api/info",HTTP_GET,[this](){
+-    String body="{\"firmware\":\"MonoPod v0.9.1.1\",\"tracks\":"+String((unsigned)media.size())+
+-      ",\"sd_ready\":"+String(media.sdOK()?"true":"false")+
+-      ",\"sd_total_mb\":"+String((uint32_t)(media.totalBytes()/1024/1024))+
+-      ",\"sd_used_mb\":"+String((uint32_t)(media.usedBytes()/1024/1024))+
+-      ",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+
+-      ",\"custom_theme\":"+String(display.themeLoaded()?"true":"false")+"}";
+-    server.send(200,"application/json",body);
+-  });
+-  server.on("/api/smoothing",HTTP_POST,[this](){
+-    if(!server.hasArg("enabled")){server.send(400,"text/plain","Missing enabled");return;}
+-    settings.data.fontSmoothing=(server.arg("enabled")=="1");
+-    settings.markDirty();ui.redraw();
+-    server.send(200,"application/json",String("{\"font_smoothing\":")+
+-      (settings.data.fontSmoothing?"true":"false")+"}");
+-  });
+-  server.on("/api/theme/reset",HTTP_POST,[this](){
+-    if(!media.sdOK()){server.send(503,"text/plain","SD unavailable");return;}
+-    SD.remove("/MonoPod/theme.mpt");
+-    theme.unload();display.palette(settings.data.contrast);ui.redraw();
+-    server.send(200,"application/json","{\"ok\":true}");
+-  });
+-  server.onNotFound([this](){server.send(404,"text/plain","Not found");});
+-  server.begin();running=true;
+-  MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP listening at http://%s:80\n",
+-    apMode?"AP":"LAN",ip().c_str());
+-  if(apMode)MONOPOD_LOG.printf("[Wi-Fi Sync] Connect PC to SSID %s\n",Config::WIFI_AP_SSID);
+-  ui.redraw(); // Sync screen must show the actual address, not the old AP default.
++ if(running||usbSync.busy()||syncMode.active())return;if(!media.sdOK()){ui.notify("No microSD card");return;}
++ if(WiFi.status()!=WL_CONNECTED&&wifiNetworks.connecting()){ui.notify("Wi-Fi connecting...");return;}
++ SyncFiles::recover();if(!syncMode.enter(SyncTransport::WiFi))return;
++ usingSta=WiFi.status()==WL_CONNECTED;
++ if(!usingSta){wifiNetworks.suspendForSync();WiFi.mode(WIFI_AP);if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){syncMode.leave(SyncTransport::WiFi);wifiNetworks.resumeAfterSync();ui.notify("Wi-Fi AP failed");return;}}
++ if(!routesReady){routes();routesReady=true;}server.begin();running=true;stopRequested=false;
++ MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP at http://%s:80\n",usingSta?"LAN":"AP",ip().c_str());ui.redraw();
+ }
+-void WiFiSyncService::end(){
+-  if(!running || busy())return; // never close files or remove SD during HTTP transfer
+-  server.stop();if(uploadFile)uploadFile.close();if(themeUploadFile)themeUploadFile.close();
+-  if(apMode){
+-    WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);
+-  }
+-  running=false;
+-  syncMode.leave(SyncTransport::WiFi);
+-  if(apMode)wifiNetworks.resumeAfterSync();
+-  apMode=false;
+-}
+-void WiFiSyncService::loop(){
+-  if(!running)return;
+-  // Keep STA reconnects alive if the router briefly disappears during LAN Sync.
+-  if(!apMode)wifiNetworks.tick();
+-  server.handleClient();
+-}
++void WiFiSyncService::end(){if(!running||busy())return;server.stop();if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}running=false;stopRequested=false;media.rescan();syncMode.leave(SyncTransport::WiFi);if(!usingSta)wifiNetworks.resumeAfterSync();ui.begin();}
++void WiFiSyncService::loop(){if(running){if(usingSta)wifiNetworks.tick();server.handleClient();SyncFiles::tick();if(uploadActive&&!SyncFiles::busy()){uploadActive=false;uploadOk=false;}if(stopRequested)end();}}
+ #endif
+--- v0.9.1.1/DIY_iPod_Mono/WiFiSync.h
++++ v0.10.0/DIY_iPod_Mono/WiFiSync.h
+@@ -2,38 +2,11 @@
+ #include "Config.h"
+ #if FEATURE_WIFI_SYNC
+ #include <WebServer.h>
+-#include <SD.h>
+ class WiFiSyncService {
+-public:
+-  void begin();
+-  void end();
+-  void loop();
+-  bool active() const {return running;}
+-  bool busy() const {return uploadActive || themeUploadActive;}
+-  String ip() const;
+-private:
+-  WebServer server{80};
+-  File uploadFile;
+-  File themeUploadFile;
+-  bool themeUploadSuccess=false;
+-  String themeUploadError;
+-  size_t themeUploadSize=0;
+-  bool apMode=false; // true only when no working STA association exists
+-  bool running=false, uploadSuccess=false;
+-  bool uploadActive=false,themeUploadActive=false;
+-  String uploadError,uploadName;
+-  void page();
+-  void upload();
+-  void finished();
+-  void themeUpload();
+-  void themeFinished();
++public:void begin();void end();void loop();bool active()const{return running;}bool busy()const;String ip()const;
++private:WebServer server{80};bool routesReady=false,running=false,stopRequested=false,usingSta=false,uploadActive=false,uploadOk=false;String uploadError;void upload();void finished();void result(bool ok);bool allowed();void routes();
+ };
+ #else
+-class WiFiSyncService {
+-public:
+-  void begin(){}void end(){}void loop(){}bool active() const{return false;}
+-  bool busy() const{return false;}
+-  String ip()const{return "Disabled";}
+-};
++class WiFiSyncService {public:void begin(){}void end(){}void loop(){}bool active()const{return false;}bool busy()const{return false;}String ip()const{return "Disabled";}};
+ #endif
+ extern WiFiSyncService wifiSync;
+--- v0.9.1.1/README.md
++++ v0.10.0/README.md
+@@ -1,3 +1,13 @@
++# MonoPod v0.10.0 — MonoPod Desktop protocol candidate
++
++Based on v0.9.1.1. Adds MPOD1 v4 and HTTP filesystem operations, verified streaming transfers, USB theme installation and a 12-color MPT2 palette while retaining MPT1 and legacy sync endpoints. Existing explicit Sync ownership, LAN STA reconnect behavior, stock antialiased font and player geometry are preserved.
++
++Desktop source and protocol documentation: `../MonoPod_Desktop/`. See `CHANGELOG_v0.10.0.md` and `../MonoPod_Desktop/docs/FINAL_REPORT_RU.md`.
++
++Both ESP32-S3 N16R8 and classic ESP32 profiles compiled with Arduino-ESP32 3.3.12. Binaries/manifests are in `../MonoPod_Desktop/firmware-builds/`. Hardware compatibility and power-loss behavior remain UNVERIFIED; no device was flashed. GPIO, AudioEngine, Backlight and Input were not rewritten.
++
++The historical documentation below is retained for reference.
++
+ # MonoPod v0.9.1.1 — Wi-Fi Sync over LAN
+ 
+ The player now keeps its existing STA connection to the router when entering Wi-Fi Sync. The HTTP service opens only after `Settings > Wi-Fi > Start Wi-Fi Sync`; it listens on the player's existing IP address on port 80. The Sync screen shows `IP: x.x.x.x`. In MonoPod Studio enter `http://x.x.x.x` (the old `192.168.4.1` is **only for AP fallback**).
+--- v0.9.1.1/tests/conftest.py
++++ v0.10.0/tests/conftest.py
+@@ -0,0 +1,7 @@
++"""Platform gates only; firmware protocol/FS behavior is checked by actual-source MSVC suites."""
++import shutil,pytest
++def pytest_collection_modifyitems(items):
++    if shutil.which('g++'):return
++    gcc_only={'test_console_capacity_cannot_collide_with_limits_h','test_native_protocol_parser','test_public_wifi_header_is_valid_cpp'}
++    for item in items:
++        if item.name in gcc_only:item.add_marker(pytest.mark.skip(reason='GCC-specific harness unavailable on this Windows host; see MSVC actual-source tests and Arduino builds.'))
+--- v0.9.1.1/tests/stubs/SD.h
++++ v0.10.0/tests/stubs/SD.h
+@@ -10,6 +10,7 @@
+   explicit operator bool()const{return stream.good();}
+   size_t size(){auto p=stream.tellg();stream.seekg(0,std::ios::end);auto n=stream.tellg();stream.seekg(p);return size_t(n);}
+   int read(uint8_t* b,size_t n){stream.read((char*)b,n);return (int)stream.gcount();}
++  bool seek(size_t n){stream.clear();stream.seekg(n);return stream.good();}
+   void close(){stream.close();}
+ private:
+   std::ifstream stream;
+--- v0.9.1.1/tests/test_v07_ui.py
++++ v0.10.0/tests/test_v07_ui.py
+@@ -4,26 +4,29 @@
+ from PIL import ImageFont
+ ROOT=Path(__file__).resolve().parent.parent
+ sys.path.insert(0,str(ROOT/'Studio'))
+-from theme_format import raster, ThemeOptions, encode_theme, verify_theme, demo_preview
++from theme_format import raster, ThemeOptions, encode_theme, verify_theme, demo_preview, find_default_font
+ 
+ def occupied_rows(im):
+-    return [y for y in range(im.height) if max(im.crop((0,y,im.width,y+1)).get_flattened_data())>127]
++    def pixels(y):
++        row=im.crop((0,y,im.width,y+1))
++        return row.get_flattened_data() if hasattr(row,'get_flattened_data') else row.getdata()
++    return [y for y in range(im.height) if max(pixels(y))>127]
+ 
+ def test_shared_baseline_for_main_text():
+-    font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',15)
++    font=ImageFont.truetype(find_default_font(),15)
+     M=occupied_rows(raster('M',font,16)[0]);u=occupied_rows(raster('u',font,16)[0]);g=occupied_rows(raster('g',font,16)[0]);i=occupied_rows(raster('i',font,16)[0])
+     assert max(M)==max(u)==max(i)==11, (M,u,i)
+     assert max(g)>max(u), (g,u)
+     assert min(M)<min(u) and min(i)<min(u)
+ 
+ def test_shared_baseline_for_small_text():
+-    font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',11)
++    font=ImageFont.truetype(find_default_font(),11)
+     upper=occupied_rows(raster('M',font,12)[0]);low=occupied_rows(raster('u',font,12)[0]);desc=occupied_rows(raster('g',font,12)[0])
+     assert max(upper)==max(low)==8
+     assert max(desc)>max(low)
+ 
+ def test_battery_and_empty_lower_margin_in_preview():
+-    opts=ThemeOptions(font_path='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf')
++    opts=ThemeOptions(font_path=find_default_font())
+     im=demo_preview(opts)
+     bg=im.getpixel((0,118))
+     assert all(im.getpixel((x,y))==bg for y in range(114,128) for x in range(160)), 'footer must remain empty'
+@@ -39,7 +42,7 @@
+         assert 'items.size())+" items"' not in (target/'UI.cpp').read_text()
+ 
+ def test_reject_old_misaligned_theme_flag():
+-    opts=ThemeOptions(font_path='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf')
++    opts=ThemeOptions(font_path=find_default_font())
+     raw=bytearray(encode_theme(opts))
+     assert raw[5]==1
+     raw[5]=0 # legacy v0.6: old glyphs have incorrect top-only alignment
+--- v0.9.1.1/tests/test_v083_usb_sync.py
++++ v0.10.0/tests/test_v083_usb_sync.py
+@@ -64,7 +64,7 @@
+ def test_usb_host_transfer_chunking_crc_and_scan():
+     fake = SimulatedUsbPort()
+     with tempfile.TemporaryDirectory() as tmp:
+-        path = Path(tmp) / 'Трек 01.flac'
++        path = Path(tmp) / 'РўСЂРµРє 01.flac'
+         payload = bytes(range(256)) * 17 + b'\x00\x55\xff'
+         path.write_bytes(payload)
+         assert file_crc_size(path) == (len(payload), zlib.crc32(payload))
+@@ -86,5 +86,5 @@
+         except ValueError:
+             continue
+         # On POSIX Path("../evil.mp3") normalizes out the slash; this checks the basename.
+-        if name != '../evil.mp3':
++        if name != '../evil.mp3' and not (__import__('os').name=='nt' and name=='x\\y.mp3'):
+             raise AssertionError(f'Did not reject {name}')
+--- v0.9.1.1/tests/test_v085_sync_mode.py
++++ v0.10.0/tests/test_v085_sync_mode.py
+@@ -25,9 +25,10 @@
+ def test_usb_gated_transfers_and_explicit_handshake():
+     src=(ROOT/'DIY_iPod_Mono/UsbSync.cpp').read_text()
+     assert 'MPOD1 SYNC START' in src and 'MPOD1 SYNC END' in src
+-    assert 'ERR SYNC_REQUIRED' in src
++    fs=(ROOT/'DIY_iPod_Mono/SyncFiles.cpp').read_text()
++    assert 'SYNC_REQUIRED' in fs and 'SyncFiles::gate(SyncTransport::UsbCdc)' in src
+     assert 'ERR TRANSFER_ACTIVE' in src
+-    assert src.index('ERR SYNC_REQUIRED') < src.index('MPOD1 DELETE')
++    assert src.index('SyncFiles::gate(SyncTransport::UsbCdc)') < src.index('MPOD1 DELETE')
+     client=(ROOT/'Studio/usb_sync.py').read_text()
+     assert "self.send('SYNC START')" in client
+     assert "self.send('SYNC END')" in client
+@@ -36,12 +37,13 @@
+ def test_wifi_session_started_before_ap_and_no_exit_during_upload():
+     src=(ROOT/'DIY_iPod_Mono/WiFiSync.cpp').read_text()
+     assert src.index('syncMode.enter(SyncTransport::WiFi)') < src.index('WiFi.softAP(')
+-    assert 'if(!running || busy())return;' in src
++    assert 'if(!running||busy())return;' in src
+     assert 'uploadActive=false;' in src
+-    assert '"/Music/.monopod-wifi.target"' in src
+-    assert 'SD.rename(part,dest.c_str())' in src
++    fs=(ROOT/'DIY_iPod_Mono/SyncFiles.cpp').read_text()
++    assert '"/Music/.monopod-wifi.target"' in fs
++    assert 'SD.rename(PART,dest.c_str())' in fs and 'SyncFiles::commit()' in src
+     assert 'syncMode.leave(SyncTransport::WiFi)' in src
+-    assert 'if(apMode)' in src
++    assert 'if(!usingSta)' in src
+ 
+ def test_usb_connection_info_does_not_enter_sync():
+     class Port:
+--- v0.9.1.1/tests/test_v087_dev_console.py
++++ v0.10.0/tests/test_v087_dev_console.py
+@@ -35,5 +35,5 @@
+     assert '#define MONOPOD_LOG Serial0' in cfg
+     assert '#define MONOPOD_LOG Serial' in cfg
+     usb=(ROOT/'DIY_iPod_Mono/UsbSync.cpp').read_text()
+-    assert 'Serial.available()>0' in usb
++    assert 'Serial.available()' in usb
+     assert 'MONOPOD_LOG' not in usb
+--- v0.9.1.1/tests/test_v089_wifi_restore.py
++++ v0.10.0/tests/test_v089_wifi_restore.py
+@@ -26,7 +26,7 @@
+         assert 'p.remove("ssid")' in wifi and 'p.remove("pass")' in wifi
+         assert 'wifiNetworks.suspendForSync()' in sync
+         assert sync.count('wifiNetworks.resumeAfterSync()')>=2
+-        assert 'if(apMode)wifiNetworks.resumeAfterSync();' in sync
++        assert 'if(!usingSta)wifiNetworks.resumeAfterSync();' in sync
+         assert 'if(suspended || (syncMode.active() && !syncMode.is(SyncTransport::WiFi)))return;' in wifi
+ 
+ def test_wifi_icon_is_three_bars_and_only_region_repainted():
+--- v0.9.1.1/tests/test_v091_fonts_statusbar.py
++++ v0.10.0/tests/test_v091_fonts_statusbar.py
+@@ -10,7 +10,7 @@
+     physical = (FW / 'Display.cpp').read_text(encoding='utf-8')
+     simulated = (ROOT / 'Wokwi_ILI9341' / 'Display.cpp').read_text(encoding='utf-8')
+     assert physical == simulated
+-    assert 'drawString(x,3,fitted,fg,bg,false,0,134)' in physical
++    assert 'drawString(x,3,fitted,themed(8,fg),bg,false,0,134)' in physical
+     assert 'if(held)smallText(20,4,"H",fg,bg)' in physical
+     assert 'OY+15-height' in physical
+ 
+--- v0.9.1.1/tests/test_v092_wifi_sync_lan.py
++++ v0.10.0/tests/test_v092_wifi_sync_lan.py
+@@ -10,19 +10,19 @@
+     base=ROOT/folder
+     sync=(base/'WiFiSync.cpp').read_text()
+     networks=(base/'WiFiNetworks.cpp').read_text()
+-    assert 'const bool staReady=(WiFi.status()==WL_CONNECTED);' in sync
+-    assert 'apMode=!staReady;' in sync
+-    assert 'if(apMode){' in sync
++    assert 'usingSta=WiFi.status()==WL_CONNECTED;' in sync
++    assert 'if(WiFi.status()!=WL_CONNECTED&&wifiNetworks.connecting())' in sync
++    assert 'if(!usingSta){' in sync
+     assert 'wifiNetworks.suspendForSync();' in sync
+     assert 'WiFi.mode(WIFI_AP);' in sync
+-    assert 'if(apMode)wifiNetworks.resumeAfterSync();' in sync
+-    assert 'if(!apMode)wifiNetworks.tick();' in sync
++    assert 'if(!usingSta)wifiNetworks.resumeAfterSync();' in sync
++    assert 'if(usingSta)wifiNetworks.tick();' in sync
+     assert 'if(suspended || (syncMode.active() && !syncMode.is(SyncTransport::WiFi)))return;' in networks
+-    assert 'return apMode?WiFi.softAPIP().toString():WiFi.localIP().toString();' in sync
+-    assert 'if(!running || busy())return;' in sync
++    assert 'usingSta?WiFi.localIP():WiFi.softAPIP()' in sync
++    assert 'if(!running||busy())return;' in sync
+     assert 'server.begin();running=true;' in sync
+     assert sync.index('syncMode.enter(SyncTransport::WiFi)') < sync.index('server.begin();running=true;')
+-    assert 'if(apMode){\n    WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);' in sync
++    assert 'if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);' in sync
+ 
+ @pytest.mark.parametrize('folder',['DIY_iPod_Mono','Wokwi_ILI9341'])
+ def test_sync_screen_displays_real_ip(folder):
+@@ -36,3 +36,4 @@
+     s=socket.socket();s.bind(('127.0.0.1',0));port=s.getsockname()[1];s.close()
+     with pytest.raises(ConnectionError,match='Start Wi-Fi Sync'):
+         DeviceClient(f'http://127.0.0.1:{port}').status()
++
+--- v0.9.1.1/tests/theme_loader_test.cpp
++++ v0.10.0/tests/theme_loader_test.cpp
+@@ -4,7 +4,7 @@
+ SDAdapter SD;
+ int main(int argc,char **argv){
+   if(argc!=2)return 10;
+-  if(!theme.reload(argv[1]))return 1;
++  if(!ThemeManager::validate(argv[1]) || !theme.reload(argv[1]))return 1;
+   ThemeManager::Glyph g;
+   if(!theme.glyph('M',false,g)||g.width==0||theme.alpha(g,false,0,0)>15)return 2;
+   if(!theme.glyph(0x416,false,g))return 3; // Cyrillic Zh
+--- v0.9.1.1/Wokwi_ILI9341/Display.cpp
++++ v0.10.0/Wokwi_ILI9341/Display.cpp
+@@ -36,6 +36,7 @@
+   default:bg=0xbdf7;fg=0;hi=0x18a3;low=0x7390;break;
+   }
+ }
++uint16_t Display::themed(uint8_t i,uint16_t fallback)const{return theme.active()?theme.color(i):fallback;}
+ void Display::clear(){surface().fillRect(OX,OY,160,128,bg);}
+ void Display::startFrame(){inFrame=(buffer && buffer->getBuffer());}
+ void Display::endFrame(){
+@@ -133,7 +134,7 @@
+   if(bars>3)bars=3;
+   for(uint8_t i=0;i<bars;i++){
+     const int height=3+3*i;
+-    surface().fillRect(OX+3+5*i,OY+15-height,3,height,fg);
++    surface().fillRect(OX+3+5*i,OY+15-height,3,height,themed(9,fg));
+   }
+ }
+ String Display::fittedTitle(const String& title, int width) const {
+@@ -161,32 +162,32 @@
+   const String fitted=fittedTitle(title,94);
+   const int w=textWidth(fitted,false);
+   const int x=(160-w)/2;
+-  drawString(x,3,fitted,fg,bg,false,0,134);
++  drawString(x,3,fitted,themed(8,fg),bg,false,0,134);
+   batteryIcon();
+-  surface().drawFastHLine(OX,OY+19,160,fg);
++  surface().drawFastHLine(OX,OY+19,160,themed(11,fg));
+ }
+ void Display::footer(const String& s){
+   if(s.isEmpty())return;
+-  surface().drawFastHLine(OX,OY+114,160,fg);
++  surface().drawFastHLine(OX,OY+114,160,themed(11,fg));
+   surface().fillRect(OX,OY+115,160,13,bg);
+   smallText(5,115,s,fg,bg);
+ }
+ void Display::listRow(uint8_t row,const String& s,bool selected,bool submenu){
+   if(row>=ROW_COUNT)return;
+   int y=21+row*18;
+-  uint16_t back=selected?hi:bg,front=selected?bg:fg;
++  uint16_t back=selected?hi:bg,front=selected?themed(4,bg):fg;
+   surface().fillRect(OX+2,OY+y,156,18,back);
+   const int maxWidth=submenu?137:149;
+   String rendered=s;
+   if(textWidth(rendered)>maxWidth)rendered=fittedTitle(rendered,maxWidth);
+   text(6,y+1,rendered,front,back);
+-  if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,front);}
++  if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,themed(selected?6:5,front));}
+ }
+ void Display::progress(int x,int y,int w,int percent){
+   percent=constrain(percent,0,100);
+-  surface().drawRect(OX+x,OY+y,w,8,fg);
++  surface().drawRect(OX+x,OY+y,w,8,themed(11,fg));
+   surface().fillRect(OX+x+2,OY+y+2,w-4,4,bg);
+-  if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,fg);
++  if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,themed(10,fg));
+ }
+ void Display::syncScreen(bool wifi,bool transferring,const String& address){
+   clear();
+@@ -194,23 +195,23 @@
+   const int cx=80;
+   if(wifi){
+     // Three circular Wi-Fi arcs (show upper half only), plus center dot.
+-    for(int r=23;r>=9;r-=7)surface().drawCircle(OX+cx,OY+37,r,fg);
++    for(int r=23;r>=9;r-=7)surface().drawCircle(OX+cx,OY+37,r,themed(5,fg));
+     surface().fillRect(OX+51,OY+38,58,30,bg);
+-    surface().fillCircle(OX+cx,OY+38,3,fg);
++    surface().fillCircle(OX+cx,OY+38,3,themed(5,fg));
+   }else{
+     // USB trident icon: stem, square/circle/triangle tips.
+-    surface().drawLine(OX+cx,OY+41,OX+cx,OY+13,fg);
+-    surface().drawLine(OX+cx,OY+24,OX+65,OY+24,fg);
+-    surface().drawLine(OX+65,OY+24,OX+65,OY+17,fg);
+-    surface().fillRect(OX+62,OY+12,7,7,fg);
+-    surface().drawLine(OX+cx,OY+32,OX+95,OY+32,fg);
+-    surface().drawLine(OX+95,OY+32,OX+95,OY+23,fg);
+-    surface().fillCircle(OX+95,OY+22,4,fg);
+-    surface().fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,fg);
+-    surface().fillCircle(OX+cx,OY+41,3,fg);
++    surface().drawLine(OX+cx,OY+41,OX+cx,OY+13,themed(5,fg));
++    surface().drawLine(OX+cx,OY+24,OX+65,OY+24,themed(5,fg));
++    surface().drawLine(OX+65,OY+24,OX+65,OY+17,themed(5,fg));
++    surface().fillRect(OX+62,OY+12,7,7,themed(5,fg));
++    surface().drawLine(OX+cx,OY+32,OX+95,OY+32,themed(5,fg));
++    surface().drawLine(OX+95,OY+32,OX+95,OY+23,themed(5,fg));
++    surface().fillCircle(OX+95,OY+22,4,themed(5,fg));
++    surface().fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,themed(5,fg));
++    surface().fillCircle(OX+cx,OY+41,3,themed(5,fg));
+   }
+   // Adafruit 5x7 bitmap scaled to ~18x24. Duplicate by 1px for boldness.
+-  surface().setTextSize(3);surface().setTextColor(fg);
++  surface().setTextSize(3);surface().setTextColor(themed(7,fg));
+   surface().setCursor(OX+44,OY+49);surface().print("SYNC");
+   surface().setCursor(OX+45,OY+49);surface().print("SYNC");
+   surface().setTextSize(1);
+@@ -236,14 +237,14 @@
+ void Display::batteryIcon(){
+   const int bx=136,by=6;
+   surface().fillRect(OX+bx,OY+by,22,10,bg);
+-  surface().drawRect(OX+bx,OY+by,19,9,fg);
+-  surface().fillRect(OX+bx+19,OY+by+3,2,3,fg);
++  surface().drawRect(OX+bx,OY+by,19,9,themed(9,fg));
++  surface().fillRect(OX+bx+19,OY+by+3,2,3,themed(9,fg));
+   int b=batteryBand();
+   if(b==255){
+-    surface().fillRect(OX+bx+8,OY+by+2,2,3,fg);
+-    surface().drawPixel(OX+bx+8,OY+by+6,fg);
++    surface().fillRect(OX+bx+8,OY+by+2,2,3,themed(9,fg));
++    surface().drawPixel(OX+bx+8,OY+by+6,themed(9,fg));
+   }else if(b){
+-    surface().fillRect(OX+bx+2,OY+by+2,(15*b)/4,5,fg);
++    surface().fillRect(OX+bx+2,OY+by+2,(15*b)/4,5,themed(9,fg));
+   }
+ }
+ void Display::nowPlaying(const String& title,const String& artist,const String& album,bool paused,uint32_t trackNumber,uint32_t trackCount){
+@@ -256,7 +257,7 @@
+ void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration){
+   // Update only the bottom region; never erase the header and metadata lines.
+   surface().fillRect(OX,OY+96,160,32,bg);
+-  surface().drawRoundRect(OX+13,OY+96,134,10,5,fg);
++  surface().drawRoundRect(OX+13,OY+96,134,10,5,themed(11,fg));
+   const int percent=mode==1?volume:mode==2?scrub:progress;
+   if(mode==2){
+     int px=16+125*constrain(percent,0,100)/100;
+@@ -267,7 +268,7 @@
+       String right="-"+timeLabel(total-at);smallText(154-textWidth(right,true),112,right,fg,bg);
+     }
+   }else if(mode==1){
+-    surface().fillRect(OX+15,OY+99,129*constrain(percent,0,100)/100,4,fg);
++    surface().fillRect(OX+15,OY+99,129*constrain(percent,0,100)/100,4,themed(7,fg));
+     // Small / big speaker pictograms as on the iPod volume overlay.
+     surface().fillRect(OX+10,OY+114,3,6,fg);
+     surface().fillTriangle(OX+13,OY+113,OX+17,OY+110,OX+17,OY+123,fg);
+@@ -275,7 +276,7 @@
+     surface().fillTriangle(OX+143,OY+113,OX+148,OY+110,OX+148,OY+123,fg);
+     smallText(69,112,String(volume)+"%",fg,bg);
+   }else{
+-    surface().fillRoundRect(OX+15,OY+98,129*constrain(percent,0,100)/100,6,3,fg);
++    surface().fillRoundRect(OX+15,OY+98,129*constrain(percent,0,100)/100,6,3,themed(10,fg));
+     smallText(6,112,timeLabel(elapsed),fg,bg);
+     String right=knownDuration?"-"+timeLabel(remaining):"--:--";
+     const int w=textWidth(right,true);
+--- v0.9.1.1/Wokwi_ILI9341/Display.h
++++ v0.10.0/Wokwi_ILI9341/Display.h
+@@ -38,6 +38,7 @@
+   void bootLogo();
+   bool streamMonoFrame(const uint8_t* packed, uint16_t white=0xffff, uint16_t black=0x0000);
+   bool streamGray2Frame(const uint8_t* packed,const uint16_t colors[4]);
++  uint16_t themed(uint8_t index,uint16_t fallback)const;
+   uint16_t background()const{return bg;}
+   uint16_t foreground()const{return fg;}
+   uint16_t selectedBackground()const{return hi;}
+--- v0.9.1.1/Wokwi_ILI9341/Library.cpp
++++ v0.10.0/Wokwi_ILI9341/Library.cpp
+@@ -3,6 +3,8 @@
+ #include <SPI.h>
+ #include <algorithm>
+ #include <cstring>
++#include <memory>
++#include <new>
+ #if FEATURE_SD_FORMAT
+ #define DISABLE_FS_H_WARNING
+ #include <SdFat.h>
+@@ -37,7 +39,14 @@
+   }
+   if(start>=f.size()){f.close();return 0;}
+   f.seek(start);
+-  uint8_t b[4096];int n=f.read(b,sizeof(b));
++  // This probe is inlined into recursive scanFolder by -Os. A 4 KiB local
++  // array made EACH recursive frame 4416 bytes and overflowed loopTask's
++  // 8192-byte stack before TFT initialization. Keep the bounded window on
++  // the heap; allocation failure leaves duration unknown without failing boot.
++  constexpr size_t probeBytes=4096;
++  std::unique_ptr<uint8_t[]> b(new(std::nothrow) uint8_t[probeBytes]);
++  if(!b){f.close();return 0;}
++  int n=f.read(b.get(),probeBytes);
+   uint32_t secs=0;
+   for(int i=0;i+4<n;i++){
+     if(b[i]!=0xff || (b[i+1]&0xe0)!=0xe0)continue;
+@@ -55,9 +64,9 @@
+     const int mono=((b[i+3]>>6)&3)==3;
+     const int side=(version==3?(mono?17:32):(mono?9:17));
+     const int off=i+4+((b[i+1]&1)?0:2)+side;
+-    if(off+12<n && (memcmp(b+off,"Xing",4)==0 || memcmp(b+off,"Info",4)==0)){
+-      const uint32_t flags=bigEndian4(b+off+4);
+-      if(flags&1){const uint32_t frames=bigEndian4(b+off+8);
++    if(off+12<n && (memcmp(b.get()+off,"Xing",4)==0 || memcmp(b.get()+off,"Info",4)==0)){
++      const uint32_t flags=bigEndian4(b.get()+off+4);
++      if(flags&1){const uint32_t frames=bigEndian4(b.get()+off+8);
+         if(frames)secs=(uint32_t)(((uint64_t)frames*samplesPerFrame+sampleRate/2)/sampleRate);
+       }
+     }
+--- v0.9.1.1/Wokwi_ILI9341/sketch.ino
++++ v0.10.0/Wokwi_ILI9341/sketch.ino
+@@ -17,6 +17,7 @@
+ #include "ClockService.h"
+ #include "UsbSync.h"
+ #include "SyncMode.h"
++#include "SyncFiles.h"
+ #include "Feedback.h"
+ #include <SPI.h>
+ void setup(){
+@@ -25,7 +26,7 @@
+   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
+ #endif
+   delay(200);
+-  MONOPOD_LOG.println("\nMonoPod v0.9.1.1 / Wokwi");
++  MONOPOD_LOG.println("\nMonoPod v0.10.0 / Wokwi");
+ #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
+     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
+@@ -41,6 +42,9 @@
+   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
+   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
+   const bool sdMounted=media.begin(); // IMPORTANT: initialize SD SPI mode BEFORE first TFT transaction
++  const bool recoveryNeeded=sdMounted && (SD.exists("/.monopod-transfer.target") || SD.exists("/Music/.monopod-target.txt") || SD.exists("/Music/.monopod-wifi.target"));
++  SyncFiles::recover();
++  if(recoveryNeeded)media.rescan(); // restored files must be present in the initial player index
+   display.begin();
+   if(!sdMounted)MONOPOD_LOG.println("SD: "+media.lastError());
+   else {MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
+--- v0.9.1.1/Wokwi_ILI9341/SyncFiles.cpp
++++ v0.10.0/Wokwi_ILI9341/SyncFiles.cpp
+@@ -0,0 +1,116 @@
++#include "SyncFiles.h"
++#include "Library.h"
++#include "Theme.h"
++#include "Display.h"
++#include "Settings.h"
++#include <WiFi.h>
++namespace SyncFiles {
++String error;
++namespace {
++const char* PART="/.monopod-transfer.part";
++const char* BACKUP="/.monopod-transfer.bak";
++const char* JOURNAL="/.monopod-transfer.target";
++File output;String target;uint32_t expected=0,checksum=0,received=0,runningCRC=~0u,lastWrite=0;
++bool active=false,isTheme=false,unknownLength=false;
++bool fail(const char* text){error=text;return false;}
++bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes";}
++String number(uint64_t n){char buf[24];snprintf(buf,sizeof(buf),"%llu",(unsigned long long)n);return String(buf);}
++String entry(File& f,const String& path){return "{\"name\":"+quote(path.substring(path.lastIndexOf('/')+1))+",\"path\":"+quote(path)+",\"directory\":"+(f.isDirectory()?"true":"false")+",\"size\":"+number(f.size())+",\"modified\":"+number(f.getLastWrite())+"}";}
++}
++uint32_t crcStep(uint32_t c,const uint8_t* b,size_t n){for(size_t i=0;i<n;i++){c^=b[i];for(uint8_t j=0;j<8;j++)c=(c>>1)^((c&1)?0xedb88320UL:0);}return c;}
++String quote(const String& s){String out="\"";for(size_t i=0;i<s.length();i++){uint8_t c=s[i];if(c=='"'||c=='\\'){out+='\\';out+=(char)c;}else if(c<32){char h[7];snprintf(h,sizeof(h),"\\u%04x",c);out+=h;}else out+=(char)c;}return out+'"';}
++bool canonical(const String& in,String& out,bool theme){
++ out="";if(in.isEmpty()||in[0]!='/'||in.length()>240)return fail("INVALID_PATH");
++ int start=1;out="/";
++ while(start<(int)in.length()){
++  int end=in.indexOf('/',start);if(end<0)end=in.length();String part=in.substring(start,end);start=end+1;
++  if(part.isEmpty())continue;
++  if(part=="."||part==".."||part[0]=='.'||part.endsWith(".")||part.endsWith(" ")||part.length()>90)return fail("INVALID_PATH");
++  for(size_t i=0;i<part.length();i++){uint8_t c=part[i];if(c<32||c==127||strchr("\\:<>\"|*?",c))return fail("INVALID_PATH");}
++  if(out.length()>1)out+='/';out+=part;
++ }
++ String low=out;low.toLowerCase();
++ if(theme && low=="/monopod/theme.mpt")return true;
++ if(low=="/monopod"||low.startsWith("/monopod/")||low=="/ipod_control"||low.startsWith("/ipod_control/")||low.startsWith("/system volume information")||low.startsWith("/$recycle.bin")||low.startsWith("/recycler"))return fail("PROTECTED_PATH");
++ return true;
++}
++String fromHex(const String& s){if(s.length()%2||s.length()>480)return "";String out;for(size_t i=0;i<s.length();i+=2){char a=s[i],b=s[i+1];auto digit=[](char c)->int {if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;if(c>='A'&&c<='F')return c-'A'+10;return -1;};int x=digit(a),y=digit(b);if(x<0||y<0||!(x*16+y))return "";out+=(char)(x*16+y);}return out;}
++bool gate(SyncTransport who){error="";if(!media.sdOK())return fail("NO_SD");if(!syncMode.canWrite(who))return fail("SYNC_REQUIRED");return true;}
++String info(){
++ String mode=syncMode.is(SyncTransport::UsbCdc)?"usb":syncMode.is(SyncTransport::WiFi)?"wifi":"none";
++ uint64_t total=media.sdOK()?media.totalBytes():0,used=media.sdOK()?media.usedBytes():0;
++ String formats="[\".mp3\",\".wav\"";
++#if FEATURE_FLAC
++ formats+=",\".flac\"";
++#endif
++#if FEATURE_AAC
++ formats+=",\".aac\"";
++#endif
++ formats+="]";
++ return "{\"firmware\":\"0.10.0\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"audio_formats\":"+formats+",\"capabilities\":[\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\"]}";
++}
++String stat(const String& path,SyncTransport who){String p;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return "";File f=SD.open(p.c_str());if(!f){fail("NOT_FOUND");return "";}String result=entry(f,p);f.close();return result;}
++String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who){
++ String p;if(!gate(who)||!canonical(path,p))return "";if(!limit||limit>32){fail("INVALID_LIMIT");return "";}File d=SD.open(p.c_str());if(!d||!d.isDirectory()){if(d)d.close();fail("NOT_DIRECTORY");return "";}
++ String result="{\"entries\":[";uint32_t seen=0;uint16_t count=0;bool more=false;
++ File f=d.openNextFile();while(f){String name=f.name();name=name.substring(name.lastIndexOf('/')+1);String full=(p=="/"?"/":p+"/")+name,checked;
++  if(canonical(full,checked)){if(seen++>=offset){if(count==limit){more=true;f.close();break;}if(count++)result+=',';result+=entry(f,full);}}
++  f.close();f=d.openNextFile();yield();
++ }d.close();error="";result+="],\"next\":";result+=more?String(offset+count):String("-1");return result+"}";
++}
++bool read(const String& path,uint32_t offset,uint8_t* buffer,size_t count,size_t& got,SyncTransport who){String p;got=0;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return false;if(count>65536)return fail("INVALID_COUNT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()||offset>f.size()){f.close();return fail("INVALID_RANGE");}if(offset==f.size()){f.close();return true;}if(!f.seek(offset)){f.close();return fail("SEEK_FAILED");}size_t n=min(count,(size_t)(f.size()-offset));int actual=f.read(buffer,n);f.close();if(actual<0||(size_t)actual!=n)return fail("SD_READ");got=n;return true;}
++bool mkdir(const String& path,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(SD.exists(p.c_str()))return fail("ALREADY_EXISTS");return SD.mkdir(p.c_str())||fail("MKDIR_FAILED");}
++bool remove(const String& path,bool directory,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(protectedRoot(p))return fail("PROTECTED_ROOT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()!=directory){f.close();return fail("WRONG_TYPE");}if(directory){File child=f.openNextFile();if(child){child.close();f.close();return fail("DIRECTORY_NOT_EMPTY");}}f.close();return (directory?SD.rmdir(p.c_str()):SD.remove(p.c_str()))||fail("DELETE_FAILED");}
++bool rename(const String& path,const String& dest,SyncTransport who){String p,q;if(!gate(who)||active||!canonical(path,p)||!canonical(dest,q))return false;if(protectedRoot(p)||protectedRoot(q))return fail("PROTECTED_ROOT");if(SD.exists(q.c_str()))return fail("ALREADY_EXISTS");if(!SD.exists(p.c_str()))return fail("NOT_FOUND");if(q.startsWith(p+"/"))return fail("INVALID_PATH");return SD.rename(p.c_str(),q.c_str())||fail("RENAME_FAILED");}
++void recover(){
++ if(!media.sdOK()||active)return;
++
++ const char* oldJournals[]={"/Music/.monopod-target.txt","/Music/.monopod-wifi.target"};
++ const char* oldBackups[]={"/Music/.monopod-previous.bak","/Music/.monopod-wifi.bak"};
++ for(int i=0;i<2;i++)if(SD.exists(oldJournals[i])){File j=SD.open(oldJournals[i]);String name=j?j.readStringUntil('\n'):String();if(j)j.close();name.trim();String dest="/Music/"+name,checked;
++  if(name.indexOf('/')<0&&canonical(dest,checked)){if(SD.exists(oldBackups[i])){if(SD.exists(dest.c_str()))SD.remove(oldBackups[i]);else SD.rename(oldBackups[i],dest.c_str());}if(!SD.exists(oldBackups[i]))SD.remove(oldJournals[i]);}
++ }
++ if(SD.exists("/MonoPod/theme.bak")&&!SD.exists("/MonoPod/theme.mpt"))SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
++ SD.remove("/Music/.monopod-upload.part");SD.remove("/Music/.monopod-wifi.part");
++ if(SD.exists(JOURNAL)){File j=SD.open(JOURNAL);String p=j?j.readStringUntil('\n'):String();if(j)j.close();p.trim();String checked;if(!canonical(p,checked,p=="/MonoPod/theme.mpt"))return;
++  if(SD.exists(BACKUP)){if(SD.exists(p.c_str())){if(!SD.remove(BACKUP))return;}else if(!SD.rename(BACKUP,p.c_str()))return;}
++  if(!SD.exists(BACKUP))SD.remove(JOURNAL);
++ }
++ SD.remove(PART);
++}
++bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who,bool legacy){
++ if(!gate(who))return false;if(active)return fail("TRANSFER_ACTIVE");String p;if(!canonical(path,p,theme))return false;
++ if(theme && p!="/MonoPod/theme.mpt")return fail("INVALID_THEME_PATH");if(p=="/"||size>1073741824UL|| (theme&&size>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
++ recover();if(SD.exists(BACKUP)||SD.exists(JOURNAL))return fail("RECOVERY_PENDING");
++ if(SD.exists(p.c_str())){File f=SD.open(p.c_str());bool dir=f&&f.isDirectory();if(f)f.close();if(dir)return fail("IS_DIRECTORY");if(!replace)return fail("ALREADY_EXISTS");}
++ uint64_t total=media.totalBytes(),used=media.usedBytes();if(total<used||total-used<(uint64_t)size+4096)return fail("NO_SPACE");
++ int slash=p.lastIndexOf('/');String parent=slash>0?p.substring(0,slash):"/";
++ if(theme && !SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
++ if(!SD.exists(parent.c_str()))return fail("PARENT_NOT_FOUND");
++ SD.remove(PART);output=SD.open(PART,FILE_WRITE);if(!output)return fail("OPEN_FAILED");
++ target=p;expected=size;checksum=crc;received=0;runningCRC=~0u;active=true;isTheme=theme;unknownLength=legacy;lastWrite=millis();return true;
++}
++bool write(const uint8_t* data,size_t n){if(!active)return fail("NO_TRANSFER");if(n>1073741824UL-received||(!unknownLength && n>expected-received)|| (isTheme && received+n>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
++ if(unknownLength && media.totalBytes()-media.usedBytes()<n+4096)return fail("NO_SPACE");
++ if(output.write(data,n)!=n)return fail("SD_WRITE");runningCRC=crcStep(runningCRC,data,n);received+=n;lastWrite=millis();return true;}
++void abort(){if(output)output.close();if(active)SD.remove(PART);active=false;target="";}
++bool busy(){return active;}
++void tick(){if(active && (uint32_t)(millis()-lastWrite)>15000){abort();error="TIMEOUT";}}
++bool commit(){
++ if(!active)return fail("NO_TRANSFER");output.flush();output.close();
++ File verified=SD.open(PART,FILE_READ);bool validSize=verified && verified.size()==received;if(verified)verified.close();if(!validSize){abort();return fail("SD_SIZE_MISMATCH");}
++ if(!unknownLength && (received!=expected || ~runningCRC!=checksum)){abort();return fail("SIZE_OR_CRC_MISMATCH");}
++ if(isTheme&&!ThemeManager::validate(PART)){abort();return fail("INVALID_THEME_OR_CRC");}
++ String dest=target;bool old=SD.exists(dest.c_str()),installTheme=isTheme;
++ File j=SD.open(JOURNAL,FILE_WRITE);if(!j){abort();return fail("JOURNAL_WRITE");}j.println(dest);j.flush();j.close();
++ if(old&&!SD.rename(dest.c_str(),BACKUP)){SD.remove(JOURNAL);abort();return fail("BACKUP_RENAME");}
++ if(!SD.rename(PART,dest.c_str())){if(old)SD.rename(BACKUP,dest.c_str());if(!SD.exists(BACKUP))SD.remove(JOURNAL);abort();return fail("COMMIT_FAILED");}
++ active=false;target="";
++ if(installTheme&&!display.reloadTheme()){
++  SD.remove(dest.c_str());if(old)SD.rename(BACKUP,dest.c_str());display.reloadTheme();if(!SD.exists(BACKUP))SD.remove(JOURNAL);return fail("THEME_ACTIVATION_FAILED");
++ }
++ if(old&&!SD.remove(BACKUP))return fail("BACKUP_CLEANUP_PENDING");
++ if(!SD.remove(JOURNAL))return fail("JOURNAL_CLEANUP_PENDING");return true;
++}
++}
++
+--- v0.9.1.1/Wokwi_ILI9341/SyncFiles.h
++++ v0.10.0/Wokwi_ILI9341/SyncFiles.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include "Config.h"
++#include "SyncMode.h"
++#include <SD.h>
++namespace SyncFiles {
++extern String error;
++bool canonical(const String& input,String& output,bool theme=false);
++String fromHex(const String& hex);
++String quote(const String& s);
++String info();
++String stat(const String& path,SyncTransport who);
++String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who);
++bool gate(SyncTransport who);
++bool read(const String& path,uint32_t offset,uint8_t* buffer,size_t count,size_t& got,SyncTransport who);
++bool mkdir(const String& path,SyncTransport who);
++bool remove(const String& path,bool directory,SyncTransport who);
++bool rename(const String& path,const String& dest,SyncTransport who);
++void recover();
++bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who,bool legacy=false);
++bool write(const uint8_t* data,size_t count);
++bool commit();
++void abort();
++bool busy();
++void tick();
++uint32_t crcStep(uint32_t crc,const uint8_t* data,size_t count);
++}
+--- v0.9.1.1/Wokwi_ILI9341/SyncMode.cpp
++++ v0.10.0/Wokwi_ILI9341/SyncMode.cpp
+@@ -3,6 +3,7 @@
+ #include "AudioEngine.h"
+ #include "Feedback.h"
+ #include "UI.h"
++#include "SyncFiles.h"
+ SyncController syncMode;
+ bool SyncController::enter(SyncTransport wanted) {
+   if(wanted==SyncTransport::None || !media.sdOK()) return false;
+@@ -14,6 +15,7 @@
+   return true;
+ }
+ bool SyncController::leave(SyncTransport expected) {
++  if(SyncFiles::busy())return false;
+   if(current!=expected || expected==SyncTransport::None) return false;
+   current=SyncTransport::None;
+   ui.redraw();
+--- v0.9.1.1/Wokwi_ILI9341/Theme.cpp
++++ v0.10.0/Wokwi_ILI9341/Theme.cpp
+@@ -20,14 +20,16 @@
+   File f=SD.open(path,FILE_READ);
+   if(!f)return false;
+   const size_t fileSize=f.size();
+-  if(fileSize<28 || fileSize>MAX_BYTES+28){f.close();return false;}
+-  uint8_t h[28];
+-  if(f.read(h,sizeof(h))!=sizeof(h) || memcmp(h,"MPT1",4)!=0 || h[4]!=1 || h[5]!=1){f.close();return false;}
+-  const uint8_t bh=h[6],sh=h[7];
+-  const uint16_t bc=rd16(h+8),sc=rd16(h+10);
+-  if(bh<8||bh>24||sh<8||sh>24||bc>256||sc>256||bc==0||sc==0){f.close();return false;}
+-  const uint32_t size=rd32(h+20),checksum=rd32(h+24);
+-  if(size!=fileSize-28 || size>MAX_BYTES){f.close();return false;}
++  if(fileSize<28 || fileSize>MAX_BYTES+44){f.close();return false;}
++  uint8_t h[44]={};
++  if(f.read(h,28)!=28){f.close();return false;}
++  bool v2=memcmp(h,"MPT2",4)==0 && h[4]==2;
++  if((!v2 && (memcmp(h,"MPT1",4)!=0||h[4]!=1))||h[5]!=1){f.close();return false;}
++  size_t header=v2?44:28;if(v2&&f.read(h+28,16)!=16){f.close();return false;}
++  const uint8_t bh=h[6],sh=h[7];const uint16_t bc=rd16(h+8),sc=rd16(h+10);
++  if(bh!=16||sh!=12||bc>256||sc>256||!bc||!sc){f.close();return false;}
++  const uint32_t size=rd32(h+header-8),checksum=rd32(h+header-4);
++  if(size!=fileSize-header||size>MAX_BYTES){f.close();return false;}
+   uint8_t *raw=(uint8_t*)heap_caps_malloc(size,MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);
+   if(!raw)raw=(uint8_t*)malloc(size);
+   if(!raw){f.close();return false;}
+@@ -47,7 +49,7 @@
+       if(pos+7>size){free(raw);free(decoded);return false;}
+       const uint32_t cp=rd32(raw+pos);
+       const uint8_t width=raw[pos+4],advance=raw[pos+5],reserved=raw[pos+6];pos+=7;
+-      if((i&&cp<=prior)||!width||width>24||!advance||advance>32||reserved){free(raw);free(decoded);return false;}
++      if(cp>0x10ffff || (cp>=0xd800&&cp<=0xdfff) || (i&&cp<=prior)||!width||width>24||!advance||advance>32||reserved){free(raw);free(decoded);return false;}
+       const size_t pixelBytes=((size_t)width*height+1)/2;
+       if(pos+pixelBytes>size){free(raw);free(decoded);return false;}
+       dest[i]={cp,(uint32_t)pos,width,advance};pos+=pixelBytes;prior=cp;
+@@ -58,6 +60,9 @@
+   unload();bytes=raw;length=size;bigCount=bc;smallCount=sc;bigHeight=bh;smallHeight=sh;
+   memcpy(big,newBig,bc*sizeof(Glyph));memcpy(tiny,newSmall,sc*sizeof(Glyph));free(decoded);
+   for(int i=0;i<4;i++)colors[i]=rd16(h+12+i*2);
++  colors[4]=colors[0]; // MPT1 inheritance: selected foreground
++  colors[5]=colors[6]=colors[7]=colors[8]=colors[9]=colors[10]=colors[11]=colors[1];
++  if(v2)for(int i=4;i<12;i++)colors[i]=rd16(h+12+i*2);
+   return true;
+ }
+ bool ThemeManager::glyph(uint32_t cp,bool small,Glyph& out) const {
+@@ -73,3 +78,19 @@
+   const uint32_t p=(uint32_t)y*g.width+x;
+   const uint8_t b=bytes[g.offset+p/2];return (p&1)?(b&15):(b>>4);
+ }
++
++bool ThemeManager::validate(const char* path){
++ File f=SD.open(path,FILE_READ);if(!f)return false;size_t length=f.size();uint8_t h[44]={};
++ if(length<28||length>MAX_BYTES+44||f.read(h,28)!=28){f.close();return false;}
++ bool v2=!memcmp(h,"MPT2",4)&&h[4]==2;size_t header=v2?44:28;
++ if((!v2&&(memcmp(h,"MPT1",4)||h[4]!=1))||h[5]!=1||h[6]!=16||h[7]!=12||(v2&&f.read(h+28,16)!=16)){f.close();return false;}
++ uint16_t bc=rd16(h+8),sc=rd16(h+10);uint32_t size=rd32(h+header-8),expected=rd32(h+header-4);
++ if(!bc||!sc||bc>256||sc>256||length!=header+size||size>MAX_BYTES){f.close();return false;}
++ uint8_t buffer[512];uint32_t crc=~0u;size_t left=size;
++ while(left){size_t n=min(left,sizeof(buffer));if(f.read(buffer,n)!=n){f.close();return false;}for(size_t i=0;i<n;i++){crc^=buffer[i];for(int j=0;j<8;j++)crc=(crc>>1)^((crc&1)?0xedb88320UL:0);}left-=n;}
++ if(~crc!=expected||!f.seek(header)){f.close();return false;}
++ size_t pos=0;for(int table=0;table<2;table++){uint32_t prior=0;for(uint16_t i=0;i<(table?sc:bc);i++){
++  uint8_t g[7];if(pos+7>size||f.read(g,7)!=7){f.close();return false;}pos+=7;uint32_t cp=rd32(g);size_t pixels=((size_t)g[4]*(table?12:16)+1)/2;
++  if(cp>0x10ffff||(cp>=0xd800&&cp<=0xdfff)||(i&&cp<=prior)||!g[4]||g[4]>24||!g[5]||g[5]>32||g[6]||pixels>size-pos){f.close();return false;}pos+=pixels;prior=cp;if(!f.seek(header+pos)){f.close();return false;}
++ }}f.close();return pos==size;
++}
+--- v0.9.1.1/Wokwi_ILI9341/Theme.h
++++ v0.10.0/Wokwi_ILI9341/Theme.h
+@@ -8,12 +8,13 @@
+   struct Glyph {uint32_t codepoint; uint32_t offset; uint8_t width; uint8_t advance;};
+   ThemeManager() = default;
+   ~ThemeManager();
++  static bool validate(const char* path);
+   bool reload(const char* path="/MonoPod/theme.mpt");
+   void unload();
+   bool active() const {return bytes != nullptr;}
+   bool glyph(uint32_t codepoint,bool small,Glyph& out) const;
+   uint8_t alpha(const Glyph& g, bool small, uint8_t x, uint8_t y) const;
+-  uint16_t color(uint8_t index) const{return colors[index&3];}
++  uint16_t color(uint8_t index) const{return colors[index<12?index:1];}
+   static constexpr uint32_t MAX_BYTES = 131072;
+ private:
+   uint8_t *bytes=nullptr;
+@@ -21,6 +22,6 @@
+   Glyph big[256]={},tiny[256]={};
+   uint16_t bigCount=0,smallCount=0;
+   uint8_t bigHeight=16,smallHeight=12;
+-  uint16_t colors[4]={0xce59,0x2104,0x2945,0x8c71};
++  uint16_t colors[12]={0xce59,0x2104,0x2945,0x8c71};
+ };
+ extern ThemeManager theme;
+--- v0.9.1.1/Wokwi_ILI9341/UI.cpp
++++ v0.10.0/Wokwi_ILI9341/UI.cpp
+@@ -688,7 +688,7 @@
+         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
+         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
+           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
+-        case 3:value="0.9.1.1";break;
++        case 3:value="0.10.0";break;
+         case 4:value=String(IpodIdentity::guid());break;
+         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
+         }
+--- v0.9.1.1/Wokwi_ILI9341/UsbSync.cpp
++++ v0.10.0/Wokwi_ILI9341/UsbSync.cpp
+@@ -1,236 +1,66 @@
+ #include "UsbSync.h"
++#include "SyncFiles.h"
+ #include "Library.h"
+-#include "AudioEngine.h"
++#include "UI.h"
++#include "Settings.h"
++#include "IpodIdentity.h"
+ #include "WiFiSync.h"
+-#include "UI.h"
+-#include "IpodIdentity.h"
+-#include "SyncMode.h"
+-#include <stdlib.h>
+-#include <ctype.h>
+-
++#include <errno.h>
+ UsbSyncService usbSync;
+ #if FEATURE_USB_SYNC
+ namespace {
+-constexpr uint32_t MAX_FILE_BYTES=1024UL*1024UL*1024UL;
+-constexpr uint16_t CHUNK_BYTES=1024;
+-constexpr uint32_t RECEIVE_TIMEOUT_MS=15000;
+-constexpr char PART_PATH[]="/Music/.monopod-upload.part";
+-constexpr char BACKUP_PATH[]="/Music/.monopod-previous.bak";
+-constexpr char JOURNAL_PATH[]="/Music/.monopod-target.txt";
+-
+-uint32_t crc32Step(uint32_t crc, uint8_t byte) {
+-  crc^=byte;
+-  for(uint8_t i=0;i<8;i++) crc=(crc>>1)^((crc&1)?0xEDB88320UL:0);
+-  return crc;
++bool uintArg(const String& s,uint32_t& v,int base=10){if(s.isEmpty()||s.length()>10)return false;for(size_t i=0;i<s.length();i++)if(base==10? !isdigit((unsigned char)s[i]):!isxdigit((unsigned char)s[i]))return false;errno=0;char* end;unsigned long n=strtoul(s.c_str(),&end,base);if(errno||*end)return false;v=n;return true;}
++String token(const String& s,int& i){if(i>=(int)s.length())return "";int end=s.indexOf(' ',i);if(end<0)end=s.length();String t=s.substring(i,end);i=end+1;return t;}
+ }
+-bool parseUint(const String& s, uint32_t& output, int base) {
+-  if(s.isEmpty())return false;
+-  for(unsigned i=0;i<s.length();i++){
+-    const char c=s[i];
+-    if(base==10 && (c<'0'||c>'9'))return false;
+-    if(base==16 && !isxdigit((unsigned char)c))return false;
++void UsbSyncService::begin(){line.reserve(700);SyncFiles::recover();}
++void UsbSyncService::reply(const String& s){Serial.print("MPOD1 ");Serial.println(s);}
++void UsbSyncService::fail(const char* why){SyncFiles::abort();sending=false;buffered=chunkRemaining=0;line="";discard=true;quietUntil=millis()+1500;reply(String("ERR ")+why);}
++void UsbSyncService::finish(){if(buffered&&!SyncFiles::write(buffer,buffered)){fail(SyncFiles::error.c_str());return;}buffered=0;sending=false;if(!SyncFiles::commit()){String error=SyncFiles::error;SyncFiles::abort();reply("ERR "+error);return;}reply("OK SAVED");}
++void UsbSyncService::command(const String& cmd){
++ if(cmd=="MPOD1 HELLO"){reply(String("READY 4 SD=")+(media.sdOK()?"1":"0"));return;}
++ if(cmd=="MPOD1 X INFO"||cmd=="MPOD1 X STORAGE"){reply("OK "+SyncFiles::info());return;}
++ if(cmd=="MPOD1 INFO"){char a[24],b[24];snprintf(a,sizeof(a),"%llu",(unsigned long long)media.totalBytes());snprintf(b,sizeof(b),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));reply(String("OK INFO SD=")+(media.sdOK()?"1":"0")+" TRACKS="+String((unsigned)media.size())+" TOTAL_BYTES="+a+" FREE_BYTES="+b+" GUID="+IpodIdentity::guid()+" FW=0.10.0 PROTOCOL=4");return;}
++ if(cmd=="MPOD1 SYNC START"){if(!media.sdOK()){reply("ERR NO_SD");return;}reply(syncMode.enter(SyncTransport::UsbCdc)?"OK SYNC_STARTED":"ERR SYNC_BUSY");return;}
++ if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
++ if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
++ if(cmd=="MPOD1 SCAN"){if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}media.rescan();reply("OK SCANNED "+String((unsigned)media.size()));return;}
++ if(cmd.startsWith("MPOD1 X ")){
++  int i=8;String op=token(cmd,i),path=SyncFiles::fromHex(token(cmd,i));
++  if(op=="SMOOTH"){String value=cmd.substring(15);if(value!="0" && value!="1"){reply("ERR ARGUMENTS");return;}settings.data.fontSmoothing=(value=="1");settings.markDirty();reply("OK SMOOTHING");return;}
++  if(op=="LIST"){uint32_t off=0,limit=0;if(!uintArg(token(cmd,i),off)||!uintArg(token(cmd,i),limit)||limit>32){reply("ERR ARGUMENTS");return;}String result=SyncFiles::list(path,off,limit,SyncTransport::UsbCdc);reply(result.length()?"OK "+result:"ERR "+SyncFiles::error);return;}
++  if(op=="STAT"||op=="META"||op=="THEMEINFO"){String result=SyncFiles::stat(op=="THEMEINFO"?"/MonoPod/theme.mpt":path,SyncTransport::UsbCdc);reply(result.length()?"OK "+result:"ERR "+SyncFiles::error);return;}
++  if(op=="READ"||op=="GET"){uint32_t off=0,count=0;if(!uintArg(token(cmd,i),off)||!uintArg(token(cmd,i),count)||count>1024){reply("ERR ARGUMENTS");return;}size_t got=0;if(!SyncFiles::read(path,off,buffer,count,got,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}char crc[9];snprintf(crc,sizeof(crc),"%08lX",(unsigned long)~SyncFiles::crcStep(~0u,buffer,got));reply("DATA "+String(got)+" "+crc);Serial.write(buffer,got);return;}
++  if(op=="MKDIR"||op=="DELETE"||op=="RMDIR"||op=="RENAME"){
++   bool ok=op=="MKDIR"?SyncFiles::mkdir(path,SyncTransport::UsbCdc):op=="RENAME"?SyncFiles::rename(path,SyncFiles::fromHex(token(cmd,i)),SyncTransport::UsbCdc):SyncFiles::remove(path,op=="RMDIR",SyncTransport::UsbCdc);reply(ok?"OK DONE":"ERR "+SyncFiles::error);return;
+   }
+-  char *end=nullptr;
+-  unsigned long v=strtoul(s.c_str(),&end,base);
+-  if(*end || (base==16 && s.length()!=8))return false;
+-  output=(uint32_t)v;
+-  return true;
+-}
+-bool validName(const String& name) {
+-  if(name.length()<5||name.length()>90||name[0]=='.'||name.endsWith("."))return false;
+-  if(name.indexOf("..")>=0)return false;
+-  for(unsigned i=0;i<name.length();i++){
+-    uint8_t c=(uint8_t)name[i];
+-    if(c<32||c==127||c=='/'||c=='\\'||c==':'||c=='<'||c=='>'||c=='"'||c=='|'||c=='*'||c=='?')return false;
++  if(op=="PUT"||op=="THEME"){
++   uint32_t n=0,crc=0,replace=0;String len=token(cmd,i),crcText=token(cmd,i),rep=token(cmd,i);
++   if(!uintArg(len,n)||crcText.length()!=8||!uintArg(crcText,crc,16)||!uintArg(rep,replace)||replace>1){reply("ERR ARGUMENTS");return;}
++   if(!SyncFiles::begin(path,n,crc,replace,op=="THEME",SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
++   size=n;received=0;buffered=0;sending=true;lastByteAt=millis();chunkRemaining=min((uint32_t)sizeof(buffer),size);if(!size){finish();return;}reply("NEXT "+String(chunkRemaining));return;
+   }
+-  return MediaLibrary::isAudio(name);
+-}
+-String destPath(const String& name){return String("/Music/")+name;}
+-// Startup recovery for power-loss between original->backup and upload->original.
+-void recoverReplacement(){
+-  if(!SD.exists(JOURNAL_PATH))return;
+-  File j=SD.open(JOURNAL_PATH,FILE_READ);
+-  String name=j?j.readStringUntil('\n'):String();
+-  if(j)j.close();name.trim();
+-  if(!validName(name))return; // do not touch unknown paths
+-  String dest=destPath(name);
+-  if(SD.exists(BACKUP_PATH)){
+-    if(SD.exists(dest.c_str()))SD.remove(BACKUP_PATH); // new file committed
+-    else SD.rename(BACKUP_PATH,dest.c_str());          // old file restored
+-  }
+-  if(!SD.exists(BACKUP_PATH))SD.remove(JOURNAL_PATH);
+-}
+-}
+-void UsbSyncService::begin(){
+-  line.reserve(180);
+-  if(media.sdOK()){
+-    const bool interrupted=SD.exists(JOURNAL_PATH);
+-    recoverReplacement();
+-    SD.remove(PART_PATH);
+-    if(interrupted)media.rescan();
+-  }
+-}
+-void UsbSyncService::reply(const String& payload){Serial.print("MPOD1 ");Serial.println(payload);}
+-void UsbSyncService::reset(bool removePart){
+-  if(upload)upload.close();
+-  if(removePart && media.sdOK())SD.remove(PART_PATH);
+-  sending=false;replacing=false;size=received=0;chunkRemaining=buffered=0;
+-  fileName="";expectedCrc=0;receivedCrc=0xFFFFFFFFUL;
+-}
+-void UsbSyncService::fail(const char* reason){reset(true);reply(String("ERR ")+reason);}
+-bool UsbSyncService::flushBuffer(){
+-  if(!buffered)return true;
+-  const size_t written=upload.write(buffer,buffered);
+-  if(written!=buffered)return false;
+-  buffered=0;return true;
+-}
+-void UsbSyncService::finish(){
+-  if(!flushBuffer()){fail("SD_WRITE");return;}
+-  upload.flush();upload.close();
+-  if((receivedCrc^0xFFFFFFFFUL)!=expectedCrc){fail("CRC_MISMATCH");return;}
+-  const String dest=destPath(fileName);
+-  const bool exists=SD.exists(dest.c_str());
+-  if(exists && !replacing){fail("ALREADY_EXISTS");return;}
+-  if(exists){
+-    if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){
+-      fail("BACKUP_PENDING");return;
+-    }
+-    File j=SD.open(JOURNAL_PATH,FILE_WRITE);
+-    if(!j){fail("JOURNAL_WRITE");return;}
+-    j.println(fileName);j.flush();j.close();
+-    if(!SD.rename(dest.c_str(),BACKUP_PATH)){
+-      SD.remove(JOURNAL_PATH);fail("BACKUP_RENAME");return;
+-    }
+-  }
+-  if(!SD.rename(PART_PATH,dest.c_str())){
+-    if(exists){SD.rename(BACKUP_PATH,dest.c_str());
+-      if(!SD.exists(BACKUP_PATH))SD.remove(JOURNAL_PATH);}
+-    fail("COMMIT_FAILED");return;
+-  }
+-  if(exists){SD.remove(BACKUP_PATH);SD.remove(JOURNAL_PATH);}
+-  reset(false);
+-  reply(exists?"OK REPLACED":"OK SAVED");
+-}
+-void UsbSyncService::command(const String& cmd){
+-  if(cmd=="MPOD1 HELLO"){
+-    if(!media.sdOK())ui.notify("No microSD card");
+-    reply(String("READY 3 ")+(media.sdOK()?"SD=1":"SD=0"));return;
+-  }
+-  if(cmd=="MPOD1 INFO"){
+-    char totalDec[24],freeDec[24];
+-    snprintf(totalDec,sizeof(totalDec),"%llu",(unsigned long long)media.totalBytes());
+-    snprintf(freeDec,sizeof(freeDec),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));
+-    String answer=String("OK INFO SD=")+(media.sdOK()?"1":"0")+
+-      " TRACKS="+String((unsigned)media.size())+
+-      " TOTAL_BYTES="+String(totalDec)+
+-      " FREE_BYTES="+String(freeDec)+
+-      " GUID="+String(IpodIdentity::guid());
+-    reply(answer);return;
+-  }
+-  if(cmd=="MPOD1 SYNC START"){
+-    if(!media.sdOK()){
+-      ui.notify("No microSD card");reply("ERR NO_SD");return;
+-    }
+-    if(syncMode.active() && !syncMode.is(SyncTransport::UsbCdc)){
+-      reply("ERR SYNC_BUSY");return;
+-    }
+-    if(!syncMode.enter(SyncTransport::UsbCdc)){
+-      reply("ERR SYNC_BUSY");return;
+-    }
+-    reply("OK SYNC_STARTED");return;
+-  }
+-  if(cmd=="MPOD1 SYNC END"){
+-    if(!syncMode.is(SyncTransport::UsbCdc)){
+-      reply("ERR NO_USB_SYNC");return;
+-    }
+-    if(sending){reply("ERR TRANSFER_ACTIVE");return;}
+-    media.rescan();
+-    syncMode.leave(SyncTransport::UsbCdc);
+-    ui.begin();
+-    reply("OK SYNC_ENDED");return;
+-  }
+-  // USB connection and INFO requests are not permission to touch the SD.
+-  if(!syncMode.canWrite(SyncTransport::UsbCdc)){
+-    reply("ERR SYNC_REQUIRED");return;
+-  }
+-  if(cmd=="MPOD1 SCAN"){
+-    if(!media.sdOK()){reply("ERR NO_SD");return;}
+-    if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
+-    media.rescan();ui.redraw();
+-    reply(String("OK SCANNED ")+(unsigned)media.size());return;
+-  }
+-  if(cmd.startsWith("MPOD1 DELETE ")){
+-    if(!media.sdOK()){reply("ERR NO_SD");return;}
+-    if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
+-    const String name=cmd.substring(13);
+-    if(!validName(name)){reply("ERR INVALID_FILE");return;}
+-    const String target=destPath(name);
+-    if(!SD.exists(target.c_str())){reply("ERR NOT_FOUND");return;}
+-    player.stop();
+-    if(!SD.remove(target.c_str())){reply("ERR DELETE_FAILED");return;}
+-    reply("OK DELETED");return;
+-  }
+-  const bool replace=cmd.startsWith("MPOD1 REPLACE ");
+-  if(!replace && !cmd.startsWith("MPOD1 PUT ")){reply("ERR UNKNOWN_COMMAND");return;}
+-  if(!media.sdOK()){reply("ERR NO_SD");return;}
+-  if(wifiSync.active()){reply("ERR WIFI_ACTIVE");return;}
+-  // MPOD1 PUT|REPLACE <decimal-size> <8-char-hex-crc32> <filename>
+-  const int prefix=replace?14:10;
+-  const int p1=cmd.indexOf(' ',prefix),p2=p1>=0?cmd.indexOf(' ',p1+1):-1;
+-  if(p1<0||p2<0){reply("ERR ARGUMENTS");return;}
+-  const String lenStr=cmd.substring(prefix,p1);
+-  const String crcStr=cmd.substring(p1+1,p2);
+-  const String name=cmd.substring(p2+1);
+-  uint32_t n=0,crc=0;
+-  if(!parseUint(lenStr,n,10)||!parseUint(crcStr,crc,16)||n==0||n>MAX_FILE_BYTES||!validName(name)){
+-    reply("ERR INVALID_FILE");return;
+-  }
+-  if(SD.exists(destPath(name).c_str())&&!replace){reply("ERR ALREADY_EXISTS");return;}
+-  if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){
+-    recoverReplacement();
+-    if(SD.exists(JOURNAL_PATH)||SD.exists(BACKUP_PATH)){reply("ERR BACKUP_PENDING");return;}
+-  }
+-  uint64_t freeBytes=media.totalBytes()-media.usedBytes();
+-  // Replacement needs free space for the NEW file while the old one is intact.
+-  // Small filesystem safety margin avoids writing through the last clusters.
+-  if(freeBytes<(uint64_t)n+4096ULL){reply("ERR NO_SPACE");return;}
+-  player.stop();
+-  if(!SD.exists("/Music") && !SD.mkdir("/Music")){reply("ERR MKDIR");return;}
+-  SD.remove(PART_PATH);
+-  upload=SD.open(PART_PATH,FILE_WRITE);
+-  if(!upload){reply("ERR OPEN_FAILED");return;}
+-  fileName=name;size=n;expectedCrc=crc;received=0;receivedCrc=0xFFFFFFFFUL;
+-  buffered=0;sending=true;replacing=replace;lastByteAt=millis();
+-  chunkRemaining=(uint16_t)min((uint32_t)CHUNK_BYTES,size);
+-  reply(String("NEXT ")+chunkRemaining);
++  reply("ERR UNKNOWN_COMMAND");return;
++ }
++ // Legacy v1-v3 commands remain byte-compatible and target /Music only.
++ if(cmd.startsWith("MPOD1 DELETE ")){String name=cmd.substring(13),path="/Music/"+name;if(name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}reply(SyncFiles::remove(path,false,SyncTransport::UsbCdc)?"OK DELETED":"ERR "+SyncFiles::error);return;}
++ bool replace=cmd.startsWith("MPOD1 REPLACE ");if(replace||cmd.startsWith("MPOD1 PUT ")){
++  int i=replace?14:10;uint32_t n=0,crc=0;String len=token(cmd,i),crcText=token(cmd,i),name=cmd.substring(i);
++  if(!uintArg(len,n)||!n||crcText.length()!=8||!uintArg(crcText,crc,16)||name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}
++  if(!SD.exists("/Music"))SD.mkdir("/Music");if(!SyncFiles::begin("/Music/"+name,n,crc,replace,false,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
++  size=n;received=0;buffered=0;sending=true;chunkRemaining=min((uint32_t)sizeof(buffer),size);lastByteAt=millis();reply("NEXT "+String(chunkRemaining));return;
++ }
++ reply("ERR UNKNOWN_COMMAND");
+ }
+ void UsbSyncService::loop(){
+-  if(sending && millis()-lastByteAt>RECEIVE_TIMEOUT_MS){fail("TIMEOUT");return;}
+-  uint16_t budget=256;
+-  while(budget-- && Serial.available()>0){
+-    const int v=Serial.read();if(v<0)break;
+-    if(sending){
+-      const uint8_t byte=(uint8_t)v;
+-      buffer[buffered++]=byte;
+-      receivedCrc=crc32Step(receivedCrc,byte);
+-      received++;chunkRemaining--;lastByteAt=millis();
+-      if(buffered==sizeof(buffer)&&!flushBuffer()){fail("SD_WRITE");return;}
+-      if(chunkRemaining==0){
+-        if(!flushBuffer()){fail("SD_WRITE");return;}
+-        if(received>=size)finish();
+-        else {chunkRemaining=(uint16_t)min((uint32_t)CHUNK_BYTES,size-received);
+-          reply(String("NEXT ")+chunkRemaining);}
+-        return;
+-      }
+-    }else{
+-      if(v=='\n'){
+-        String cmd=line;line="";cmd.trim();
+-        if(!cmd.isEmpty())command(cmd);
+-        return;
+-      }else if(v=='\r')continue;
+-      else if(line.length()<175 && v>=32 && v<256)line+=(char)v;
+-      else {line="";reply("ERR LINE_TOO_LONG");return;}
+-    }
+-  }
++ if(sending && (!Serial || (uint32_t)(millis()-lastByteAt)>15000)){fail("TIMEOUT_OR_DISCONNECT");return;}
++ uint16_t budget=1024;while(budget-- && Serial.available()){
++  int c=Serial.read();if(c<0)break;
++  if(discard){quietUntil=millis()+1500;continue;}
++  if(sending){buffer[buffered++]=(uint8_t)c;received++;chunkRemaining--;lastByteAt=millis();if(!chunkRemaining){if(!SyncFiles::write(buffer,buffered)){fail(SyncFiles::error.c_str());return;}buffered=0;if(received==size)finish();else{chunkRemaining=min((uint32_t)sizeof(buffer),size-received);reply("NEXT "+String(chunkRemaining));}}}
++  else if(c=='\n'){String cmd=line;line="";if(cmd.startsWith("MPOD1 "))command(cmd);}
++  else if(c!='\r'){if(line.length()>=700){line="";discard=true;quietUntil=millis()+1500;reply("ERR LINE_TOO_LONG");}else line+=(char)c;}
++ }
++ if(discard && (int32_t)(millis()-quietUntil)>=0){discard=false;line="";}
+ }
+ #endif
++
+--- v0.9.1.1/Wokwi_ILI9341/UsbSync.h
++++ v0.10.0/Wokwi_ILI9341/UsbSync.h
+@@ -3,27 +3,12 @@
+ #if FEATURE_USB_SYNC
+ #include <SD.h>
+ class UsbSyncService {
+-public:
+-  void begin();
+-  void loop();
+-  bool busy() const {return sending;}
++public:void begin();void loop();bool busy()const{return sending;}
+ private:
+-  File upload;
+-  String line, fileName;
+-  uint32_t size=0, received=0, receivedCrc=0xFFFFFFFFUL, expectedCrc=0;
+-  uint16_t chunkRemaining=0;
+-  uint8_t buffer[512];
+-  uint16_t buffered=0;
+-  uint32_t lastByteAt=0;
+-  bool sending=false, replacing=false;
+-  void command(const String& command);
+-  void fail(const char* reason);
+-  void reset(bool removePart);
+-  bool flushBuffer();
+-  void finish();
+-  void reply(const String& payload);
++ String line;uint32_t size=0,received=0,lastByteAt=0,quietUntil=0;uint16_t chunkRemaining=0,buffered=0;
++ uint8_t buffer[1024];bool sending=false,discard=false;void command(const String& cmd);void reply(const String& payload);void fail(const char* reason);void finish();
+ };
+ #else
+-class UsbSyncService {public: void begin(){} void loop(){} bool busy()const{return false;} };
++class UsbSyncService {public:void begin(){}void loop(){}bool busy()const{return false;}};
+ #endif
+ extern UsbSyncService usbSync;
+--- v0.9.1.1/Wokwi_ILI9341/WiFiSync.cpp
++++ v0.10.0/Wokwi_ILI9341/WiFiSync.cpp
+@@ -1,257 +1,82 @@
+ #include "WiFiSync.h"
+ #include "UsbSync.h"
++#include "SyncFiles.h"
++#include "WiFiNetworks.h"
+ #include "Library.h"
+-#include "AudioEngine.h"
+-#include <SD.h>
+-#include <WiFi.h>
+-#include "ClockService.h"
+ #include "Display.h"
+ #include "Theme.h"
+ #include "UI.h"
+ #include "Settings.h"
+-#include "SyncMode.h"
+-#include "WiFiNetworks.h"
++#include "ClockService.h"
++#include <WiFi.h>
+ WiFiSyncService wifiSync;
+ #if FEATURE_WIFI_SYNC
+-String WiFiSyncService::ip() const {
+-  if(!running)return "Offline";
+-  return apMode?WiFi.softAPIP().toString():WiFi.localIP().toString();
++namespace {
++bool number(const String& s,uint32_t& value,int base=10){if(s.isEmpty()||s.length()>10)return false;for(size_t i=0;i<s.length();i++)if(base==10?!isdigit((unsigned char)s[i]):!isxdigit((unsigned char)s[i]))return false;unsigned long long v=strtoull(s.c_str(),nullptr,base);if(v>0xffffffffULL)return false;value=v;return true;}
+ }
+-void WiFiSyncService::page(){
+-  server.send(200,"text/html; charset=utf-8",
+-    "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
+-    "<title>MonoPod Sync</title><style>body{max-width:560px;margin:2em auto;padding:1em;"
+-    "font:16px system-ui}button,input{margin:8px 0;padding:8px}</style>"
+-    "<h2>MonoPod Sync</h2><p>Upload MP3, WAV, FLAC or AAC to /Music.</p>"
+-    "<form action='/upload' method='post' enctype='multipart/form-data'>"
+-    "<input type='file' name='track' accept='.mp3,.wav,.flac,.aac'>"
+-    "<button type='submit'>Upload</button></form>"
+-    "<button onclick=\"fetch('/time?unix='+Math.floor(Date.now()/1000)).then(()=>alert('Time set'))\">Set clock from this device</button>"
+-    "<p>Local network or MonoPod AP. HTTP only; no public Internet exposure.</p>");
+-}
+-static String safeName(String s){
+-  int cut=max(s.lastIndexOf('/'),s.lastIndexOf('\\'));if(cut>=0)s=s.substring(cut+1);
+-  String out;
+-  for(unsigned int i=0;i<s.length()&&out.length()<90;i++){
+-    const unsigned char c=(unsigned char)s[i];
+-    if(c<32||c==127||c=='/'||c=='\\'||c==':'||c=='<'||c=='>'||c=='"'||c=='|')continue;
+-    out+=(char)c;
+-  }
+-  if(out.startsWith("."))out="track"+out;
+-  return out;
+-}
++String WiFiSyncService::ip()const{return running?(usingSta?WiFi.localIP():WiFi.softAPIP()).toString():"Offline";}
++bool WiFiSyncService::busy()const{return uploadActive||SyncFiles::busy();}
++bool WiFiSyncService::allowed(){if(!SyncFiles::gate(SyncTransport::WiFi)){server.send(409,"text/plain",SyncFiles::error);return false;}return true;}
++void WiFiSyncService::result(bool ok){if(ok)server.send(200,"application/json","{\"ok\":true}");else{String e=SyncFiles::error;int code=e=="NOT_FOUND"?404:e=="SD_WRITE"||e=="SD_READ"?500:e=="NO_SPACE"?507:409;server.send(code,"text/plain",e);}}
+ void WiFiSyncService::upload(){
+-  HTTPUpload &u=server.upload();
+-  if(u.status==UPLOAD_FILE_START){
+-    uploadActive=true;
+-    uploadSuccess=false;uploadError="";uploadName="";
+-    if(!syncMode.canWrite(SyncTransport::WiFi) || !media.sdOK()){
+-      uploadError="Not in Wi-Fi sync or no SD";return;
+-    }
+-    uploadName=safeName(u.filename);
+-    if(!MediaLibrary::isAudio(uploadName) || uploadName.endsWith(".m4a")){
+-      uploadError="Unsupported file";return;
+-    }
+-    if(!SD.exists("/Music") && !SD.mkdir("/Music")){
+-      uploadError="Cannot create Music directory";return;
+-    }
+-    SD.remove("/Music/.monopod-wifi.part");
+-    uploadFile=SD.open("/Music/.monopod-wifi.part",FILE_WRITE);
+-    if(!uploadFile)uploadError="Cannot open temporary file";
+-  }else if(u.status==UPLOAD_FILE_WRITE){
+-    if(uploadFile && uploadFile.write(u.buf,u.currentSize)!=u.currentSize){
+-      uploadError="Write failed";uploadFile.close();
+-    }
+-  }else if(u.status==UPLOAD_FILE_END){
+-    if(uploadFile){uploadFile.flush();uploadFile.close();uploadSuccess=uploadError.isEmpty();}
+-  }else if(u.status==UPLOAD_FILE_ABORTED){
+-    if(uploadFile)uploadFile.close();uploadError="Aborted";
+-    SD.remove("/Music/.monopod-wifi.part");
+-    uploadActive=false;
+-  }
++ HTTPUpload& u=server.upload();
++ if(u.status==UPLOAD_FILE_START){
++  if(uploadActive){uploadError="Only one multipart file is allowed";SyncFiles::abort();return;}
++  uploadActive=true;uploadOk=false;uploadError="";
++  if(!SyncFiles::gate(SyncTransport::WiFi)){uploadError=SyncFiles::error;return;}
++  bool legacy=server.uri()!="/api/fs/upload",theme=server.uri()=="/api/theme"||server.arg("theme")=="1";
++  String path=theme?"/MonoPod/theme.mpt":legacy?"/Music/"+u.filename:server.arg("path");uint32_t size=0,crc=0;
++  if(!legacy && (!number(server.arg("size"),size)||server.arg("crc").length()!=8||!number(server.arg("crc"),crc,16))){uploadError="INVALID_ARGUMENTS";return;}
++  if(legacy&&!theme){if(u.filename.indexOf('/')>=0||u.filename.indexOf('\\')>=0||!MediaLibrary::isAudio(u.filename)){uploadError="INVALID_FILE";return;}if(!SD.exists("/Music"))SD.mkdir("/Music");}
++  if(!SyncFiles::begin(path,size,crc,legacy||server.arg("replace")=="1",theme,SyncTransport::WiFi,legacy))uploadError=SyncFiles::error;
++ }else if(u.status==UPLOAD_FILE_WRITE){
++  if(uploadError.length())return;if(!SyncFiles::write(u.buf,u.currentSize)){uploadError=SyncFiles::error;SyncFiles::abort();}
++ }else if(u.status==UPLOAD_FILE_END){uploadOk=uploadError.isEmpty()&&SyncFiles::busy();}
++ else if(u.status==UPLOAD_FILE_ABORTED){SyncFiles::abort();uploadError="ABORTED";uploadActive=false;uploadOk=false;}
+ }
+ void WiFiSyncService::finished(){
+-  static const char* part="/Music/.monopod-wifi.part";
+-  static const char* backup="/Music/.monopod-wifi.bak";
+-  static const char* journal="/Music/.monopod-wifi.target";
+-  if(uploadFile)uploadFile.close();
+-  bool ok=uploadSuccess && uploadError.isEmpty() && !uploadName.isEmpty();
+-  if(ok){
+-    String dest="/Music/"+uploadName;
+-    if(SD.exists(backup)||SD.exists(journal)){
+-      ok=false;uploadError="Old backup pending";
+-    }
+-    const bool hadOld=SD.exists(dest.c_str());
+-    if(ok && hadOld){
+-      File j=SD.open(journal,FILE_WRITE);
+-      if(!j){ok=false;uploadError="Cannot write recovery journal";}
+-      else{j.println(uploadName);j.flush();j.close();}
+-    }
+-    if(ok && hadOld && !SD.rename(dest.c_str(),backup)){
+-      SD.remove(journal);ok=false;uploadError="Cannot back up old track";
+-    }
+-    if(ok && !SD.rename(part,dest.c_str())){
+-      if(hadOld)SD.rename(backup,dest.c_str());
+-      ok=false;uploadError="Cannot commit uploaded track";
+-    }
+-    if(ok && hadOld){SD.remove(backup);SD.remove(journal);}
+-    if(!ok && hadOld && SD.exists(backup) && !SD.exists(dest.c_str()))
+-      SD.rename(backup,dest.c_str());
+-    if(!ok && !SD.exists(backup))SD.remove(journal);
+-  }
+-  if(!ok)SD.remove(part);
+-  uploadActive=false;
+-  if(ok){media.rescan();ui.redraw();server.send(200,"text/plain","Track saved or replaced; library updated.");}
+-  else server.send(400,"text/plain",uploadError.isEmpty()?"No file written":uploadError);
+-  uploadName="";
++ bool ok=uploadOk&&uploadError.isEmpty();if(ok&&!SyncFiles::commit()){uploadError=SyncFiles::error;ok=false;}
++ if(!ok)SyncFiles::abort();uploadActive=false;uploadOk=false;
++ if(ok){if(server.uri()=="/upload")media.rescan();server.send(200,"application/json","{\"ok\":true}");ui.redraw();}else server.send(422,"text/plain",uploadError.length()?uploadError:"NO_UPLOAD");
+ }
+-void WiFiSyncService::themeUpload(){
+-  HTTPUpload &u=server.upload();
+-  if(u.status==UPLOAD_FILE_START){
+-    themeUploadActive=true;
+-    themeUploadSuccess=false;themeUploadError="";themeUploadSize=0;
+-    if(themeUploadFile)themeUploadFile.close();
+-    if(!media.sdOK()){themeUploadError="No SD";return;}
+-    if(!SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
+-    SD.remove("/MonoPod/theme.tmp");
+-    themeUploadFile=SD.open("/MonoPod/theme.tmp",FILE_WRITE);
+-    if(!themeUploadFile)themeUploadError="Cannot write theme";
+-  }else if(u.status==UPLOAD_FILE_WRITE){
+-    if(themeUploadError.length())return;
+-    themeUploadSize+=u.currentSize;
+-    if(themeUploadSize>ThemeManager::MAX_BYTES+28){themeUploadError="Theme is too large";themeUploadFile.close();return;}
+-    if(!themeUploadFile||themeUploadFile.write(u.buf,u.currentSize)!=u.currentSize){
+-      themeUploadError="SD write failed";if(themeUploadFile)themeUploadFile.close();
+-    }
+-  }else if(u.status==UPLOAD_FILE_END){
+-    if(themeUploadFile){themeUploadFile.flush();themeUploadFile.close();}
+-    themeUploadSuccess=themeUploadError.isEmpty();
+-  }else if(u.status==UPLOAD_FILE_ABORTED){
+-    if(themeUploadFile)themeUploadFile.close();
+-    SD.remove("/MonoPod/theme.tmp");themeUploadError="Aborted";
+-    themeUploadActive=false;
+-  }
+-}
+-void WiFiSyncService::themeFinished(){
+-  themeUploadActive=false;
+-  if(!themeUploadSuccess){SD.remove("/MonoPod/theme.tmp");server.send(400,"text/plain",themeUploadError.isEmpty()?"No theme data":themeUploadError);return;}
+-  // Parse + CRC-verify before replacing an existing theme.
+-  static ThemeManager probe;
+-  if(!probe.reload("/MonoPod/theme.tmp")){
+-    SD.remove("/MonoPod/theme.tmp");server.send(422,"text/plain","Invalid MPT1 theme or CRC");return;
+-  }
+-  probe.unload();
+-  const bool hadOld=SD.exists("/MonoPod/theme.mpt");
+-  SD.remove("/MonoPod/theme.bak");
+-  if(hadOld && !SD.rename("/MonoPod/theme.mpt","/MonoPod/theme.bak")){
+-    server.send(500,"text/plain","Cannot back up old theme");return;
+-  }
+-  if(!SD.rename("/MonoPod/theme.tmp","/MonoPod/theme.mpt")){
+-    if(hadOld)SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
+-    server.send(500,"text/plain","Cannot install new theme");return;
+-  }
+-  if(!display.reloadTheme()){
+-    SD.remove("/MonoPod/theme.mpt");
+-    if(hadOld)SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
+-    display.reloadTheme();
+-    server.send(500,"text/plain","Failed to activate theme");return;
+-  }
+-  SD.remove("/MonoPod/theme.bak");ui.redraw();
+-  server.send(200,"application/json","{\"ok\":true,\"theme\":\"installed\"}");
++void WiFiSyncService::routes(){
++ server.on("/",HTTP_GET,[this](){server.send(200,"text/html; charset=utf-8","<!doctype html><title>MonoPod Sync</title><h2>MonoPod Wi-Fi Sync</h2><p>Local HTTP. Use MonoPod Desktop for the file manager.</p><form action='/upload' method='post' enctype='multipart/form-data'><input type='file' name='track' accept='.mp3,.wav,.flac,.aac'><button>Upload music</button></form>");});
++ server.on("/api/info",HTTP_GET,[this](){server.send(200,"application/json",SyncFiles::info());});
++ server.on("/api/storage",HTTP_GET,[this](){if(allowed())server.send(200,"application/json",SyncFiles::info());});
++ server.on("/api/fs/list",HTTP_GET,[this](){if(!allowed())return;uint32_t offset=0,limit=32;if((server.hasArg("offset")&&!number(server.arg("offset"),offset))||(server.hasArg("limit")&&!number(server.arg("limit"),limit))||limit>32||!limit){server.send(400,"text/plain","INVALID_ARGUMENTS");return;}String json=SyncFiles::list(server.arg("path"),offset,limit,SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
++ auto stat=[this](){if(!allowed())return;String json=SyncFiles::stat(server.arg("path"),SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);};
++ server.on("/api/fs/stat",HTTP_GET,stat);server.on("/api/fs/metadata",HTTP_GET,stat);
++ server.on("/api/theme/info",HTTP_GET,[this](){if(!allowed())return;String json=SyncFiles::stat("/MonoPod/theme.mpt",SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
++ server.on("/api/fs/download",HTTP_GET,[this](){
++  if(!allowed())return;uint32_t offset=0,count=0;if(!number(server.arg("offset"),offset)||!number(server.arg("count"),count)||count>16384){server.send(400,"text/plain","INVALID_RANGE");return;}
++  // Fixed 1 KiB working buffer; two passes compute CRC before streaming the same range.
++  uint8_t buffer[1024];size_t total=0,got=0;uint32_t crc=~0u;
++  while(total<count){size_t n=min((size_t)1024,(size_t)(count-total));if(!SyncFiles::read(server.arg("path"),offset+total,buffer,n,got,SyncTransport::WiFi)){result(false);return;}crc=SyncFiles::crcStep(crc,buffer,got);total+=got;if(got<n)break;}
++  char text[9];snprintf(text,sizeof(text),"%08lX",(unsigned long)~crc);server.sendHeader("X-CRC32",text);server.setContentLength(total);server.send(200,"application/octet-stream","");size_t sent=0;
++  while(sent<total){size_t n=min((size_t)1024,total-sent);if(!SyncFiles::read(server.arg("path"),offset+sent,buffer,n,got,SyncTransport::WiFi)||!got)break;if(server.client().write(buffer,got)!=got)break;sent+=got;yield();}
++ });
++ server.on("/api/fs/mkdir",HTTP_POST,[this](){if(allowed())result(SyncFiles::mkdir(server.arg("path"),SyncTransport::WiFi));});
++ server.on("/api/fs/rename",HTTP_POST,[this](){if(allowed())result(SyncFiles::rename(server.arg("path"),server.arg("destination"),SyncTransport::WiFi));});
++ server.on("/api/fs/file",HTTP_DELETE,[this](){if(allowed())result(SyncFiles::remove(server.arg("path"),server.arg("directory")=="1",SyncTransport::WiFi));});
++ server.on("/api/fs/upload",HTTP_POST,[this](){finished();},[this](){upload();});
++ server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
++ server.on("/api/theme",HTTP_POST,[this](){finished();},[this](){upload();});
++ server.on("/api/smoothing",HTTP_POST,[this](){if(!allowed())return;if(!server.hasArg("enabled")){server.send(400,"text/plain","Missing enabled");return;}settings.data.fontSmoothing=server.arg("enabled")=="1";settings.markDirty();result(true);});
++ server.on("/api/theme/reset",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}if(SD.exists("/MonoPod/theme.mpt")&&!SD.remove("/MonoPod/theme.mpt")){server.send(500,"text/plain","DELETE_FAILED");return;}theme.unload();display.palette(settings.data.contrast);result(true);});
++ server.on("/api/scan",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}media.rescan();result(true);});
++ server.on("/api/sync/end",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}server.send(200,"application/json","{\"ok\":true}");stopRequested=true;});
++ server.on("/time",HTTP_GET,[this](){if(!allowed())return;time_t epoch=(time_t)strtoll(server.arg("unix").c_str(),nullptr,10);if(epoch<1600000000||epoch>4102444800LL){server.send(400,"text/plain","Invalid time");return;}clockService.setUnix(epoch);result(true);});
++ server.onNotFound([this](){server.send(404,"text/plain","Not found");});
+ }
+ void WiFiSyncService::begin(){
+-  if(running || usbSync.busy() || syncMode.active())return;
+-  if(!media.sdOK()){ui.notify("No microSD card");return;}
+-  // Recover an interrupted rename before opening the network writer.
+-  const char* journal="/Music/.monopod-wifi.target";
+-  const char* backup="/Music/.monopod-wifi.bak";
+-  if(SD.exists(journal)){
+-    File j=SD.open(journal,FILE_READ);
+-    String name=j?j.readStringUntil('\n'):String();
+-    if(j)j.close();name.trim();
+-    if(!name.isEmpty() && safeName(name)==name && MediaLibrary::isAudio(name)){
+-      String dest="/Music/"+name;
+-      if(SD.exists(backup)){
+-        if(SD.exists(dest.c_str()))SD.remove(backup);
+-        else SD.rename(backup,dest.c_str());
+-      }
+-      if(!SD.exists(backup))SD.remove(journal);
+-    }
+-  }
+-  SD.remove("/Music/.monopod-wifi.part");
+-  // The moment the user explicitly starts Wi-Fi Sync, audio and UI are locked.
+-  // Reuse an existing station connection; never disconnect it merely to enable Sync.
+-  const bool staReady=(WiFi.status()==WL_CONNECTED);
+-  if(!staReady && wifiNetworks.connecting()){
+-    ui.notify("Wi-Fi connecting...");return;
+-  }
+-  if(!syncMode.enter(SyncTransport::WiFi))return;
+-  apMode=!staReady;
+-  if(apMode){
+-    // Offline fallback only: give the PC a dedicated MonoPod-Sync access point.
+-    wifiNetworks.suspendForSync();
+-    WiFi.mode(WIFI_AP);
+-    if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){
+-      WiFi.mode(WIFI_OFF);
+-      syncMode.leave(SyncTransport::WiFi);
+-      wifiNetworks.resumeAfterSync();
+-      apMode=false;
+-      ui.notify("Wi-Fi AP failed");return;
+-    }
+-  }
+-  server.on("/",HTTP_GET,[this](){page();});
+-  server.on("/time",HTTP_GET,[this](){
+-    if(!server.hasArg("unix")){server.send(400,"text/plain","Missing unix");return;}
+-    time_t epoch=(time_t)strtoll(server.arg("unix").c_str(),nullptr,10);
+-    if(epoch<1600000000 || epoch>4102444800LL){server.send(400,"text/plain","Invalid time");return;}
+-    clockService.setUnix(epoch);server.send(200,"text/plain","Clock updated");
+-  });
+-  server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
+-  server.on("/api/theme",HTTP_POST,[this](){themeFinished();},[this](){themeUpload();});
+-  server.on("/api/info",HTTP_GET,[this](){
+-    String body="{\"firmware\":\"MonoPod v0.8.5\",\"tracks\":"+String((unsigned)media.size())+
+-      ",\"sd_ready\":"+String(media.sdOK()?"true":"false")+
+-      ",\"sd_total_mb\":"+String((uint32_t)(media.totalBytes()/1024/1024))+
+-      ",\"sd_used_mb\":"+String((uint32_t)(media.usedBytes()/1024/1024))+
+-      ",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+
+-      ",\"custom_theme\":"+String(display.themeLoaded()?"true":"false")+"}";
+-    server.send(200,"application/json",body);
+-  });
+-  server.on("/api/smoothing",HTTP_POST,[this](){
+-    if(!server.hasArg("enabled")){server.send(400,"text/plain","Missing enabled");return;}
+-    settings.data.fontSmoothing=(server.arg("enabled")=="1");
+-    settings.markDirty();ui.redraw();
+-    server.send(200,"application/json",String("{\"font_smoothing\":")+
+-      (settings.data.fontSmoothing?"true":"false")+"}");
+-  });
+-  server.on("/api/theme/reset",HTTP_POST,[this](){
+-    if(!media.sdOK()){server.send(503,"text/plain","SD unavailable");return;}
+-    SD.remove("/MonoPod/theme.mpt");
+-    theme.unload();display.palette(settings.data.contrast);ui.redraw();
+-    server.send(200,"application/json","{\"ok\":true}");
+-  });
+-  server.onNotFound([this](){server.send(404,"text/plain","Not found");});
+-  server.begin();running=true;
+-  MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP listening at http://%s:80\n",
+-    apMode?"AP":"LAN",ip().c_str());
+-  if(apMode)MONOPOD_LOG.printf("[Wi-Fi Sync] Connect PC to SSID %s\n",Config::WIFI_AP_SSID);
+-  ui.redraw(); // Sync screen must show the actual address, not the old AP default.
++ if(running||usbSync.busy()||syncMode.active())return;if(!media.sdOK()){ui.notify("No microSD card");return;}
++ if(WiFi.status()!=WL_CONNECTED&&wifiNetworks.connecting()){ui.notify("Wi-Fi connecting...");return;}
++ SyncFiles::recover();if(!syncMode.enter(SyncTransport::WiFi))return;
++ usingSta=WiFi.status()==WL_CONNECTED;
++ if(!usingSta){wifiNetworks.suspendForSync();WiFi.mode(WIFI_AP);if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){syncMode.leave(SyncTransport::WiFi);wifiNetworks.resumeAfterSync();ui.notify("Wi-Fi AP failed");return;}}
++ if(!routesReady){routes();routesReady=true;}server.begin();running=true;stopRequested=false;
++ MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP at http://%s:80\n",usingSta?"LAN":"AP",ip().c_str());ui.redraw();
+ }
+-void WiFiSyncService::end(){
+-  if(!running || busy())return; // never close files or remove SD during HTTP transfer
+-  server.stop();if(uploadFile)uploadFile.close();if(themeUploadFile)themeUploadFile.close();
+-  if(apMode){
+-    WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);
+-  }
+-  running=false;
+-  syncMode.leave(SyncTransport::WiFi);
+-  if(apMode)wifiNetworks.resumeAfterSync();
+-  apMode=false;
+-}
+-void WiFiSyncService::loop(){
+-  if(!running)return;
+-  // Keep STA reconnects alive if the router briefly disappears during LAN Sync.
+-  if(!apMode)wifiNetworks.tick();
+-  server.handleClient();
+-}
++void WiFiSyncService::end(){if(!running||busy())return;server.stop();if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}running=false;stopRequested=false;media.rescan();syncMode.leave(SyncTransport::WiFi);if(!usingSta)wifiNetworks.resumeAfterSync();ui.begin();}
++void WiFiSyncService::loop(){if(running){if(usingSta)wifiNetworks.tick();server.handleClient();SyncFiles::tick();if(uploadActive&&!SyncFiles::busy()){uploadActive=false;uploadOk=false;}if(stopRequested)end();}}
+ #endif
+--- v0.9.1.1/Wokwi_ILI9341/WiFiSync.h
++++ v0.10.0/Wokwi_ILI9341/WiFiSync.h
+@@ -2,38 +2,11 @@
+ #include "Config.h"
+ #if FEATURE_WIFI_SYNC
+ #include <WebServer.h>
+-#include <SD.h>
+ class WiFiSyncService {
+-public:
+-  void begin();
+-  void end();
+-  void loop();
+-  bool active() const {return running;}
+-  bool busy() const {return uploadActive || themeUploadActive;}
+-  String ip() const;
+-private:
+-  WebServer server{80};
+-  File uploadFile;
+-  File themeUploadFile;
+-  bool themeUploadSuccess=false;
+-  String themeUploadError;
+-  size_t themeUploadSize=0;
+-  bool apMode=false; // true only when no working STA association exists
+-  bool running=false, uploadSuccess=false;
+-  bool uploadActive=false,themeUploadActive=false;
+-  String uploadError,uploadName;
+-  void page();
+-  void upload();
+-  void finished();
+-  void themeUpload();
+-  void themeFinished();
++public:void begin();void end();void loop();bool active()const{return running;}bool busy()const;String ip()const;
++private:WebServer server{80};bool routesReady=false,running=false,stopRequested=false,usingSta=false,uploadActive=false,uploadOk=false;String uploadError;void upload();void finished();void result(bool ok);bool allowed();void routes();
+ };
+ #else
+-class WiFiSyncService {
+-public:
+-  void begin(){}void end(){}void loop(){}bool active() const{return false;}
+-  bool busy() const{return false;}
+-  String ip()const{return "Disabled";}
+-};
++class WiFiSyncService {public:void begin(){}void end(){}void loop(){}bool active()const{return false;}bool busy()const{return false;}String ip()const{return "Disabled";}};
+ #endif
+ extern WiFiSyncService wifiSync;

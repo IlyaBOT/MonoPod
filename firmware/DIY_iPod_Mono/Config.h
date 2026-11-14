@@ -67,17 +67,15 @@ constexpr uint8_t PIN_SD_CS = 14;
 constexpr uint8_t PIN_I2S_BCLK = 16;
 constexpr uint8_t PIN_I2S_LRC = 17;
 constexpr uint8_t PIN_I2S_DATA = 18;
-constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, internal pull-up + resistor ladder
-// ADC button ladder on S3 uses weak internal pull-up to 3V3; no 10k external pull-up.
-// Actual S3 board: MENU=0, PREV=5k1, NEXT=10k, PLAY=20k, SELECT=39k9.
-// The internal pull-up is not precision rated: verify measured ADC levels on the real board.
-constexpr bool BUTTON_ADC_INTERNAL_PULLUP = true;
-// Measured GPIO9 values may differ from calculations: weak internal pull-up is variable.
-// Expected at VDD=3.3V and Rpullup=45k: 0 / 336 / 600 / 1015 / 1551mV.
-// Inclusive non-overlapping windows: MENU / PREV / NEXT / PLAY / SELECT.
-// A gap between windows is intentional: unstable voltages must NOT trigger keys.
+constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, external 10k pull-up to 3V3
+// Five normally-open buttons connect GPIO9 to GND through separate resistors:
+// MENU=0, PREV=5.1k, NEXT=10k, PLAY=20k, SELECT=39.9k.
+// Required: one physical 10k resistor between GPIO9 and 3V3.
+constexpr bool BUTTON_ADC_INTERNAL_PULLUP = false;
+// Nominal voltage with external 10k pull-up: 0 / 1115 / 1650 / 2200 / 2640 mV.
+// Windows allow analog tolerances and preserve gaps between keys.
 constexpr uint16_t BUTTON_ADC_WINDOWS_MV[5][2] = {
-  { 0, 120 }, { 180, 480 }, { 490, 830 }, { 845, 1330 }, { 1360, 2100 }
+  { 0, 160 }, { 900, 1300 }, { 1450, 1850 }, { 1980, 2400 }, { 2460, 2900 }
 };
 constexpr uint8_t PIN_BATTERY_ADC = 4; // ADC1, 100k/100k divider
 constexpr uint8_t PIN_HOLD = 21; // external 10k pull-up

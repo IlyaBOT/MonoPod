@@ -1,0 +1,3279 @@
+{
+  "version": "0.4",
+  "units": "mm",
+  "cadquery": "2.7.0",
+  "parameters_sha256": "cb38dc0024b650240416a5355e9757d352c1c9eadeb9236c2d09487b2415f60b",
+  "effective_parameters": {
+    "version": "0.4",
+    "units": "mm",
+    "case": {
+      "width": 94.0,
+      "height": 148.0,
+      "depth": 26.0,
+      "corner_radius": 8.0,
+      "edge_radius": 0.6,
+      "front_thickness": 2.4,
+      "wall": 2.0,
+      "rear_thickness": 2.0,
+      "lip_wall": 1.2,
+      "lip_height": 2.0,
+      "seam_clearance": 0.25,
+      "closure_xy": [
+        [
+          -40.0,
+          -65.0
+        ],
+        [
+          40.0,
+          -65.0
+        ],
+        [
+          -40.0,
+          65.0
+        ],
+        [
+          40.0,
+          65.0
+        ]
+      ],
+      "closure_boss_diameter": 7.2,
+      "closure_root_diameter": 8.4,
+      "closure_root_height": 3.0,
+      "closure_end_gap": 0.0,
+      "closure_pilot_depth": 6.3
+    },
+    "wheel": {
+      "x": 0.0,
+      "y": -31.0,
+      "face_recess": 0.6,
+      "radial_gap": 0.25,
+      "ring_radial_clearance": 0.25,
+      "ring_axial_clearance": 0.1,
+      "lug_radial_clearance": 0.25,
+      "boss_diameter": 7.2,
+      "pilot_depth": 1.85,
+      "lug_radius": 4.0
+    },
+    "display": {
+      "x": 0.0,
+      "y": 35.0,
+      "rotation_degrees": 90.0,
+      "pcb_width": 35.0,
+      "pcb_height": 56.0,
+      "pcb_thickness": 1.6,
+      "pcb_front_depth": 6.0,
+      "hole_pitch_x": 30.0,
+      "hole_pitch_y": 50.0,
+      "hole_diameter": 2.8,
+      "glass_width": 34.0,
+      "glass_height": 43.0,
+      "glass_above_pcb": 3.4,
+      "glass_y_offset": 0.0,
+      "active_width": 28.0,
+      "active_height": 35.0,
+      "window_width": 29.0,
+      "window_height": 36.0,
+      "window_radius": 0.8,
+      "rear_component_height": 3.0,
+      "boss_diameter": 6.4,
+      "pilot_depth": 2.65
+    },
+    "mainboard": {
+      "width": 70.0,
+      "height": 90.0,
+      "thickness": 1.6,
+      "x": 0.0,
+      "hole_diameter": 2.2,
+      "boss_diameter": 5.6,
+      "pilot_depth": 3.7,
+      "component_height": 7.0,
+      "rear_solder_height": 2.0,
+      "stack_to_wheel_face": 22.0,
+      "mount_from_left_bottom": [
+        [
+          67.0,
+          3.0
+        ],
+        [
+          3.0,
+          87.0
+        ],
+        [
+          67.0,
+          87.0
+        ]
+      ],
+      "jack_tip_recess": 1.0
+    },
+    "tp4056": {
+      "pcb_width": 17.0,
+      "pcb_length": 28.0,
+      "module_height": 4.0,
+      "pcb_thickness": 1.0,
+      "usb_left_from_board_left": 6.5,
+      "usb_tip_beyond_board": 6.5,
+      "mount_standoff": 0.2,
+      "usb_axis_above_pcb_rear": 2.5,
+      "usb_protrusion": 1.5,
+      "usb_width": 8.8,
+      "usb_height": 3.0,
+      "usb_metal_length": 7.0,
+      "aperture_width": 9.6,
+      "aperture_height": 3.8,
+      "tunnel_wall": 1.6,
+      "body_clearance": 0.3
+    },
+    "jack": {
+      "body_width": 11.5,
+      "body_length": 14.2,
+      "body_height": 6.45,
+      "body_x_offset": -0.25,
+      "axis_above_body_bottom": 3.0,
+      "thread_diameter": 6.0,
+      "thread_length": 3.55,
+      "bore_diameter": 3.6,
+      "panel_hole_diameter": 6.3,
+      "panel_thickness": 1.6,
+      "nut_diameter": 8.2,
+      "nut_thickness": 1.6,
+      "body_clearance": 0.3,
+      "pin_length": 3.0,
+      "gap_from_usb_right": 8.0,
+      "tip_beyond_board": 7.5,
+      "mount_standoff": 0.2,
+      "nut_access_diameter": 11.0,
+      "seat_outer_diameter": 13.0
+    },
+    "hold": {
+      "x": 0.0,
+      "center_depth": 17.0,
+      "travel": 3.0,
+      "body_length_x": 15.7,
+      "body_width_z": 7.4,
+      "body_depth_y": 6.5,
+      "flange_length": 23.3,
+      "flange_width_z": 5.5,
+      "flange_thickness": 0.5,
+      "hole_pitch": 19.0,
+      "hole_diameter": 2.2,
+      "lever_width_x": 3.8,
+      "lever_width_z": 2.0,
+      "lever_length_y": 5.0,
+      "terminal_length_y": 3.0,
+      "standoff_height": 2.4,
+      "boss_diameter": 5.2,
+      "pilot_depth": 3.7,
+      "window_clearance": 0.2,
+      "lever_gap": 0.0,
+      "neck_length_x": 7.0,
+      "neck_width_z": 4.4,
+      "neck_inner_protrusion": 0.4,
+      "cap_length_x": 14.0,
+      "cap_width_z": 8.4,
+      "cap_thickness_y": 1.8,
+      "cap_wall_gap": 0.2,
+      "pocket_end_gap": 0.2,
+      "cap_corner_radius": 1.2,
+      "grip_rib_count": 3,
+      "grip_rib_width": 0.7,
+      "grip_rib_height": 0.25,
+      "grip_rib_pitch": 2.0
+    },
+    "fasteners": {
+      "m2_pilot": 1.7,
+      "m25_pilot": 2.1,
+      "m2_clearance": 2.2,
+      "m25_clearance": 2.8,
+      "wheel_screw": 4.0,
+      "display_screw": 5.0,
+      "mainboard_screw": 5.0,
+      "hold_screw": 4.0,
+      "closure_screw": 8.0,
+      "m2_head_diameter": 4.0,
+      "m25_head_diameter": 5.0,
+      "head_height": 2.0,
+      "minimum_blind_floor": 0.6,
+      "connector_insert_screw": 4.0
+    },
+    "coupons": {
+      "window_border": 5.0,
+      "wheel_border": 5.0,
+      "wheel_step_extras": [
+        0.0,
+        0.1,
+        0.2
+      ],
+      "clearances": [
+        0.15,
+        0.2,
+        0.25,
+        0.3
+      ],
+      "lever_gaps": [
+        -0.05,
+        0.0,
+        0.1,
+        0.2
+      ],
+      "hold_hole_pitches": [
+        15.0,
+        19.0
+      ],
+      "jack_panel_thicknesses": [
+        1.2,
+        1.6,
+        2.0,
+        2.4
+      ],
+      "jack_holes": [
+        6.1,
+        6.3,
+        6.5
+      ],
+      "usb_recesses": [
+        1.5,
+        2.0,
+        2.5
+      ],
+      "m2_pilots": [
+        1.6,
+        1.7,
+        1.8
+      ],
+      "m25_pilots": [
+        2.0,
+        2.1,
+        2.2
+      ],
+      "jack_plate_width": 24.0,
+      "jack_plate_height": 24.0,
+      "hold_patch_width": 34.0,
+      "hold_patch_height": 20.0,
+      "screw_bar_width": 82.0,
+      "screw_bar_height": 24.0,
+      "screw_bar_base": 2.0,
+      "screw_boss_height": 5.0,
+      "tolerance_key_width": 8.0,
+      "tolerance_key_height": 6.0,
+      "tolerance_frame_thickness": 3.0,
+      "bottom_patch_margin": 4.0,
+      "bottom_patch_length": 35.0,
+      "bottom_patch_front_depth": 12.0,
+      "marker_diameter": 0.8,
+      "marker_depth": 0.35,
+      "stack_gauge_jaw_length": 35.0,
+      "stack_gauge_width": 10.0,
+      "stack_gauge_wall": 2.4,
+      "stl_linear_tolerance": 0.035,
+      "stl_angular_tolerance": 0.1,
+      "insert_clearances": [
+        0.15,
+        0.2,
+        0.25,
+        0.3
+      ],
+      "connector_aperture_extras": [
+        0.0,
+        0.2,
+        0.4
+      ],
+      "usb_cable_side_clearances": [
+        0.3,
+        0.4,
+        0.5
+      ]
+    },
+    "acrylic": {
+      "stock_width": 200.0,
+      "stock_height": 100.0,
+      "thickness": 1.0,
+      "overlap": 3.0,
+      "corner_radius": 2.0,
+      "pocket_side_clearance": 0.2,
+      "front_lip_thickness": 0.8,
+      "adhesive_gap": 0.2,
+      "adhesive_inner_margin": 0.5,
+      "stop_pad_diameter": 1.2,
+      "minimum_display_air_gap": 0.4,
+      "fit_clearances": [
+        0.15,
+        0.2,
+        0.25,
+        0.3
+      ],
+      "sheet_margin": 5.0,
+      "sheet_part_gap": 3.0,
+      "svg_stroke_width": 0.01,
+      "mount_style": "flush_carrier",
+      "face_recess": 0.1
+    },
+    "connector_insert": {
+      "width": 54.0,
+      "x": -12.0,
+      "gap": 0.2,
+      "wall_thickness": 2.0,
+      "mount_from_left": [
+        3.5,
+        50.5
+      ],
+      "mount_depth": 7.5,
+      "boss_diameter": 4.8,
+      "boss_length": 2.8,
+      "pilot_depth": 2.3,
+      "root_width": 4.8,
+      "root_min_depth": 7.5,
+      "tunnel_end_gap": 0.3,
+      "assembly_clearance": 0.3
+    },
+    "lens_carrier": {
+      "bond_width": 2.0,
+      "frame_thickness": 0.8,
+      "ear_thickness": 0.8,
+      "boss_side_clearance": 0.2,
+      "sleeve_wall": 1.4,
+      "panel_pocket_clearance": 0.2,
+      "panel_pocket_axial_clearance": 0.15,
+      "glass_side_clearance": 0.3,
+      "inner_corner_radius": 0.8,
+      "display_pilot_depth": 2.85,
+      "jig_base_thickness": 2.0,
+      "jig_border": 6.0,
+      "jig_lens_side_clearance": 0.3
+    },
+    "usb_cable": {
+      "body_width": 9.7,
+      "body_height": 5.6,
+      "body_length": 16.0,
+      "metal_tip_length": 7.0,
+      "metal_width": 8.2,
+      "metal_height": 2.4,
+      "engagement_depth": 6.0,
+      "side_clearance": 0.4,
+      "axial_clearance": 0.5,
+      "well_wall": 1.6,
+      "well_corner_radius": 0.6,
+      "well_outer_radius": 1.6,
+      "measurement_size_allowance": 0.2,
+      "tip_length_allowance": 0.2
+    }
+  },
+  "full_roundtrip": true,
+  "generator_sha256": "8751b5befecce9379a49001fdfbfa714d6050b4be949acbfa72fdc5dcf22e533",
+  "parameter_checks": {
+    "wheel_blind_floor": true,
+    "wheel_screw_end_clearance": true,
+    "closure_screw_end_clearance": true,
+    "hold_blind_floor": true,
+    "wheel_ring_front_skin": true,
+    "display_glass_behind_panel": true,
+    "display_window_inside_glass": true,
+    "case_wall_at_least_four_lines": true,
+    "hold_neck_side_wall": true,
+    "hold_neck_end_wall": true,
+    "jack_full_nut_on_thread": true,
+    "mainboard_boss_solder_clearance": true,
+    "board_mounts_inside_board": true,
+    "insert_pilot_tip_reserve": true,
+    "insert_pilot_blind_end": true,
+    "insert_boss_minimum_wall": true,
+    "mainboard_screw_engagement": true,
+    "insert_jack_seat_inside_wall": true,
+    "insert_seat_annulus": true,
+    "acrylic_front_lip_printable": true,
+    "acrylic_nonnegative_glue_and_side_gap": true,
+    "acrylic_positive_sheet_thickness": true,
+    "acrylic_air_gap_to_display": true,
+    "acrylic_stop_pads_on_ledge": true,
+    "acrylic_lens_corner_radius": true,
+    "acrylic_lens_fits_stock": true,
+    "protected_jack_tip": true,
+    "usb_hood_well_has_depth": true,
+    "usb_well_web_printable": true,
+    "usb_well_clear_of_charger_pcb": true,
+    "usb_hood_side_allowance": true,
+    "usb_metal_engagement_within_tip": true,
+    "usb_axial_measurement_reserve": true,
+    "flush_lens_behind_face": true,
+    "carrier_thickness_printable": true,
+    "carrier_glass_air_gap": true,
+    "carrier_optical_opening": true,
+    "carrier_bond_land": true,
+    "carrier_screw_engagement": true,
+    "carrier_pilot_blind_floor": true,
+    "carrier_sleeve_height": true
+  },
+  "parts": {
+    "front_panel": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 30045.173488824934,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 27574,
+      "stl_volume_error_fraction": 1.3852488891431974e-05,
+      "stl_bounds_error_mm": 0.006915800481850893,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          47.0,
+          74.0000001,
+          9.103828801926284e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -47.0000001,
+          -74.0,
+          -24.0
+        ],
+        [
+          47.0,
+          74.0,
+          1.1102230246251565e-16
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          9.999999406318238e-08,
+          3.898993572246276e-18
+        ],
+        [
+          94.0,
+          148.0,
+          24.0
+        ]
+      ],
+      "step_sha256": "8ea4a31815743236fee65a562865a5c50c2ed6571c252194b629dc4c4377b80f",
+      "stl_sha256": "d61613bb0adeeeffd44ae7a81c51b7a787182f1c3add675d68cec211fe3ef631",
+      "group": "main",
+      "note": "",
+      "passed": true
+    },
+    "back_chassis": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 46017.842438190826,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 18650,
+      "stl_volume_error_fraction": 2.22192361036355e-05,
+      "stl_bounds_error_mm": 0.002590114930285381,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 0,
+        "translation_xyz": [
+          47.0,
+          74.0,
+          26.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -47.0,
+          -74.0,
+          -26.0
+        ],
+        [
+          47.0,
+          74.0,
+          -2.3999999999999986
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          94.0,
+          148.0,
+          23.600000381469727
+        ]
+      ],
+      "step_sha256": "d2c336c9bc3ff29edcc3ad93f98512435d10d6762e8fc14dab37c0daccb457cd",
+      "stl_sha256": "3853f561d8daa274b35d2d528c618a85948316d45fbecad812f0498e13fa7c5b",
+      "group": "main",
+      "note": "",
+      "passed": true
+    },
+    "hold_slider_cap": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 261.9255169643128,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1116,
+      "stl_volume_error_fraction": 1.3280325708926858e-05,
+      "stl_bounds_error_mm": 0.0003618990342832973,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          7.000000000000001,
+          21.199999999999992,
+          76.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -7.000000000000001,
+          71.6,
+          -21.2
+        ],
+        [
+          7.000000000000001,
+          76.0,
+          -12.8
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -2.6613256395049923e-16
+        ],
+        [
+          14.0,
+          8.399999618530273,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "e7b85d57f2b41cbbdaea98846998647f7e86e0bb5b79d397004ec86ded5c08fc",
+      "stl_sha256": "0aee325b551fc0eaa49f1a65a06e1490fa304457864568b8ae47f0d965b8c4bc",
+      "group": "main",
+      "note": "",
+      "passed": true
+    },
+    "bottom_connector_insert": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2269.9958411671887,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 2.5077780558436453e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -69.45,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "805f13d4eaa995f595c31f7c88319de9ccebeee0ef3e0ded128a2a1f8675fd79",
+      "stl_sha256": "4b39bee2daf7dc29d2de103ef361580fb4fc8c52897757aa0d304d001729f247",
+      "group": "main",
+      "note": "Надевается снаружи после установки всей припаянной сборки. 2xM2x4, гайка джека снаружи в углублении.",
+      "passed": true
+    },
+    "display_lens_carrier": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 889.3091004732095,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6664,
+      "stl_volume_error_fraction": 0.00015763985553105423,
+      "stl_bounds_error_mm": 0.0014957355372544612,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          29.8,
+          54.8,
+          -1.3000000000000016
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -29.8,
+          15.2,
+          -6.0
+        ],
+        [
+          29.8,
+          54.8,
+          -1.2999999999999998
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          3.936416032956913e-05,
+          2.715335313041578e-06,
+          7.830368287623798e-17
+        ],
+        [
+          59.59996032714844,
+          39.599998474121094,
+          4.699999809265137
+        ]
+      ],
+      "step_sha256": "7e6af43269419e1e021aaeaff39f56476af761a5c4aade77090a63957c05919a",
+      "stl_sha256": "2d15e62b856b7ce98d4d3f026413154c9027ce10eb0a99ecb80acf4958755cb0",
+      "group": "main",
+      "note": "Плоский акрил приклеить сзади по полосе 2 мм; общие с TFT четыре M2.5x5. Печать клеевой плоскостью на столе.",
+      "passed": true
+    },
+    "front_panel_rear_lip_alternative": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 30724.57467567886,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 30478,
+      "stl_volume_error_fraction": 1.7157437828509113e-05,
+      "stl_bounds_error_mm": 0.006915800481850893,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          47.0,
+          74.0000001,
+          9.103828801926284e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -47.0000001,
+          -74.0,
+          -24.0
+        ],
+        [
+          47.0,
+          74.0,
+          1.1102230246251565e-16
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          9.999999406318238e-08,
+          3.898993572246276e-18
+        ],
+        [
+          94.0,
+          148.0,
+          24.0
+        ]
+      ],
+      "step_sha256": "305d43bba95dacb803158a2347c51ae889e2cb4a875015625268e329cf9b67c6",
+      "stl_sha256": "7eac24d14e58c9a17168cf8c366817c6d8db57ebe8a19accad6af87b46ef1792",
+      "group": "alternative",
+      "note": "Альтернатива: прежний передний бортик и акрил на глубине 1 мм. Без display_lens_carrier, TFT крепить M2.5x4.",
+      "passed": true
+    },
+    "display_window_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 3639.05113482487,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6744,
+      "stl_volume_error_fraction": 1.875136736102935e-05,
+      "stl_bounds_error_mm": 0.0009949083322631225,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          33.0,
+          57.50000000000001,
+          -1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -33.0,
+          12.499999999999996,
+          -5.2
+        ],
+        [
+          33.00000000000001,
+          57.50000000000001,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          7.105427357601002e-15,
+          1.9854087000682297e-16
+        ],
+        [
+          66.0,
+          45.0,
+          5.199999809265137
+        ]
+      ],
+      "step_sha256": "712453b49fb3660af8e55fdcdf43fc1a83cdf3685e4cc03d8c0610469a9c4516",
+      "stl_sha256": "734fe64e4ede81e2d270ab1c568663b46153d58455a6bf9837a3eaaad21febd4",
+      "group": "coupon",
+      "note": "Полное окно, четыре стойки и отверстия дисплея; M2.5x4.",
+      "passed": true
+    },
+    "acrylic_seat_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 3639.05113482487,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6744,
+      "stl_volume_error_fraction": 1.875136736102935e-05,
+      "stl_bounds_error_mm": 0.0009949083322631225,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          33.0,
+          57.50000000000001,
+          -1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -33.0,
+          12.499999999999996,
+          -5.2
+        ],
+        [
+          33.00000000000001,
+          57.50000000000001,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          7.105427357601002e-15,
+          1.9854087000682297e-16
+        ],
+        [
+          66.0,
+          45.0,
+          5.199999809265137
+        ]
+      ],
+      "step_sha256": "cf696d8e7babbd8a1f8b1f10b17deacb5999273576a5ef0c0b67b1e0175e064d",
+      "stl_sha256": "734fe64e4ede81e2d270ab1c568663b46153d58455a6bf9837a3eaaad21febd4",
+      "group": "coupon",
+      "note": "Примерка плоского акрила заподлицо с display_lens_carrier и TFT; номинальный зазор 0.2 на сторону.",
+      "passed": true
+    },
+    "acrylic_seat_gap_0p15": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 3655.868971023131,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6760,
+      "stl_volume_error_fraction": 1.9090983528157112e-05,
+      "stl_bounds_error_mm": 0.0009949083322631225,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          33.0,
+          57.50000000000001,
+          -1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -33.0,
+          12.499999999999996,
+          -5.2
+        ],
+        [
+          33.00000000000001,
+          57.50000000000001,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          7.105427357601002e-15,
+          1.9854087000682297e-16
+        ],
+        [
+          66.0,
+          45.0,
+          5.199999809265137
+        ]
+      ],
+      "step_sha256": "17a082e809e8a61ef85cd6216f997ca1766e2a2a8dcee613c82a12a59b0f0863",
+      "stl_sha256": "6493ce119208f8394e7d1569b23c61d756da80085fba188586c157334b0a423a",
+      "group": "coupon",
+      "note": "Тот же лазерный акрил; карман с зазором 0.15 на сторону. Вариант 0.20 представлен основным acrylic_seat_coupon.",
+      "passed": true
+    },
+    "acrylic_seat_gap_0p25": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 3622.2244626939837,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6744,
+      "stl_volume_error_fraction": 1.9425694891561442e-05,
+      "stl_bounds_error_mm": 0.0009949083322631225,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          33.0,
+          57.50000000000001,
+          -1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -33.0,
+          12.499999999999996,
+          -5.2
+        ],
+        [
+          33.00000000000001,
+          57.50000000000001,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          7.105427357601002e-15,
+          1.9854087000682297e-16
+        ],
+        [
+          66.0,
+          45.0,
+          5.199999809265137
+        ]
+      ],
+      "step_sha256": "766ce3c952bd1cc6723fc01f4dcb938e5bda6e8d696869e26da462151463fd7b",
+      "stl_sha256": "a00d5fbedb607174cbfcf37d3bb0c0b9059ad3e2665c3d786217cfe595770921",
+      "group": "coupon",
+      "note": "Тот же лазерный акрил; карман с зазором 0.25 на сторону. Вариант 0.20 представлен основным acrylic_seat_coupon.",
+      "passed": true
+    },
+    "acrylic_seat_gap_0p30": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 3605.3883620025736,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6728,
+      "stl_volume_error_fraction": 1.934809692183567e-05,
+      "stl_bounds_error_mm": 0.0009949083322631225,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          33.0,
+          57.50000000000001,
+          -1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -33.0,
+          12.499999999999996,
+          -5.2
+        ],
+        [
+          33.00000000000001,
+          57.50000000000001,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          7.105427357601002e-15,
+          1.9854087000682297e-16
+        ],
+        [
+          66.0,
+          45.0,
+          5.199999809265137
+        ]
+      ],
+      "step_sha256": "46b246bbea7ffcef326bdd965c566753bc0e69e23baee773a151cb42ca36f0bd",
+      "stl_sha256": "c734cff1b3f5bff1b44aef041adef21c67f6b77b6ed052d62eb6f83418ffd2fb",
+      "group": "coupon",
+      "note": "Тот же лазерный акрил; карман с зазором 0.30 на сторону. Вариант 0.20 представлен основным acrylic_seat_coupon.",
+      "passed": true
+    },
+    "clickwheel_mount_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4344.375958841692,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 5568,
+      "stl_volume_error_fraction": 0.00040620815722191926,
+      "stl_bounds_error_mm": 0.006915800481847671,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "d7e20b50472c2ef4fb262d55270add296b29f542f8f924e19b1009bd341291ee",
+      "stl_sha256": "9736ca1be62f45b98ccc06030d51d502f25ed2c1f1cc88e002d57dd79bd3c0ec",
+      "group": "coupon",
+      "note": "Полный интерфейс каркаса 42x42, выборка и глухие пилоты; M2.5x4.",
+      "passed": true
+    },
+    "clickwheel_depth_extra_0p00": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4388.967724966743,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6072,
+      "stl_volume_error_fraction": 0.000397860957543313,
+      "stl_bounds_error_mm": 0.006915800481847671,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "08bdd7864f456683fad00ce9439359fc995df150eee6b0c0e4dcee8a8ce87184",
+      "stl_sha256": "dd30dad314aa8e33ff5d39f5afe2d79fdd2ffc06a6ea52028e5bc553149620f0",
+      "group": "coupon",
+      "note": "1 точек: ступень 1.15 + осевой запас 0.00; другие размеры как у панели.",
+      "passed": true
+    },
+    "clickwheel_depth_extra_0p10": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4344.024100464491,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6576,
+      "stl_volume_error_fraction": 0.00040627475450658057,
+      "stl_bounds_error_mm": 0.006915800481847671,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "b6ca2911807fc49040a1740233049961ae753727381d7b1ff00c6c50a96c2c1d",
+      "stl_sha256": "70d7739cf2ae08bac299025ade75eec45573085c6753ba21d8699f4081e6997e",
+      "group": "coupon",
+      "note": "2 точек: ступень 1.15 + осевой запас 0.10; другие размеры как у панели.",
+      "passed": true
+    },
+    "clickwheel_depth_extra_0p20": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4299.0804759622315,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 7080,
+      "stl_volume_error_fraction": 0.00041485203919677116,
+      "stl_bounds_error_mm": 0.006915800481847671,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "3556d9934ed316328009652ff31b5bcf9d144e04a2f0076d674f1b19264b8fe8",
+      "stl_sha256": "33726b4174c5bcd91fadcc92a0163378c9204ddbf046aa57ee06b02a80995a54",
+      "group": "coupon",
+      "note": "3 точек: ступень 1.15 + осевой запас 0.20; другие размеры как у панели.",
+      "passed": true
+    },
+    "clickwheel_window_gap_0p15": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4360.938435311416,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6072,
+      "stl_volume_error_fraction": 0.00040309064957575456,
+      "stl_bounds_error_mm": 0.006884718681928289,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "545c92af6ecae2b9b33332e0cd8fffea63171d6f1f70d94744160961328bcd86",
+      "stl_sha256": "e251d3b94cfd210a2aa278af47ba3783cdb9e339ea17ed4930d4f81a3a4e8788",
+      "group": "coupon",
+      "note": "1 точек: радиальный зазор вокруг колеса 0.15 на сторону.",
+      "passed": true
+    },
+    "clickwheel_window_gap_0p20": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4352.4027280716155,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 6576,
+      "stl_volume_error_fraction": 0.00040469239286804453,
+      "stl_bounds_error_mm": 0.006900259581886149,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "919322b4df7eead3e083181c3233f6d43365b004c2859d2c45b1098ebe545592",
+      "stl_sha256": "03cb4cc724246fd937fc9792fce50ad0a520ac5d5084a9a07a94ff40739ff6e2",
+      "group": "coupon",
+      "note": "2 точек: радиальный зазор вокруг колеса 0.20 на сторону.",
+      "passed": true
+    },
+    "clickwheel_window_gap_0p25": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4343.848171275888,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 7080,
+      "stl_volume_error_fraction": 0.0004063080441826192,
+      "stl_bounds_error_mm": 0.006915800481847671,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "cfd35401b73ccdccbd6f3e1e91a79e1277bbbe45545bb1bae3fa711774a15e30",
+      "stl_sha256": "fbb57ed3feffad379a04168081b80354afd400b474d36a5633be45b955f3ae57",
+      "group": "coupon",
+      "note": "3 точек: радиальный зазор вокруг колеса 0.25 на сторону.",
+      "passed": true
+    },
+    "clickwheel_window_gap_0p30": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4335.274764924244,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 7584,
+      "stl_volume_error_fraction": 0.00040793582865042313,
+      "stl_bounds_error_mm": 0.0069313413818038894,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          -0.9999999999999999,
+          7.549516567451064e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -61.0,
+          -2.45
+        ],
+        [
+          30.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          1.1102230246251565e-16,
+          7.917109093634068e-17
+        ],
+        [
+          60.0,
+          60.0,
+          2.450000047683716
+        ]
+      ],
+      "step_sha256": "068ad9c46a51fe6e64d9b8ff500853d7335a8c3899dcbc45cd1d41bf27811ade",
+      "stl_sha256": "9c12a4ca5c00e18a77bc9efc0a670d6ba84e5749c0e6d4989212219938afef80",
+      "group": "coupon",
+      "note": "4 точек: радиальный зазор вокруг колеса 0.30 на сторону.",
+      "passed": true
+    },
+    "bottom_edge_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 11349.75179284526,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 8462,
+      "stl_volume_error_fraction": 3.863551241983577e-05,
+      "stl_bounds_error_mm": 0.002590114930285381,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 0,
+        "translation_xyz": [
+          47.0,
+          74.0,
+          26.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -47.0,
+          -74.0,
+          -26.0
+        ],
+        [
+          47.0,
+          -39.0,
+          -2.3999999999999986
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          94.0,
+          35.0,
+          23.600000381469727
+        ]
+      ],
+      "step_sha256": "f36524c4a9862af67b4e20737149c748c0bc2af83091d6c01ed4e06821e2af4d",
+      "stl_sha256": "284e46f5549f4e8049d84cbea69ad77b6427c6770cc582848e2c79baa3d03a24",
+      "group": "coupon",
+      "note": "Поддон для нижней части всей припаянной сборки; использовать с bottom_connector_insert. Для примерки верх платы временно поддержать на той же высоте.",
+      "passed": true
+    },
+    "bottom_insert_gap_0p15": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2285.0558411671886,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 2.3955072744463505e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.05,
+          -2.5499999999999927,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.05,
+          -74.0,
+          -23.85
+        ],
+        [
+          15.05,
+          -69.45,
+          -2.5500000000000007
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.099998474121094,
+          21.299999237060547,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "7646653cad9485b78bc907c673c04e7fc90fa4abb3057a282e0b4b57faf8f32e",
+      "stl_sha256": "3c8f62141b7d097c436f7c05923ec7abbfa719f4d81ea0dc82cf721a91304ba0",
+      "group": "coupon",
+      "note": "Зазор вставки 0.15 к неизменённому bottom_edge_coupon; оси разъёмов и винтов сохранены.",
+      "passed": true
+    },
+    "bottom_insert_gap_0p25": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2254.9758411671883,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 2.533211124013987e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          38.95,
+          -2.6499999999999906,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -38.95,
+          -74.0,
+          -23.75
+        ],
+        [
+          14.95,
+          -69.45,
+          -2.6499999999999986
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          53.900001525878906,
+          21.100000381469727,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "8c624600285a146fa2f9b277ba16f77f5e9c45dd76a3d8140eee7dc0f8110482",
+      "stl_sha256": "27800a7588abb3f5d473aacb98350fc52ae582f268f5c5fbced1cbd8e60f068e",
+      "group": "coupon",
+      "note": "Зазор вставки 0.25 к неизменённому bottom_edge_coupon; оси разъёмов и винтов сохранены.",
+      "passed": true
+    },
+    "bottom_insert_gap_0p30": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2239.9958411671882,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 2.4967267519957066e-06,
+      "stl_bounds_error_mm": 0.0020202262598383314,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          38.9,
+          -2.6999999999999913,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -38.9,
+          -74.0,
+          -23.7
+        ],
+        [
+          14.899999999999999,
+          -69.45,
+          -2.6999999999999993
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          53.79999923706055,
+          21.0,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "eac681e81d2bfd127bce6518a694a591ae9bf9cdab37bb6146ea7ab7716f7e74",
+      "stl_sha256": "cee000331a0dbf9cec7fdd2285fd1e5327dcf39590fa6661ab2229c748027131",
+      "group": "coupon",
+      "note": "Зазор вставки 0.30 к неизменённому bottom_edge_coupon; оси разъёмов и винтов сохранены.",
+      "passed": true
+    },
+    "bottom_aperture_extra_0p20": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2257.3489041113976,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 3.1419659947841245e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -69.45,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "376ec55d467c505f27809fd5b33d2c820e36ffc3dd73ce40ac17b2387b43bc58",
+      "stl_sha256": "95bd0c070ea83f91b7c5aa076b2745e1f1f8f532ff8842d014f3fbdb0374c919",
+      "group": "coupon",
+      "note": "Окна USB и джека расширены на 0.20 по полному размеру; плата и оси НЕ смещены.",
+      "passed": true
+    },
+    "bottom_aperture_extra_0p40": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2244.3013822692074,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 3.7733723808270992e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -69.45,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "36977d15b6da366bceedbe0004bb520c7236c7c6b34c09551c9da80bcec571f2",
+      "stl_sha256": "4fde2e5ad3c0150c676ffec4d5788386f948976d08c1eb1002317bce2efb8289",
+      "group": "coupon",
+      "note": "Окна USB и джека расширены на 0.40 по полному размеру; плата и оси НЕ смещены.",
+      "passed": true
+    },
+    "bottom_insert_recess_1p50": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2219.930533326701,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 6.707172594311148e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -69.95,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          4.050000190734863
+        ]
+      ],
+      "step_sha256": "e88cd9f9ccea14cd7091a4128fe900c51ac94355d0af7c782ef4401c97c33118",
+      "stl_sha256": "df50532e1b5b6ace0195e5487fe0fd0de6b243e208b815e487509259c3965a57",
+      "group": "coupon",
+      "note": "Для утопления USB 1.50 СДВИНУТЬ ВСЮ ПЛАТУ по Y на -0.50; отдельно зарядник не перемещается. Шаблон отверстий основной версии тогда не подходит.",
+      "passed": true
+    },
+    "bottom_insert_recess_2p50": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2320.0611490076762,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 1.510376449013569e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -68.95,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          5.050000190734863
+        ]
+      ],
+      "step_sha256": "92e44a94dcbbe764bd908b2b666d88869faa3716d23a84431b3ea16edcb2d477",
+      "stl_sha256": "560af81de54a9fb7297b92ea967ab5149456a7b26c6ee255b855cb2e94330a1c",
+      "group": "coupon",
+      "note": "Для утопления USB 2.50 СДВИНУТЬ ВСЮ ПЛАТУ по Y на +0.50; отдельно зарядник не перемещается. Шаблон отверстий основной версии тогда не подходит.",
+      "passed": true
+    },
+    "usb_cable_well_gap_0p30": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2269.9238411671877,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 2.512517325837406e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -69.45,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "d60f025cc4063386f1874f8dd9015b5daf62704b09270f707ee82ec32da9e499",
+      "stl_sha256": "710b336dd921cf5413459a5ba01cd55d86132111f9478a861102364736a41629",
+      "group": "coupon",
+      "note": "Корпус кабеля 9.7x5.6, зазор 0.30 на сторону. Джек, оси, положение платы и креплений неизменны.",
+      "passed": true
+    },
+    "usb_cable_well_gap_0p50": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2270.0358411671878,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 4644,
+      "stl_volume_error_fraction": 2.5040655922469876e-06,
+      "stl_bounds_error_mm": 0.002020226259835667,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -39.0,
+          -74.0,
+          -23.8
+        ],
+        [
+          15.0,
+          -69.45,
+          -2.6000000000000014
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -6.106226635438361e-16
+        ],
+        [
+          54.0,
+          21.200000762939453,
+          4.550000190734863
+        ]
+      ],
+      "step_sha256": "a9279ae7ed89368770975559d3a441c91e502d8997f5212b2ed0b079217cc66c",
+      "stl_sha256": "bbd19e2dfd48fd05baff0a811568aa5f46cdc68604951ff266c119be1cf0a6d5",
+      "group": "coupon",
+      "note": "Корпус кабеля 9.7x5.6, зазор 0.50 на сторону. Джек, оси, положение платы и креплений неизменны.",
+      "passed": true
+    },
+    "lens_gluing_jig": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 5108.196496720931,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1052,
+      "stl_volume_error_fraction": 3.1738310992869586e-05,
+      "stl_bounds_error_mm": 0.0024095504303858206,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          27.000000000000004,
+          58.50000000000001,
+          1.9999999999999987
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -27.000000000000004,
+          11.499999999999996,
+          -0.1
+        ],
+        [
+          27.0,
+          58.50000000000001,
+          2.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          3.552713678800501e-15,
+          7.105427357601002e-15,
+          0.0
+        ],
+        [
+          54.0,
+          47.0,
+          2.0999999046325684
+        ]
+      ],
+      "step_sha256": "19fa2719a75bf6f721ebf525550ab11cabe4677b037cc5ca781b4f85b2e1bc70",
+      "stl_sha256": "39da4fd3385d38b06d597ee7decfb621f160264d81dcd9c2f3ff219c5b5135e8",
+      "group": "coupon",
+      "note": "Опора при вклейке: наружная панель лежит на плоском бортике, акрил — на выступе 0.1 мм. Покрыть тонкой разделительной плёнкой; её толщину учесть при примерке. Не приклеивать рамку к кондуктору.",
+      "passed": true
+    },
+    "jack_panel_thickness_1p20": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 649.4967718223362,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1536,
+      "stl_volume_error_fraction": 1.4697266388794034e-05,
+      "stl_bounds_error_mm": 0.0009791766974304632,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          12.0,
+          12.0,
+          1.5543122344752192e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -12.0,
+          -12.0,
+          -1.2
+        ],
+        [
+          12.0,
+          12.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          8.473607754746674e-17
+        ],
+        [
+          24.0,
+          24.0,
+          1.2000000476837158
+        ]
+      ],
+      "step_sha256": "7e6194a14be30d8a9c37b75eadfc3476fdf1742d88de960e7ac0ac5d296a88ed",
+      "stl_sha256": "e49c3d289affe0f3da3ae9e988e6b990f206fd3344e03ffca6a47acb1a9187b6",
+      "group": "coupon",
+      "note": "1 точек: толщина 1.20, отверстие 6.30; гайка снаружи.",
+      "passed": true
+    },
+    "jack_panel_thickness_1p60": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 865.8784096373809,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2040,
+      "stl_volume_error_fraction": 1.473040478757348e-05,
+      "stl_bounds_error_mm": 0.0009791766974304632,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          12.0,
+          12.0,
+          1.5543122344752192e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -12.0,
+          -12.0,
+          -1.6
+        ],
+        [
+          12.0,
+          12.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          8.473607754746674e-17
+        ],
+        [
+          24.0,
+          24.0,
+          1.600000023841858
+        ]
+      ],
+      "step_sha256": "2770b1cbaa41548cdd92ebb1f954e2b970cf248bff6c83200ac77398ed67c864",
+      "stl_sha256": "1292537c6a8d9cb68a9d72a76e1d1ffffbe3beeac16b299354af2642c267ea2d",
+      "group": "coupon",
+      "note": "2 точек: толщина 1.60, отверстие 6.30; гайка снаружи.",
+      "passed": true
+    },
+    "jack_panel_thickness_2p00": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1082.2600474524263,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2544,
+      "stl_volume_error_fraction": 1.4750411688938434e-05,
+      "stl_bounds_error_mm": 0.0009791766974336369,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          12.0,
+          12.0,
+          1.5543122344752192e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -12.0,
+          -12.0,
+          -2.0
+        ],
+        [
+          12.0,
+          12.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          8.473607754746674e-17
+        ],
+        [
+          24.0,
+          24.0,
+          2.0
+        ]
+      ],
+      "step_sha256": "282891ee118455db3e885d6aefcce8da2361e24390d1ab5afc3de380878576e4",
+      "stl_sha256": "ece4a74d7dc0197a9ce969b0f9b8ff0317f7755d35c5cf02c70b1f78d46a2fa3",
+      "group": "coupon",
+      "note": "3 точек: толщина 2.00, отверстие 6.30; гайка снаружи.",
+      "passed": true
+    },
+    "jack_panel_thickness_2p40": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1298.6416852674715,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 3048,
+      "stl_volume_error_fraction": 1.4813349973111067e-05,
+      "stl_bounds_error_mm": 0.0009791766974304632,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          12.0,
+          12.0,
+          1.469576158976824e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -12.0,
+          -12.0,
+          -2.4
+        ],
+        [
+          12.0,
+          12.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          1.9721522630525295e-31
+        ],
+        [
+          24.0,
+          24.0,
+          2.4000000953674316
+        ]
+      ],
+      "step_sha256": "4ba8dfc1e4786e68e48ac748d87e0bf10e8259a725f45e13392094314814b07e",
+      "stl_sha256": "09e8c178233b1afcaa39c1d6b51ef5f2f5f25ee57b93212c30166025947a6fd5",
+      "group": "coupon",
+      "note": "4 точек: толщина 2.40, отверстие 6.30; гайка снаружи.",
+      "passed": true
+    },
+    "jack_hole_diameter_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2147.7223119812784,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 5072,
+      "stl_volume_error_fraction": 2.5349417194390543e-05,
+      "stl_bounds_error_mm": 0.0010102584973547119,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          30.0,
+          12.0,
+          1.5543122344752192e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -30.0,
+          -12.0,
+          -1.6
+        ],
+        [
+          30.0,
+          12.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          8.473607754746674e-17
+        ],
+        [
+          60.0,
+          24.0,
+          1.600000023841858
+        ]
+      ],
+      "step_sha256": "9c557f1d7720576266b77e47f0a6e494e48d0d59ebd1bf908a6ad294b866405d",
+      "stl_sha256": "632aaa70e12393b2177372ec8e901953bbb679ff07ea7aead0b2911e657639f9",
+      "group": "coupon",
+      "note": "1/2/3 точки: отверстия 6.1, 6.3, 6.5",
+      "passed": true
+    },
+    "hold_switch_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1345.512183101134,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2560,
+      "stl_volume_error_fraction": 2.5991065985512687e-05,
+      "stl_bounds_error_mm": 0.0008081314304551057,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          17.0,
+          26.999999999999993,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.0,
+          69.6,
+          -27.0
+        ],
+        [
+          17.0,
+          74.0,
+          -7.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -7.762200002471058e-17
+        ],
+        [
+          34.0,
+          20.0,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "326cc42cf2a0823e4fb40c48b045445745822faaaf41c6d1eb17893b4f31b127",
+      "stl_sha256": "9ea6dd1af1a5ecfe8dc83bd26aff6fbee2bd30b7c9472d34624c4f59b052a3e8",
+      "group": "coupon",
+      "note": "Окно, две бобышки и пилоты: актуальные размеры hold из JSON; M2x4 изнутри.",
+      "passed": true
+    },
+    "hold_window_gap_0p15": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1348.532183101134,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2560,
+      "stl_volume_error_fraction": 2.5933157038981588e-05,
+      "stl_bounds_error_mm": 0.0008081314304551057,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          17.0,
+          26.999999999999993,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.0,
+          69.6,
+          -27.0
+        ],
+        [
+          17.0,
+          74.0,
+          -7.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -7.762200002471058e-17
+        ],
+        [
+          34.0,
+          20.0,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "afe1bd4ff5815862f88c988341a58fde3d52150f17ff2745ad4245e38c86da8e",
+      "stl_sha256": "e82db0f8869e1659630ed48702385f07b24baafaa049a09ed675f08c6b5c8ea5",
+      "group": "coupon",
+      "note": "Боковой зазор окна 0.15; применяется с основным колпачком.",
+      "passed": true
+    },
+    "hold_window_gap_0p20": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1345.512183101134,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2560,
+      "stl_volume_error_fraction": 2.5991065985512687e-05,
+      "stl_bounds_error_mm": 0.0008081314304551057,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          17.0,
+          26.999999999999993,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.0,
+          69.6,
+          -27.0
+        ],
+        [
+          17.0,
+          74.0,
+          -7.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -7.762200002471058e-17
+        ],
+        [
+          34.0,
+          20.0,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "ef49b7ff0f825a5e9b89c182eadcd6da75e6f75afbc9a44f89dfb443c6cb2b9e",
+      "stl_sha256": "9ea6dd1af1a5ecfe8dc83bd26aff6fbee2bd30b7c9472d34624c4f59b052a3e8",
+      "group": "coupon",
+      "note": "Боковой зазор окна 0.20; применяется с основным колпачком.",
+      "passed": true
+    },
+    "hold_window_gap_0p25": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1342.4521831011343,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2560,
+      "stl_volume_error_fraction": 2.6045610841985943e-05,
+      "stl_bounds_error_mm": 0.0008081314304551057,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          17.0,
+          26.999999999999993,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.0,
+          69.6,
+          -27.0
+        ],
+        [
+          17.0,
+          74.0,
+          -7.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -7.762200002471058e-17
+        ],
+        [
+          34.0,
+          20.0,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "9cc2a6c645e7909271dfcd7a1abf0d5891ab712545da2436917647211a1975c0",
+      "stl_sha256": "de7627dd366976fe342e2d6927561eb8d55ac9b12e2a09101e851a057f0221fc",
+      "group": "coupon",
+      "note": "Боковой зазор окна 0.25; применяется с основным колпачком.",
+      "passed": true
+    },
+    "hold_window_gap_0p30": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1339.3521831011344,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2560,
+      "stl_volume_error_fraction": 2.6107789180394397e-05,
+      "stl_bounds_error_mm": 0.0008081314304551057,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          17.0,
+          26.999999999999993,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.0,
+          69.6,
+          -27.0
+        ],
+        [
+          17.0,
+          74.0,
+          -7.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -7.762200002471058e-17
+        ],
+        [
+          34.0,
+          20.0,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "18544755b2aa13f552d7d8a0a5c928370b65755452617f7a28cb830881e90626",
+      "stl_sha256": "38d2402e84151ef0571a5f8b7c9f4767d9d711509e6a7bad1a30bda76ac41691",
+      "group": "coupon",
+      "note": "Боковой зазор окна 0.30; применяется с основным колпачком.",
+      "passed": true
+    },
+    "hold_mount_pitch_15p00": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1343.1560465687262,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2416,
+      "stl_volume_error_fraction": 2.09542237139505e-05,
+      "stl_bounds_error_mm": 0.000801242848605277,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          17.0,
+          26.999999999999993,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.0,
+          69.6,
+          -27.0
+        ],
+        [
+          17.0,
+          74.0,
+          -7.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -7.762200002471058e-17
+        ],
+        [
+          34.0,
+          20.0,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "c4d499a3190c72f045296e402bef5950ba30df05512d5aed165edd0b8ab6d308",
+      "stl_sha256": "0d6c9acf2465596ef47d492f429ff0843b294a7730cf3030a2a5f1878abed4bb",
+      "group": "coupon",
+      "note": "Пробная компактная версия: шаг отверстий 15.00; габарит рычага проверить.",
+      "passed": true
+    },
+    "hold_cap_lever_gap_m0p05": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 263.74951696431293,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1116,
+      "stl_volume_error_fraction": 1.3217191501502865e-05,
+      "stl_bounds_error_mm": 0.0003618990342832973,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          7.000000000000001,
+          21.199999999999992,
+          76.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -7.000000000000001,
+          71.6,
+          -21.2
+        ],
+        [
+          7.000000000000001,
+          76.0,
+          -12.8
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -2.6613256395049923e-16
+        ],
+        [
+          14.0,
+          8.399999618530273,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "4d73be16c1b86ea368584efb64577e2b909a7c964b183a681ed2281504b8d1e9",
+      "stl_sha256": "81582ac880e7387b7f2763ad582f3c2899afb6b573eae191101c8c6d2b86abc8",
+      "group": "coupon",
+      "note": "Посадка кармана рычага: -0.05 на сторону; основной hold_slider_cap +0.00.",
+      "passed": true
+    },
+    "hold_cap_lever_gap_0p10": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 258.08551696431283,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1116,
+      "stl_volume_error_fraction": 1.3510660234558753e-05,
+      "stl_bounds_error_mm": 0.0003618990342832973,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          7.000000000000001,
+          21.199999999999992,
+          76.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -7.000000000000001,
+          71.6,
+          -21.2
+        ],
+        [
+          7.000000000000001,
+          76.0,
+          -12.8
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -2.6613256395049923e-16
+        ],
+        [
+          14.0,
+          8.399999618530273,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "b78b576675d19958d9ecbed8b91d7f62e61d0ffc66eb7aeed9bee2e55837f0c9",
+      "stl_sha256": "3d9964d5de059bfb881e6768a1d2eb50188bd1a02a57439a76f9925135067d7e",
+      "group": "coupon",
+      "note": "Посадка кармана рычага: +0.10 на сторону; основной hold_slider_cap +0.00.",
+      "passed": true
+    },
+    "hold_cap_lever_gap_0p20": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 253.98951696431288,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1116,
+      "stl_volume_error_fraction": 1.372806130996656e-05,
+      "stl_bounds_error_mm": 0.0003618990342832973,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": -90,
+        "translation_xyz": [
+          7.000000000000001,
+          21.199999999999992,
+          76.0
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -7.000000000000001,
+          71.6,
+          -21.2
+        ],
+        [
+          7.000000000000001,
+          76.0,
+          -12.8
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          -2.6613256395049923e-16
+        ],
+        [
+          14.0,
+          8.399999618530273,
+          4.400000095367432
+        ]
+      ],
+      "step_sha256": "76f5085b9c16993f0db453dba32562450b76ea7ef3c634d921a1a523b9fef947",
+      "stl_sha256": "cadeb801057bd68ed20519ddd942fa2642ca21bd640dacfce3c9272080740ebb",
+      "group": "coupon",
+      "note": "Посадка кармана рычага: +0.20 на сторону; основной hold_slider_cap +0.00.",
+      "passed": true
+    },
+    "screw_boss_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 4833.242266227356,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 17156,
+      "stl_volume_error_fraction": 7.961224812205648e-05,
+      "stl_bounds_error_mm": 0.0011190447970763628,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          41.0,
+          12.0,
+          1.5543122344752192e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -41.0,
+          -12.0,
+          -7.0
+        ],
+        [
+          41.0,
+          12.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          8.473607754746674e-17
+        ],
+        [
+          82.0,
+          24.0,
+          7.0
+        ]
+      ],
+      "step_sha256": "d7c706eff6806dbb952c5d2f12933fb0b48ae874aa0ac2101d9071345a3651ba",
+      "stl_sha256": "78c4e052ec1ab00d7b48263aac2d25ff00476b5c8446cba4fbc463de0f09d98e",
+      "group": "coupon",
+      "note": "1..6 точек: M2 [1.6, 1.7, 1.8]; M2.5 [2.0, 2.1, 2.2]. Для подбора пилота использовать M2x3/4 и M2.5x3/4.",
+      "passed": true
+    },
+    "mainboard_hole_template_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1911.7664014332963,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 2220,
+      "stl_volume_error_fraction": 9.749162878533217e-06,
+      "stl_bounds_error_mm": 0.0008734720005207919,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          34.8,
+          24.3,
+          7.996943598432217e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -34.8,
+          -65.3,
+          -2.0
+        ],
+        [
+          34.8,
+          24.3,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.00011855403863592073,
+          0.0,
+          8.389930101942263e-20
+        ],
+        [
+          69.59999084472656,
+          89.59931182861328,
+          2.0
+        ]
+      ],
+      "step_sha256": "0b5a5e727a4db2190128922e7457052814306a4faeb9978152df5e9ca65a4de3",
+      "stl_sha256": "a3ad402a31fdeb5c3ca2656a7b3a7c1fa0d62fe9a432c806e729e1ed4a86c14b",
+      "group": "coupon",
+      "note": "Три M2-точки mainboard.mount_from_left_bottom от левого нижнего угла платы; отверстия оценочные, проверить до печати корпуса.",
+      "passed": true
+    },
+    "stack_height_gauge": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 2207.999999999999,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 28,
+      "stl_volume_error_fraction": 4.103218320350595e-08,
+      "stl_bounds_error_mm": 8.629394550041525e-07,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          17.5,
+          2.4000000000000004,
+          5.000000000000003
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -17.5,
+          -5.0,
+          -24.4
+        ],
+        [
+          17.5,
+          5.0,
+          2.4
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          35.0,
+          26.799999237060547,
+          10.0
+        ]
+      ],
+      "step_sha256": "fc6200ed05ccf30239fae4988c946df2fca8f1fb10ee9b97aa04eae66776b686",
+      "stl_sha256": "233097d7e17154817d06e8ceff5991ab6c0632a02429e655eb695b791ba7065b",
+      "group": "coupon",
+      "note": "Свободный просвет между губками 22 мм. Проверить сборку от самой нижней точки пайки до лица колеса, не давить на колесо и детали. Печатается боком без поддержек.",
+      "passed": true
+    },
+    "closure_front_boss_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 1255.6588986249803,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1532,
+      "stl_volume_error_fraction": 0.0001099209647493262,
+      "stl_bounds_error_mm": 0.0011194262667917343,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          10.0,
+          10.0,
+          1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -10.0,
+          -10.0,
+          -10.4
+        ],
+        [
+          10.0,
+          10.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          1.076208299045792e-16
+        ],
+        [
+          20.0,
+          20.0,
+          10.399999618530273
+        ]
+      ],
+      "step_sha256": "16b822836e89960445e1d6727a06f86699d63937619dd3b0e0d1c6318db578f1",
+      "stl_sha256": "c1e0f91363c49a43e52c95d3ea898c8ad53d0e1c415249f54a271e22a7a0e6b4",
+      "group": "coupon",
+      "note": "Передний пробник стыка: тот же пилот и глубина, короткая стойка для проверки M2.5x8.",
+      "passed": true
+    },
+    "closure_rear_plate_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 780.8176980266463,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1032,
+      "stl_volume_error_fraction": 6.386987225503489e-06,
+      "stl_bounds_error_mm": 0.0006024626075956977,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 0,
+        "translation_xyz": [
+          10.0,
+          10.0,
+          12.4
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -10.0,
+          -10.0,
+          -12.4
+        ],
+        [
+          10.0,
+          10.0,
+          -10.4
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          20.0,
+          20.0,
+          2.0
+        ]
+      ],
+      "step_sha256": "295cc2995195496ee1fc737d542ba884a7d1ed7dd2153a962c0eb149e4cc714f",
+      "stl_sha256": "6c3e69dd2f2c43ebb2e12e3002813dd970ed54434b7e1afa8e0cbecbbf6945dd",
+      "group": "coupon",
+      "note": "Задняя пластина стыка. Соединить с closure_front_boss_coupon винтом M2.5x8; затягивать до контакта опор.",
+      "passed": true
+    },
+    "tolerance_frame_coupon": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 3701.8143808524283,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 7692,
+      "stl_volume_error_fraction": 3.9902853153481323e-07,
+      "stl_bounds_error_mm": 0.0006024626076057693,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          38.0,
+          10.0,
+          1.3322676295501878e-15
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -38.0,
+          -10.0,
+          -3.0
+        ],
+        [
+          38.0,
+          10.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          1.076208299045792e-16
+        ],
+        [
+          76.0,
+          20.0,
+          3.0
+        ]
+      ],
+      "step_sha256": "2a46ed9ddebb42860b9aa0e29c1185aaf9177a2615b4a67e604069cc3a6159bc",
+      "stl_sha256": "b051cc852a99ca85d750c8ebdfa106a44b0cf3cb6ac2538334ada06f9bd3f8a8",
+      "group": "coupon",
+      "note": "1..4 точек: зазор на сторону [0.15, 0.2, 0.25, 0.3]; использовать tolerance_key, без масштабирования.",
+      "passed": true
+    },
+    "tolerance_key": {
+      "brep_valid": true,
+      "solids": 1,
+      "volume_mm3": 666.9869010969643,
+      "stl_watertight": true,
+      "stl_winding_consistent": true,
+      "stl_triangles": 1052,
+      "stl_volume_error_fraction": 1.1043720919505026e-05,
+      "stl_bounds_error_mm": 0.00030128130379836193,
+      "step_roundtrip_passed": true,
+      "print_transform": {
+        "rotation_x_degrees": 180,
+        "translation_xyz": [
+          6.0,
+          6.0,
+          7.34788079488412e-16
+        ],
+        "mirrored": false
+      },
+      "cad_bounds_mm": [
+        [
+          -6.0,
+          -6.0,
+          -8.0
+        ],
+        [
+          6.0,
+          6.0,
+          0.0
+        ]
+      ],
+      "stl_bounds_mm": [
+        [
+          0.0,
+          0.0,
+          9.860761315262648e-32
+        ],
+        [
+          12.0,
+          12.0,
+          8.0
+        ]
+      ],
+      "step_sha256": "db245b5f280427972a1f2c5b2ebac787c0e0f24a8200c2528e0b0d098b62f768",
+      "stl_sha256": "ac25a9ab664add9da9f11f43f3fe601cd4b842632fb884e588349bd63fc59c12",
+      "group": "coupon",
+      "note": "Один ключ 8.00 x 8.00; последовательно примерить во все четыре окна.",
+      "passed": true
+    }
+  },
+  "assembly": {
+    "passed": true,
+    "unintended_overlaps_mm3": {
+      "front_back": 0.0,
+      "front__clickwheel_frame": 0.0,
+      "front__clickwheel_wheel": 0.0,
+      "front__clickwheel_select": 0.0,
+      "front__clickwheel_pcb": 0.0,
+      "front__display_pcb": 0.0,
+      "front__display_glass": 0.0,
+      "front__display_rear_keepout": 0.0,
+      "front__screen_lens": 0.0,
+      "front__lens_adhesive_envelope": 0.0,
+      "back__mainboard": 0.0,
+      "back__mainboard_component_keepout": 0.0,
+      "back__mainboard_rear_solder_keepout": 0.0,
+      "back__tp4056_pcb": 0.0,
+      "back__tp4056_components": 0.0,
+      "back__usb_c_shell": 0.0,
+      "back__jack_body": 0.0,
+      "back__jack_nut": 0.0,
+      "back__hold_switch_body": 0.0,
+      "back__hold_lever": 0.0,
+      "back__hold_terminal_keepout": 0.0,
+      "back__display_rear_keepout": 0.0,
+      "back__clickwheel_assembly": 0.0,
+      "insert_back": 0.0,
+      "insert_front": 0.0,
+      "insert__mainboard": 0.0,
+      "insert__mainboard_component_keepout": 0.0,
+      "insert__mainboard_rear_solder_keepout": 0.0,
+      "insert__tp4056_pcb": 0.0,
+      "insert__tp4056_components": 0.0,
+      "insert__usb_c_shell": 0.0,
+      "insert__jack_body": 0.0,
+      "insert__jack_nut": 0.0,
+      "carrier__front": 0.0,
+      "carrier__back": 0.0,
+      "carrier__clickwheel_frame": 0.0,
+      "carrier__clickwheel_wheel": 0.0,
+      "carrier__clickwheel_select": 0.0,
+      "carrier__clickwheel_pcb": 0.0,
+      "carrier__clickwheel_assembly": 0.0,
+      "carrier__display_pcb": 0.0,
+      "carrier__display_glass": 0.0,
+      "carrier__display_active": 0.0,
+      "carrier__display_rear_keepout": 0.0,
+      "carrier__screen_lens": 0.0,
+      "carrier__lens_adhesive_envelope": 0.0,
+      "carrier__mainboard": 0.0,
+      "carrier__tp4056_pcb": 0.0,
+      "carrier__tp4056_components": 0.0,
+      "carrier__usb_c_shell": 0.0,
+      "carrier__jack_body": 0.0,
+      "carrier__jack_nut": 0.0,
+      "carrier__mainboard_component_keepout": 0.0,
+      "carrier__mainboard_rear_solder_keepout": 0.0,
+      "carrier__hold_switch_body": 0.0,
+      "carrier__hold_lever": 0.0,
+      "carrier__hold_terminal_keepout": 0.0,
+      "front__mainboard": 0.0,
+      "front__mainboard_component_keepout": 0.0,
+      "front__mainboard_rear_solder_keepout": 0.0,
+      "front__tp4056_pcb": 0.0,
+      "front__tp4056_components": 0.0,
+      "front__usb_c_shell": 0.0,
+      "front__jack_body": 0.0
+    },
+    "hold_sweep": [
+      {
+        "offset_x": -1.5,
+        "cap_back_overlap_mm3": 0.0,
+        "cap_lever_overlap_mm3": 0.0,
+        "cap_body_overlap_mm3": 0.0
+      },
+      {
+        "offset_x": 0,
+        "cap_back_overlap_mm3": 0.0,
+        "cap_lever_overlap_mm3": 0.0,
+        "cap_body_overlap_mm3": 0.0
+      },
+      {
+        "offset_x": 1.5,
+        "cap_back_overlap_mm3": 0.0,
+        "cap_lever_overlap_mm3": 0.0,
+        "cap_body_overlap_mm3": 0.0
+      }
+    ],
+    "wheel_down_clearance_overlap_mm3": 0.0,
+    "select_down_clearance_overlap_mm3": 0.0,
+    "imported_screw_pilot_interference_mm3": 9.248848772168234,
+    "expected_thread_forming_interference_mm3": 9.24884877216835,
+    "module_pair_overlaps_mm3": {
+      "wheel__display": 0.0,
+      "wheel__electronics": 0.0,
+      "wheel__jack_nut": 0.0,
+      "wheel__hold": 0.0,
+      "wheel__lens": 0.0,
+      "display__electronics": 0.0,
+      "display__jack_nut": 0.0,
+      "display__hold": 0.0,
+      "display__lens": 0.0,
+      "electronics__jack_nut": 0.0,
+      "electronics__hold": 0.0,
+      "electronics__lens": 0.0,
+      "jack_nut__hold": 0.0,
+      "jack_nut__lens": 0.0,
+      "hold__lens": 0.0
+    },
+    "thread_note": "Intentional Ø2.5 unthreaded reference shanks intersect Ø2.1 pilots. No modeled thread or physical pull-out test.",
+    "acrylic": {
+      "width": 35.0,
+      "height": 42.0,
+      "front_depth": 0.1,
+      "rear_depth": 1.1,
+      "display_air_gap": 1.5,
+      "carrier_front": 1.3,
+      "carrier_rear": 2.1,
+      "carrier_ear_front": 5.2,
+      "clear_width": 31.0,
+      "clear_height": 38.0
+    },
+    "board_datums": {
+      "left": -35.0,
+      "right": 35.0,
+      "bottom": -65.5,
+      "top": 24.5,
+      "x": 0.0,
+      "y": -20.5,
+      "front": 19.0,
+      "rear": 20.6,
+      "solder_rear": 22.6
+    },
+    "usb_datums": {
+      "x": -24.1,
+      "mouth_y": -72.0,
+      "pcb_front_y": -70.5,
+      "pcb_end_y": -42.5,
+      "pcb_rear_depth": 18.8,
+      "axis_depth": 16.3
+    },
+    "jack_datums": {
+      "x": -8.700000000000003,
+      "tip_y": -73.0,
+      "shoulder_y": -69.45,
+      "base_depth": 18.8,
+      "axis_depth": 15.8,
+      "panel_outer_y": -71.05
+    },
+    "rigid_module_pair_overlaps_mm3": {
+      "mainboard__charger": 0.0,
+      "mainboard__jack": 0.0,
+      "charger__jack": 0.0
+    },
+    "installation": {
+      "passed": true,
+      "whole_board_lowering_continuous_conservative_envelopes_mm3": {
+        "mainboard": 0.0,
+        "mainboard_component_keepout": 0.0,
+        "mainboard_rear_solder_keepout": 0.0,
+        "tp4056_pcb": 0.0,
+        "tp4056_components": 0.0,
+        "usb_c_shell": 0.0,
+        "jack_body": 0.0
+      },
+      "insert_slide_samples": [
+        {
+          "offset_y_mm": -24.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -12.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -6.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -3.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -1.5,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -0.75,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -0.25,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": 0.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        }
+      ],
+      "insert_slide_sampling_not_continuous_proof": true,
+      "sequence": [
+        "remove jack nut and bottom insert",
+        "lower complete soldered board along -Z",
+        "secure board with three M2x5",
+        "slide insert along +Y over both connectors",
+        "secure insert with two M2x4",
+        "fit jack nut without forcing soldered alignment",
+        "fit front panel"
+      ],
+      "physical_assembly_verified": false
+    },
+    "usb_cable_fit": {
+      "passed": true,
+      "datums": {
+        "body_front_y": -73.0,
+        "body_rear_y": -89.0,
+        "metal_tip_y": -66.0,
+        "well_floor_y": -72.5,
+        "well_rear_y": -70.9,
+        "well_depth": 1.5,
+        "well_width": 10.5,
+        "well_height": 6.3999999999999995,
+        "usb_recess": 2.0,
+        "pcb_clearance": 0.4000000000000057,
+        "corner_radius": 0.6
+      },
+      "hood_insertion_samples": [
+        {
+          "variant": "nominal",
+          "offset_y_mm": -15.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "nominal",
+          "offset_y_mm": -5.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "nominal",
+          "offset_y_mm": -1.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "nominal",
+          "offset_y_mm": 0.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": -15.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": -5.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": -1.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": 0.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        }
+      ],
+      "metal_printed_part_overlaps_mm3": {
+        "front_panel": 0.0,
+        "back_chassis": 0.0,
+        "bottom_connector_insert": 0.0
+      },
+      "measurement_allowance_on_total_size_mm": 0.2,
+      "shorter_tip_allowance_mm": 0.2,
+      "assumed_engagement_mm": 6.0,
+      "physical_cable_fit_or_electrical_contact_verified": false,
+      "note": "User measured hood 9.7x5.6 and exposed tip about 7 mm. Mating depth and metal section are provisional envelopes; no internal USB contact geometry or physical mating validation."
+    },
+    "limits": "Rigid CAD positions and envelopes only. No FEA, measured fit, wiring/battery routing or real actuation validation."
+  },
+  "input_hashes_preserved": true,
+  "physical_fit_verified": false,
+  "seconds": 16.01,
+  "passed": true
+}

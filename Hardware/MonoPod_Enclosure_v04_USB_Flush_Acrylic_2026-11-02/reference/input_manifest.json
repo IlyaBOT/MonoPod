@@ -1,0 +1,50 @@
+{
+  "clickwheel/README_RU.md": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\README_RU.md",
+    "sha256": "7348b68d395d6c61e0bbbf00d4983a4789be5dc75698d1158def63e88cbdbe03"
+  },
+  "clickwheel/cad/assembly.step": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\cad\\assembly.step",
+    "sha256": "9a2f24445304f1b71afe83c41ed35e7540ba1db97f6b811f005b5e28f6f57400"
+  },
+  "clickwheel/cad/frame.step": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\cad\\frame.step",
+    "sha256": "418e1b772652ed2f110fd073c3fabf2aa8b9ae8503700aca009084efe9523a91"
+  },
+  "clickwheel/cad/wheel.step": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\cad\\wheel.step",
+    "sha256": "fd4747d8b0bb228e287e415cd6543a1d9a4b9171ce997555c45fd2eca76d0e93"
+  },
+  "clickwheel/cad/select.step": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\cad\\select.step",
+    "sha256": "85012ecea57b6c4af2216a4912dbf8fd9ce265a36dd728e42599d6f279ce1ea7"
+  },
+  "clickwheel/reference/pcb_with_component_envelopes.step": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\reference\\pcb_with_component_envelopes.step",
+    "sha256": "c81a0d68a3c97db204b00168a885db610c354c9dabaca5b887480be786667189"
+  },
+  "clickwheel/source/parameters.json": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\source\\parameters.json",
+    "sha256": "db8b91d28ce1cabdda516ff77832811cdedd359280a9c5ff4aca0e056a75dfd7"
+  },
+  "clickwheel/source/pcb_geometry.json": {
+    "source": "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-29\\files-pasted-by-the-user-pcb\\outputs\\MonoPod_ClickWheel_Mechanics_v03_2026-10-31\\source\\pcb_geometry.json",
+    "sha256": "816fb3fcd1576179651d1b237423a97b5d45a7520a39bcf516d27e87ac5a39b0"
+  },
+  "photos/photo_1_2026-11-01_18-29-50.jpg": {
+    "source": "D:\\Загрузки\\Telegram Desktop\\photo_1_2026-11-01_18-29-50.jpg",
+    "sha256": "54d5b331ef7921430b4b88aa6df9e069718f32284da3d3a2b4a2e721ca4a9af5"
+  },
+  "photos/photo_2_2026-11-01_18-29-50.jpg": {
+    "source": "D:\\Загрузки\\Telegram Desktop\\photo_2_2026-11-01_18-29-50.jpg",
+    "sha256": "eeb8c2838d76728c05d8eb90510e6a1846042d9f10f7c7545d09e37c768ed3df"
+  },
+  "photos/photo_3_2026-11-01_18-29-50.jpg": {
+    "source": "D:\\Загрузки\\Telegram Desktop\\photo_3_2026-11-01_18-29-50.jpg",
+    "sha256": "528d643d242555c8749922e8be12e979bd661f42a7694fd36d337789adf6a202"
+  },
+  "photos/rigid_electronics_2026-11-01.png": {
+    "source": "C:\\Temp\\codex-clipboard-0060e429-20cb-40c4-8d82-78c2b9650c25.png",
+    "sha256": "24806d67737576f92c1cb0185d2f46181089944e06a2969fb7dee3c06bcb49e0"
+  }
+}

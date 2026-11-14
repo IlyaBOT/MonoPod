@@ -1,0 +1,84 @@
+0x4037b0a9
+esp_cpu_compare_and_set
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/esp_hw_support/cpu.c:225
+0x4037f806
+spinlock_acquire
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/esp_hw_support/include/spinlock.h:132
+xPortEnterCriticalTimeout
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:489
+0x403843c5
+xPortEnterCriticalTimeoutSafe
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:581
+vPortEnterCriticalSafe
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/include/freertos/portmacro.h:588
+multi_heap_internal_lock
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/heap/multi_heap.c:171
+0x403844ed
+multi_heap_free
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/heap/multi_heap_poisoning.c:276
+0x403767e7
+heap_caps_free
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/heap/heap_caps_base.c:86
+0x4037fc35
+vPortFree
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/freertos/heap_idf.c:63
+0x4037f34e
+vQueueDelete
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/freertos/FreeRTOS-Kernel/queue.c:2376
+0x40377355
+_lock_close
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/newlib/src/locks.c:114
+0x40377405
+__retarget_lock_close_recursive
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/newlib/src/locks.c:313
+0x420d12b7
+_fopen_r
+/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/fopen.c:134
+0x420d1335
+fopen
+/builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/fopen.c:168 (discriminator 1)
+0x42012f9c
+VFSFileImpl::VFSFileImpl(VFSImpl*, char const*, char const*)
+C:\Users\IlyaBOT\AppData\Local\Arduino15\packages\esp32\hardware\esp32\3.3.12\libraries\FS\src/vfs_api.cpp:274
+0x420131a9
+void std::_Construct<VFSFileImpl, VFSImpl*, char const*&, char const*&>(VFSFileImpl*, VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/stl_construct.h:119 (discriminator 1)
+void std::allocator_traits<std::allocator<void> >::construct<VFSFileImpl, VFSImpl*, char const*&, char const*&>(std::allocator<void>&, VFSFileImpl*, VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/alloc_traits.h:657 (discriminator 1)
+std::_Sp_counted_ptr_inplace<VFSFileImpl, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_Sp_counted_ptr_inplace<VFSImpl*, char const*&, char const*&>(std::allocator<void>, VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/shared_ptr_base.h:607 (discriminator 1)
+std::__shared_count<(__gnu_cxx::_Lock_policy)2>::__shared_count<VFSFileImpl, std::allocator<void>, VFSImpl*, char const*&, char const*&>(VFSFileImpl*&, std::_Sp_alloc_shared_tag<std::allocator<void> >, VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/shared_ptr_base.h:969 (discriminator 1)
+std::__shared_ptr<VFSFileImpl, (__gnu_cxx::_Lock_policy)2>::__shared_ptr<std::allocator<void>, VFSImpl*, char const*&, char const*&>(std::_Sp_alloc_shared_tag<std::allocator<void> >, VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/shared_ptr_base.h:1713 (discriminator 1)
+std::shared_ptr<VFSFileImpl>::shared_ptr<std::allocator<void>, VFSImpl*, char const*&, char const*&>(std::_Sp_alloc_shared_tag<std::allocator<void> >, VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/shared_ptr.h:463 (discriminator 1)
+std::shared_ptr<VFSFileImpl> std::make_shared<VFSFileImpl, VFSImpl*, char const*&, char const*&>(VFSImpl*&&, char const*&, char const*&)
+C:/Users/IlyaBOT/AppData/Local/Arduino15/packages/esp32/tools/esp-x32/2601/xtensa-esp-elf/include/c++/14.2.0/bits/shared_ptr.h:1008 (discriminator 1)
+0x420132f1
+VFSImpl::open(char const*, char const*, bool)
+C:\Users\IlyaBOT\AppData\Local\Arduino15\packages\esp32\hardware\esp32\3.3.12\libraries\FS\src/vfs_api.cpp:83
+0x420127e1
+fs::FS::open(char const*, char const*, bool)
+C:\Users\IlyaBOT\AppData\Local\Arduino15\packages\esp32\hardware\esp32\3.3.12\libraries\FS\src/FS.cpp:209 (discriminator 1)
+0x42006c65
+MediaLibrary::scanFolder(String const&, unsigned char)
+I:\DIY_iPod_Mono\MonoPod_v0.9.0\DIY_iPod_Mono/Library.cpp:120 (discriminator 1)
+0x42006dee
+MediaLibrary::scanFolder(String const&, unsigned char)
+I:\DIY_iPod_Mono\MonoPod_v0.9.0\DIY_iPod_Mono/Library.cpp:128 (discriminator 9)
+0x4200866a
+MediaLibrary::rescan()
+I:\DIY_iPod_Mono\MonoPod_v0.9.0\DIY_iPod_Mono/Library.cpp:107 (discriminator 3)
+0x420087dd
+MediaLibrary::begin()
+I:\DIY_iPod_Mono\MonoPod_v0.9.0\DIY_iPod_Mono/Library.cpp:91
+0x42003725
+setup()
+I:\DIY_iPod_Mono\MonoPod_v0.9.0\DIY_iPod_Mono/DIY_iPod_Mono.ino:49
+0x4203fdba
+loopTask(void*)
+C:\Users\IlyaBOT\AppData\Local\Arduino15\packages\esp32\hardware\esp32\3.3.12\cores\esp32/main.cpp:67
+0x4037f62d
+vPortTaskWrapper
+/home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:143

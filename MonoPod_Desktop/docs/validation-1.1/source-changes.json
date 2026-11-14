@@ -1,0 +1,118 @@
+[
+  {
+    "path": "Directory.Build.props",
+    "status": "modified",
+    "before_sha256": "177e2593c8ad0e2581f49e5a5fe9d8a7e84f8890f333c2ac541c0332b86c525e",
+    "after_sha256": "1b1863aa665715c121c9fd5501e8471806465616ab0bddd203e9e0aad4b3aae5"
+  },
+  {
+    "path": "README.md",
+    "status": "modified",
+    "before_sha256": "a7669c2fd623a30b3106de621a4e73612033e6977e154fdec61ab91a557001b7",
+    "after_sha256": "5daa9505414e7e5ded10ade931992761fc09c231e79719981ae412fa6877e2f4"
+  },
+  {
+    "path": "docs/BUILD.md",
+    "status": "modified",
+    "before_sha256": "a220c1f6c69f01ac68590eb0332c1dc4e267ae97a9784074d627a7b561d5cd7a",
+    "after_sha256": "4d4ea3e4ee338899b256f8d4d2b09dbabd4e6ce56fcb665ef7eb1a69393c7af3"
+  },
+  {
+    "path": "docs/PROTOCOL.md",
+    "status": "modified",
+    "before_sha256": "66a969fc959ed7a7d49fdb91f13ef4b4c5491fcc37bc4ca84f175bf4db751950",
+    "after_sha256": "13249c7f88033ac79874621f75ead9c4b36c88469354ffb63695bd341b4b52b7"
+  },
+  {
+    "path": "docs/USER_GUIDE_RU.md",
+    "status": "modified",
+    "before_sha256": "22b3f5a482b9d398dfcbb1aa1b567fa8d7b8fcea422eb5921cef08624ba5b756",
+    "after_sha256": "487acf0a8f71e96d03486dd50693b6345c4183c02af27168b7b4b3da61ab7fec"
+  },
+  {
+    "path": "MonoPod.Core/Models.cs",
+    "status": "modified",
+    "before_sha256": "b9f8f1e66ed5f0f932441390416f23193bde8ec8ec8ef1470f53a7bcd9ca386e",
+    "after_sha256": "33e1ee5ead770866fca8d869345c460ebd966b2bcde9aa098bdf0f3473c1163d"
+  },
+  {
+    "path": "MonoPod.Core/SerialLink.cs",
+    "status": "modified",
+    "before_sha256": "538a352b367b4b02d8fda284e5b3b556c7b2e7a00261f63063314b906bc73d0d",
+    "after_sha256": "deb1b8d8d98af6c3e76b195edc01804b6f65213b280459a4408f7077e388c743"
+  },
+  {
+    "path": "MonoPod.Core/UsbMonoPodTransport.cs",
+    "status": "modified",
+    "before_sha256": "3cf87f178df818bf3b519b5ba783c97bb77b8252e4f93191b63a699a2d477fda",
+    "after_sha256": "1b167e818da0dbb1bd885e22ce3fff7467d0fe1eaef2be3044cee50d07eaa850"
+  },
+  {
+    "path": "MonoPod.Core/WiFiMonoPodTransport.cs",
+    "status": "modified",
+    "before_sha256": "e6651585dc08c2b4991543f37f0dba2f495eb18580086805d7dfa79fc4c12d42",
+    "after_sha256": "4a072ab6d665f9a20f78ec4010185d6f7cb72feb7f5e32b4e302c9299bfc9e6e"
+  },
+  {
+    "path": "MonoPod.Desktop/MonoPod.Desktop.csproj",
+    "status": "modified",
+    "before_sha256": "6ba0fc618e572f25844319b74ef1bc7fb5f74a0969d1895c1069d21bef56eea3",
+    "after_sha256": "29fae5c96a2bd880d0eb507d6b61ebdc5ba307d6729640fe5d980a3603cb0537"
+  },
+  {
+    "path": "MonoPod.Desktop/Forms/MainForm.cs",
+    "status": "modified",
+    "before_sha256": "3eec59ce347ba7cff04f051191056845cc521dd7196a465e665cfb919a2dd59d",
+    "after_sha256": "efc264239c26cbdcea81e8a47e0ef38b5d4da343de98b3dcb8c4be89d6e694bf"
+  },
+  {
+    "path": "MonoPod.Desktop/Forms/ThemeEditorForm.cs",
+    "status": "modified",
+    "before_sha256": "b4ef70329eca452523341ba053ddcf92c00a95e78cc74f87c81a00c234f2ca02",
+    "after_sha256": "f111c6ba43151340a3f6ef3c9432ef772a03a7d23a07860041440a0dbdf52bc4"
+  },
+  {
+    "path": "MonoPod.Desktop/Services/Preferences.cs",
+    "status": "modified",
+    "before_sha256": "7dea5243d96c2c23741760b67466247217959c49bdb60ca1760139f64e716efb",
+    "after_sha256": "74563fe0bf5f5d039d91a6732a74596dd0954f761545b2202b694059465462e4"
+  },
+  {
+    "path": "MonoPod.Desktop.Tests/HttpDevice.cs",
+    "status": "modified",
+    "before_sha256": "c3e8263f79610f01c96d805b9a555e141c89db41570d16dce3d1f028656451f9",
+    "after_sha256": "6adce939b5cd61ade624019c51d64c89058c7e969778b9d6117b923f20c8fd5f"
+  },
+  {
+    "path": "MonoPod.Desktop.Tests/TransferTimeoutTests.cs",
+    "status": "modified",
+    "before_sha256": "1ba4f268e0bec0012bc1b18fb4b830875977d51d47e2c3347b405003a2cbbd53",
+    "after_sha256": "fac4159d49ef353aff649253fead2a5567cebea6288c5df8e19d7a4d8572f85c"
+  },
+  {
+    "path": "MonoPod.Desktop.Tests/UsbDevice.cs",
+    "status": "modified",
+    "before_sha256": "aca6172bb603f9d998edb38c2f782d3c31547f6bc8ca672e24e31b3e8a5eea7d",
+    "after_sha256": "0dae6441e46f1717e2b458194b6a9b9036e642fb326f72516b828f6f4126cb39"
+  },
+  {
+    "path": "MonoPod.Desktop.Tests/HttpFirmwareV4Tests.cs",
+    "status": "added",
+    "sha256": "3db4b58559474bec5c2229325e858cbfddd6f697128b5d3fef0f7aecf3e61c9a"
+  },
+  {
+    "path": "MonoPod.Desktop.Tests/UsbV4RegressionTests.cs",
+    "status": "added",
+    "sha256": "87f382c4b4fd7c90a2eab6d457f878c5d4241a01eb09ef4a30273adcaef87516"
+  },
+  {
+    "path": "MonoPod.Desktop.Tests/UiThemeRegressionTests.cs",
+    "status": "added",
+    "sha256": "95d132666f6ed488d23cdc94466cdbea1e7c0c3f7120d0571ab1cb4c795107ea"
+  },
+  {
+    "path": "docs/RELEASE_1.1_RU.md",
+    "status": "added",
+    "sha256": "2c24b28d85f5bc73123bf9d5d52b1871128066ace6fc70af0c47eaa1c8b9838e"
+  }
+]

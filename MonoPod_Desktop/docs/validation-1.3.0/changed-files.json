@@ -1,0 +1,167 @@
+{
+  "backup": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\monopoddb-1.3.0-20261102-230437",
+  "files": [
+    {
+      "path": "MonoPod.Core/LibraryDatabase.cs",
+      "status": "added",
+      "sha256": "37985ac87a14e061cb119a6d8ed9f9669c7a5795e318c3815b7dfe1d8bcd751b",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Core/MetadataEditing.cs",
+      "status": "added",
+      "sha256": "a41a44cbd9d7efdfa624af77e54effb21809c37e3b45629b3c48d4f15c403912",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Core/Models.cs",
+      "status": "modified",
+      "sha256": "782227762c8f8e02499d825dffbced67f3a515b7d344c6a1054d9b74e316e807",
+      "before_sha256": "3ecc584e601ceaae207396fc49c9c6a08138d0387e46933a85d3df94f728c6a5"
+    },
+    {
+      "path": "MonoPod.Core/MonoPod.Core.csproj",
+      "status": "modified",
+      "sha256": "24b62fbcb7daa703bf92f8ae96c63ac3d310d5a6a074f317923d709bb437f2b3",
+      "before_sha256": "4c827219a95e191168d7d820bd6c5b3773964319c169a5a9910b2016af72ca93"
+    },
+    {
+      "path": "MonoPod.Core/UsbMonoPodTransport.cs",
+      "status": "modified",
+      "sha256": "95dcc5edcb5f8bdc640b8a162a896a59aff73e1e437a2c490f147b55df98293d",
+      "before_sha256": "3a0814f5c998e1f076262b31dea6d15ac59bb7a94c394acc95aba0554e0390d5"
+    },
+    {
+      "path": "MonoPod.Core/UsbMonoPodTransport.Library.cs",
+      "status": "added",
+      "sha256": "3d16afdf5f1feeab1e74ea0937796a90b0fcdae647ce45f0995782f92ee096fa",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Core/WiFiMonoPodTransport.cs",
+      "status": "modified",
+      "sha256": "7f52f46c4de3aa633966318a6244f47dab8626c358b410bce18d9bbae247dbb6",
+      "before_sha256": "05511e42fddb58497838a90f75e5f32e80e5f22c0b1ec94343dc2cc028fd83af"
+    },
+    {
+      "path": "MonoPod.Core/WiFiMonoPodTransport.Library.cs",
+      "status": "added",
+      "sha256": "784648c2145aa8400bcd8c028edf756dafeca54df314fcfefb295b46aae7dc45",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop/MonoPod.Desktop.csproj",
+      "status": "modified",
+      "sha256": "47cbdd83b8fb27973767d66ec6d73935ed7fe351d2732c99e9b3c794a7c78b47",
+      "before_sha256": "c1598c073c1337569960d1bfcf4be7ca452eab6e37040c1e01c3a935d193834c"
+    },
+    {
+      "path": "MonoPod.Desktop/Forms/MainForm.cs",
+      "status": "modified",
+      "sha256": "4ded39888fd77f13a3aa2c47ee8eb52ca1c04abee71ee33145cd9e3b69d04a69",
+      "before_sha256": "682a1af4c13c955c943cb543479e2b29757fb288410129b97d40c1d2515cb615"
+    },
+    {
+      "path": "MonoPod.Desktop/Forms/MainForm.DeviceFeatures.cs",
+      "status": "modified",
+      "sha256": "5f5569f1b45245857f809a459ac676658ddab756b805a228ded278303812f57f",
+      "before_sha256": "d23edb0daf78665451c902f6044bc5f72e479f1db55eaf0297b8e6c76f1f0b3f"
+    },
+    {
+      "path": "MonoPod.Desktop/Forms/MainForm.Library.cs",
+      "status": "added",
+      "sha256": "070da667886b985dd5bd1ded39b0d06b3b9aa3c25bbd2db0ecc265aa82bea8b3",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop/Forms/MetadataEditorForm.cs",
+      "status": "added",
+      "sha256": "9893073970fcaa0b7d52e29d9f686cf356420b3781c12a76df97be42ff115f71",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/LargeMetadataDownloadTests.cs",
+      "status": "added",
+      "sha256": "883b8db87208394880e902c9189fd3f901c31f4f99954b52974acc4c0972305a",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/LibraryDatabaseTests.cs",
+      "status": "added",
+      "sha256": "6d38cbb818ac61de27bb0a0df4cb844265ba688c8c7726fd5a6a633e3e3a68f7",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/MetadataEditingTests.cs",
+      "status": "added",
+      "sha256": "64ad3338b8ec5136abfb29893ca8432194b7df101aad6365e2c82df76cbb3e06",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/MonoPod.Desktop.Tests.csproj",
+      "status": "modified",
+      "sha256": "8b1685f548063c05ce844127db61ded917f94893c437f1f5777e6c90b1594f7d",
+      "before_sha256": "8ae9ef497cffffeedeaae676d1b4ef27519985c831fc7bc0e288b3d8a9ed6b25"
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/UiLibraryTests.cs",
+      "status": "added",
+      "sha256": "0e73354c0b0952dcf4d486d5592967bb331f14673261ecfd91c2c466bb68ae39",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/UsbDevice.cs",
+      "status": "modified",
+      "sha256": "78a47896032412d677b37f1c38f3611c6aba16bfe2b157c25e752c6f21b3af32",
+      "before_sha256": "7e9d9c1f7f6700aa887c808fc704569ce75fb4a418b63e0ab7a49c3ff53abeb2"
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/Fixtures/tone.flac",
+      "status": "added",
+      "sha256": "6605320cc3c64f0478fea14f24117dac80186571c921c41d01a526eab24e9187",
+      "before_sha256": null
+    },
+    {
+      "path": "MonoPod.Desktop.Tests/Fixtures/tone.mp3",
+      "status": "added",
+      "sha256": "8fa28f712562f6fc4b82cd0e261ae12dd80bb573a2be4ca1e74406630103a498",
+      "before_sha256": null
+    },
+    {
+      "path": "Directory.Build.props",
+      "status": "modified",
+      "sha256": "fb6f382670d683775742eab60669d07349224426bb9579fbd920d29345bf61aa",
+      "before_sha256": "451267e02fdc48e50b42b171cefb3fefd6f1700e3c9a567a8a4331b584a34971"
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "b77a7762fcb21c126d06f3d9a2a64fd8bd3b848bfc6547d430f903ed156cd3de",
+      "before_sha256": null
+    },
+    {
+      "path": "tools/package_desktop_13.py",
+      "status": "added",
+      "sha256": "2a54ee26e4dd1da30c5186e9dbf57c6bd5dfab986656a095bf9f115eb09ef48c",
+      "before_sha256": null
+    },
+    {
+      "path": "docs/BUILD.md",
+      "status": "modified",
+      "sha256": "582d4eca119896f1a34af0b3afb07b78d00773fbaaef7abdaa563bff3182d437",
+      "before_sha256": null
+    },
+    {
+      "path": "docs/RELEASE_1.3_RU.md",
+      "status": "added",
+      "sha256": "8d5140afb1d4043c4e87d82b06c6aa9007f02125199f5504e8659e6cfcf88193",
+      "before_sha256": null
+    },
+    {
+      "path": "docs/THIRD_PARTY_NOTICES.md",
+      "status": "added",
+      "sha256": "daa3ad16e9725e69cdc76747f60d68a61c2be5b3bfe5789d089350aa6683ddc7",
+      "before_sha256": null
+    }
+  ]
+}

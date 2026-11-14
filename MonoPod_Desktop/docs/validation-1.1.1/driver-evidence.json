@@ -1,0 +1,6 @@
+{
+  "path": "C:\\Users\\IlyaBOT\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.3.12\\cores\\esp32\\HWCDC.cpp",
+  "sha256": "c5ed5fdd05aa0df9b74d390812643599223f96b459256718d0ad328aeaba6a8a",
+  "queue_initialization": "setRxBufferSize(256) in HWCDC::begin",
+  "overflow_behavior": "ISR reads FIFO, xQueueSendFromISR failure breaks loop; remaining FIFO bytes are lost."
+}

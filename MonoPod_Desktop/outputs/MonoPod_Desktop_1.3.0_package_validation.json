@@ -1,0 +1,20 @@
+{
+  "packages": [
+    {
+      "file": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.3.0_win-x64.zip",
+      "bytes": 70434676,
+      "sha256": "ba917be6b1b1e8097ca44731bb40dd4fd0789e0f10f12bbe57b8828eb90ade34",
+      "entries": 483,
+      "crc_and_all_file_sha256": "passed"
+    },
+    {
+      "file": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.3.0_source.zip",
+      "bytes": 657502,
+      "sha256": "8b14b55199915211ebcd3aa72e3f40fe5e4526346c20645ee5252b2fd7ddd9d9",
+      "entries": 131,
+      "crc_and_all_file_sha256": "passed"
+    }
+  ],
+  "tests": 269,
+  "physical_device_tested": false
+}

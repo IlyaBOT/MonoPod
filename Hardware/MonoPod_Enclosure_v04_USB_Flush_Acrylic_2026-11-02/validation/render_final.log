@@ -1,0 +1,3 @@
+I:\DIY_iPod_Mono\CAD_Runtime_Enclosure_v04\venv\Lib\site-packages\cadquery\utils.py:82: FutureWarning: save will be removed in the next release.
+  warn(f"{f.__name__} will be removed in the next release.", FutureWarning)
+Rendered actual CAD: C:\Users\IlyaBOT\Documents\Codex\2026-10-29\files-pasted-by-the-user-pcb\outputs\MonoPod_Enclosure_v04_USB_Flush_Acrylic_2026-11-02\images

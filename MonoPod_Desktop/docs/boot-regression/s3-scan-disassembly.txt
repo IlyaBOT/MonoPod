@@ -1,0 +1,20 @@
+
+I:\DIY_iPod_Mono\MonoPod_Desktop\work\build-s3\DIY_iPod_Mono.ino.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+42006e7c <MediaLibrary::scanFolder(String const&, unsigned char)>:
+42006e7c:	02c136        	entry	a1, 0x160
+42006e7f:	748040        	extui	a8, a4, 0, 8
+42006e82:	5189      	s32i.n	a8, a1, 20
+42006e84:	e46781        	l32r	a8, 42000020 <_stext> (3fca2868 <__stack_chk_guard>)
+42006e87:	1139      	s32i.n	a3, a1, 4
+42006e89:	0020c0        	memw
+42006e8c:	0898      	l32i.n	a9, a8, 0
+42006e8e:	1ca182        	movi	a8, 0x11c
+42006e91:	20c882        	addi	a8, a8, 32
+42006e94:	881a      	add.n	a8, a8, a1
+42006e96:	0020c0        	memw
+42006e99:	0899      	s32i.n	a9, a8, 0
+42006e9b:	88          	.byte	0x88

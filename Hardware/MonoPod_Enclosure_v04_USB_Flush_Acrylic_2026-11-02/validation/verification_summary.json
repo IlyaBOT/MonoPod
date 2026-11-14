@@ -1,0 +1,503 @@
+{
+  "version": "0.4",
+  "part_count": 51,
+  "main_parts": 5,
+  "alternative_parts": 1,
+  "coupon_parts": 45,
+  "units": "mm",
+  "parameters": 237,
+  "geometry_passed": true,
+  "step_stl_roundtrips": 51,
+  "parameter_checks": 30,
+  "assembly_checks": {
+    "front_with_clickwheel": {
+      "valid": true,
+      "solids": 59,
+      "volume_mm3": 39580.78142687197,
+      "sha256": "aba4f01b3e579923a73bc1f72bd315bfe6cbf832fe0f3a86410b47d19994f60d"
+    },
+    "back_with_connectors": {
+      "valid": true,
+      "solids": 11,
+      "volume_mm3": 62494.574081605075,
+      "sha256": "c8cdda1672d0248749136a3daf23eb57d1234051819a089a458a82996ce457a6"
+    },
+    "assembly_mockup": {
+      "valid": true,
+      "solids": 73,
+      "volume_mm3": 110172.14737020533,
+      "sha256": "3955f4ac14a066f77efc640418849fc0288da1c3d63384da42724e7f268a11ec"
+    },
+    "coupons_identification_sheet": {
+      "valid": true,
+      "solids": 45,
+      "volume_mm3": 119992.70117469541,
+      "sha256": "539943824c0af62e8ef45505b359b20e5a3cac5abc9dbfd299b73485d025ff64"
+    },
+    "front_acrylic_display_assembly": {
+      "valid": true,
+      "solids": 6,
+      "volume_mm3": 40512.44423747897,
+      "sha256": "258e2f14c097036b03b99efe8ab990c50e0fefc85aa300d121c66cb4e30505cd"
+    },
+    "acrylic_screen_lens": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1466.566370614365,
+      "sha256": "9af2978866479177ecec36c6c89cf38f3f5334238982054e24b719a67931db20"
+    },
+    "soldered_electronics_assembly": {
+      "valid": true,
+      "solids": 5,
+      "volume_mm3": 13110.199270593806,
+      "sha256": "b3aae02eb1fdc73c6e1a121a7395a90390f0a05adb41e23891a12f1bca42194a"
+    },
+    "acrylic_carrier_subassembly": {
+      "valid": true,
+      "solids": 3,
+      "volume_mm3": 2399.878886893567,
+      "sha256": "b5b185f88d6e2e75ec5f358c98528bdab4a8817fcc0d5a460568775a08412a5c"
+    },
+    "bottom_cable_fit_assembly": {
+      "valid": true,
+      "solids": 13,
+      "volume_mm3": 63492.944947102274,
+      "sha256": "0ba332496f811645c98fcb4a70abf05754573abcf1d6ea8e5a926723e7a60e82"
+    }
+  },
+  "physical_fit_verified": false,
+  "originals": {
+    "copied_clickwheel_files_and_four_photos_match_recorded_hashes": true,
+    "source_status": {
+      "clickwheel/README_RU.md": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/cad/assembly.step": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/cad/frame.step": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/cad/wheel.step": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/cad/select.step": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/reference/pcb_with_component_envelopes.step": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/source/parameters.json": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "clickwheel/source/pcb_geometry.json": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "photos/photo_1_2026-11-01_18-29-50.jpg": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "photos/photo_2_2026-11-01_18-29-50.jpg": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "photos/photo_3_2026-11-01_18-29-50.jpg": {
+        "original_path_available": true,
+        "original_hash_matches": true
+      },
+      "photos/rigid_electronics_2026-11-01.png": {
+        "original_path_available": false,
+        "preserved_previous_reference_and_archive_match_recorded_hash": true,
+        "historical_original_path": "C:\\Temp\\codex-clipboard-0060e429-20cb-40c4-8d82-78c2b9650c25.png"
+      }
+    },
+    "inputs": {
+      "clickwheel/README_RU.md": "7348b68d395d6c61e0bbbf00d4983a4789be5dc75698d1158def63e88cbdbe03",
+      "clickwheel/cad/assembly.step": "9a2f24445304f1b71afe83c41ed35e7540ba1db97f6b811f005b5e28f6f57400",
+      "clickwheel/cad/frame.step": "418e1b772652ed2f110fd073c3fabf2aa8b9ae8503700aca009084efe9523a91",
+      "clickwheel/cad/wheel.step": "fd4747d8b0bb228e287e415cd6543a1d9a4b9171ce997555c45fd2eca76d0e93",
+      "clickwheel/cad/select.step": "85012ecea57b6c4af2216a4912dbf8fd9ce265a36dd728e42599d6f279ce1ea7",
+      "clickwheel/reference/pcb_with_component_envelopes.step": "c81a0d68a3c97db204b00168a885db610c354c9dabaca5b887480be786667189",
+      "clickwheel/source/parameters.json": "db8b91d28ce1cabdda516ff77832811cdedd359280a9c5ff4aca0e056a75dfd7",
+      "clickwheel/source/pcb_geometry.json": "816fb3fcd1576179651d1b237423a97b5d45a7520a39bcf516d27e87ac5a39b0",
+      "photos/photo_1_2026-11-01_18-29-50.jpg": "54d5b331ef7921430b4b88aa6df9e069718f32284da3d3a2b4a2e721ca4a9af5",
+      "photos/photo_2_2026-11-01_18-29-50.jpg": "eeb8c2838d76728c05d8eb90510e6a1846042d9f10f7c7545d09e37c768ed3df",
+      "photos/photo_3_2026-11-01_18-29-50.jpg": "528d643d242555c8749922e8be12e979bd661f42a7694fd36d337789adf6a202",
+      "photos/rigid_electronics_2026-11-01.png": "24806d67737576f92c1cb0185d2f46181089944e06a2969fb7dee3c06bcb49e0"
+    }
+  },
+  "previous_revision": {
+    "previous_revision_files_and_zip_untouched": true,
+    "unchanged_geometry_of_existing_parts": [
+      "back_chassis",
+      "hold_slider_cap",
+      "clickwheel_mount_coupon",
+      "clickwheel_depth_extra_0p00",
+      "clickwheel_depth_extra_0p10",
+      "clickwheel_depth_extra_0p20",
+      "clickwheel_window_gap_0p15",
+      "clickwheel_window_gap_0p20",
+      "clickwheel_window_gap_0p25",
+      "clickwheel_window_gap_0p30",
+      "bottom_edge_coupon",
+      "jack_panel_thickness_1p20",
+      "jack_panel_thickness_1p60",
+      "jack_panel_thickness_2p00",
+      "jack_panel_thickness_2p40",
+      "jack_hole_diameter_coupon",
+      "hold_switch_coupon",
+      "hold_window_gap_0p15",
+      "hold_window_gap_0p20",
+      "hold_window_gap_0p25",
+      "hold_window_gap_0p30",
+      "hold_mount_pitch_15p00",
+      "hold_cap_lever_gap_m0p05",
+      "hold_cap_lever_gap_0p10",
+      "hold_cap_lever_gap_0p20",
+      "screw_boss_coupon",
+      "stack_height_gauge",
+      "closure_front_boss_coupon",
+      "closure_rear_plate_coupon",
+      "tolerance_frame_coupon",
+      "tolerance_key"
+    ],
+    "changed_existing_geometry": [
+      "front_panel",
+      "bottom_connector_insert",
+      "display_window_coupon",
+      "acrylic_seat_coupon",
+      "acrylic_seat_gap_0p15",
+      "acrylic_seat_gap_0p25",
+      "acrylic_seat_gap_0p30",
+      "bottom_insert_gap_0p15",
+      "bottom_insert_gap_0p25",
+      "bottom_insert_gap_0p30",
+      "bottom_aperture_extra_0p20",
+      "bottom_aperture_extra_0p40",
+      "mainboard_hole_template_coupon"
+    ],
+    "new_printed_parts": [
+      "bottom_insert_recess_1p50",
+      "bottom_insert_recess_2p50",
+      "display_lens_carrier",
+      "front_panel_rear_lip_alternative",
+      "lens_gluing_jig",
+      "usb_cable_well_gap_0p30",
+      "usb_cable_well_gap_0p50"
+    ],
+    "removed_printed_parts": [
+      "bottom_insert_recess_0p50",
+      "bottom_insert_recess_1p00"
+    ],
+    "acrylic_cut_svg_byte_identical": true,
+    "rear_lip_alternative_matches_v03_front_by_symmetric_difference": true
+  },
+  "laser": {
+    "passed": true,
+    "version": "0.4",
+    "units": "mm",
+    "sheet_mm": [
+      200.0,
+      100.0,
+      1.0
+    ],
+    "lens_mm": [
+      42.0,
+      35.0,
+      1.0
+    ],
+    "radius_mm": 2.0,
+    "one_part_file": "acrylic_screen_lens_1to1.dxf",
+    "optional_sheet_parts": 8,
+    "stock_margin_mm": 5.0,
+    "part_gap_mm": 3.0,
+    "kerf_compensation_applied": false,
+    "kerf_note": "Apply measured outside compensation in CAM; do not apply it twice.",
+    "cad_area_mm2": 1466.5663706143594,
+    "svg_area_mm2": 1466.5698893306262,
+    "files": {
+      "acrylic_screen_lens_1to1.dxf": {
+        "passed": true,
+        "closed_cut_contours": 1,
+        "units": "mm",
+        "outline_size_mm": [
+          42.0,
+          35.0
+        ],
+        "corner_radius_mm": 2.0,
+        "stock_outline_present": false,
+        "sha256": "be514f3e407618670e782081f6b202d549bd71b24f471b175c3c15c13448e7e6"
+      },
+      "acrylic_screen_lens_1to1.svg": {
+        "passed": true,
+        "closed_cut_contours": 1,
+        "units": "mm",
+        "text_or_stock_outline_present": false,
+        "sha256": "6af2e087d6c9572631f1f5e44850b6be266fcdff45b930c709d855b1a6bde30f"
+      },
+      "acrylic_stock_layout_1to1.dxf": {
+        "passed": true,
+        "closed_cut_contours": 8,
+        "units": "mm",
+        "outline_size_mm": [
+          42.0,
+          35.0
+        ],
+        "corner_radius_mm": 2.0,
+        "stock_outline_present": false,
+        "sha256": "fd14ea46a72ab668bbc968ef809597a80800986f979c259dbbe968cbac002218"
+      },
+      "acrylic_stock_layout_1to1.svg": {
+        "passed": true,
+        "closed_cut_contours": 8,
+        "units": "mm",
+        "text_or_stock_outline_present": false,
+        "sha256": "eda18c18e2fba03b4aa30746117046d2094962acef92796506cf46397aa261ee"
+      }
+    },
+    "preview_sha256": "02a2f9b64bb1a9ba84d6b7872c90f9f4c54367a6fbac1499ffcc8c73a05f7241",
+    "parameters_sha256": "cb38dc0024b650240416a5355e9757d352c1c9eadeb9236c2d09487b2415f60b",
+    "generator_sha256": "8751b5befecce9379a49001fdfbfa714d6050b4be949acbfa72fdc5dcf22e533",
+    "laser_script_sha256": "0dd0087704fe2614f338af15b3b3201a120cd071cb9de3d1e83d546c2d2a7fda",
+    "physical_cut_or_glue_test_performed": false
+  },
+  "soldered_assembly_installation": {
+    "passed": true,
+    "whole_board_lowering_continuous_conservative_envelopes_mm3": {
+      "mainboard": 0.0,
+      "mainboard_component_keepout": 0.0,
+      "mainboard_rear_solder_keepout": 0.0,
+      "tp4056_pcb": 0.0,
+      "tp4056_components": 0.0,
+      "usb_c_shell": 0.0,
+      "jack_body": 0.0
+    },
+    "insert_slide_samples": [
+      {
+        "offset_y_mm": -24.0,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": -12.0,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": -6.0,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": -3.0,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": -1.5,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": -0.75,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": -0.25,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      },
+      {
+        "offset_y_mm": 0.0,
+        "chassis_overlap_mm3": 0.0,
+        "soldered_assembly_overlap_mm3": 0.0
+      }
+    ],
+    "insert_slide_sampling_not_continuous_proof": true,
+    "sequence": [
+      "remove jack nut and bottom insert",
+      "lower complete soldered board along -Z",
+      "secure board with three M2x5",
+      "slide insert along +Y over both connectors",
+      "secure insert with two M2x4",
+      "fit jack nut without forcing soldered alignment",
+      "fit front panel"
+    ],
+    "physical_assembly_verified": false
+  },
+  "usb_cable_fit": {
+    "passed": true,
+    "datums": {
+      "body_front_y": -73.0,
+      "body_rear_y": -89.0,
+      "metal_tip_y": -66.0,
+      "well_floor_y": -72.5,
+      "well_rear_y": -70.9,
+      "well_depth": 1.5,
+      "well_width": 10.5,
+      "well_height": 6.3999999999999995,
+      "usb_recess": 2.0,
+      "pcb_clearance": 0.4000000000000057,
+      "corner_radius": 0.6
+    },
+    "hood_insertion_samples": [
+      {
+        "variant": "nominal",
+        "offset_y_mm": -15.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "nominal",
+        "offset_y_mm": -5.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "nominal",
+        "offset_y_mm": -1.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "nominal",
+        "offset_y_mm": 0.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "size_allowance_and_shorter_tip",
+        "offset_y_mm": -15.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "size_allowance_and_shorter_tip",
+        "offset_y_mm": -5.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "size_allowance_and_shorter_tip",
+        "offset_y_mm": -1.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      },
+      {
+        "variant": "size_allowance_and_shorter_tip",
+        "offset_y_mm": 0.0,
+        "front_panel_overlap_mm3": 0.0,
+        "back_chassis_overlap_mm3": 0.0,
+        "bottom_connector_insert_overlap_mm3": 0.0,
+        "mainboard_overlap_mm3": 0.0,
+        "mainboard_component_keepout_overlap_mm3": 0.0,
+        "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+        "tp4056_pcb_overlap_mm3": 0.0,
+        "tp4056_components_overlap_mm3": 0.0,
+        "usb_c_shell_overlap_mm3": 0.0,
+        "jack_body_overlap_mm3": 0.0,
+        "jack_nut_overlap_mm3": 0.0
+      }
+    ],
+    "metal_printed_part_overlaps_mm3": {
+      "front_panel": 0.0,
+      "back_chassis": 0.0,
+      "bottom_connector_insert": 0.0
+    },
+    "measurement_allowance_on_total_size_mm": 0.2,
+    "shorter_tip_allowance_mm": 0.2,
+    "assumed_engagement_mm": 6.0,
+    "physical_cable_fit_or_electrical_contact_verified": false,
+    "note": "User measured hood 9.7x5.6 and exposed tip about 7 mm. Mating depth and metal section are provisional envelopes; no internal USB contact geometry or physical mating validation."
+  },
+  "acrylic_mount": {
+    "width": 35.0,
+    "height": 42.0,
+    "front_depth": 0.1,
+    "rear_depth": 1.1,
+    "display_air_gap": 1.5,
+    "carrier_front": 1.3,
+    "carrier_rear": 2.1,
+    "carrier_ear_front": 5.2,
+    "clear_width": 31.0,
+    "clear_height": 38.0
+  },
+  "limits": [
+    "Board 70x90 and approximate edge/protrusion/stack dimensions supplied by user; axis heights, thickness, holes and solder require measurement.",
+    "Cable hood 9.7x5.6 and exposed tip about 7 measured approximately by user. Caliper error and real USB engagement depth not established; electrical contact not verified.",
+    "Display, HOLD, nut, battery and wiring remain unmeasured. Whole-board access checked using conservative continuous envelopes; insert and cable slides checked at sample positions.",
+    "No physical FDM print, assembly, laser cut, adhesive, strength, actuation or capacitive testing performed."
+  ]
+}

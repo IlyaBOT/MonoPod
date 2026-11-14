@@ -1,0 +1,1 @@
+Started; tabs=5; dpi=96; filesColumns=19; themePalette=12

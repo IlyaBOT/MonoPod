@@ -1,0 +1,57 @@
+{
+  "desktop": "1.1.0",
+  "firmware_contract": "0.10.6 / MPOD1 v4",
+  "desktop_tests": {
+    "total": "108",
+    "executed": "108",
+    "passed": "108",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "native_theme_cases": {
+    "passed": 9,
+    "failed": 0,
+    "actual_source": "Theme.cpp/h 0.10.6"
+  },
+  "published_launch": {
+    "app_file_version": "1.1.0.0",
+    "app_product_version": "1.1.0",
+    "core_version": "1.1.0.0",
+    "real_settings_unchanged": true,
+    "smoke": [
+      {
+        "scale": "1",
+        "exit_code": 0,
+        "ui": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+        "folder": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\desktop-1.1-2026-10-31\\smoke-1"
+      },
+      {
+        "scale": "1.25",
+        "exit_code": 0,
+        "ui": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+        "folder": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\desktop-1.1-2026-10-31\\smoke-1.25"
+      },
+      {
+        "scale": "1.5",
+        "exit_code": 0,
+        "ui": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+        "folder": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\desktop-1.1-2026-10-31\\smoke-1.5"
+      }
+    ]
+  },
+  "physical_device_tested": false,
+  "firmware_modified": false,
+  "source_backup": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\desktop-1.1-2026-10-31\\before-source.zip",
+  "previous_app_backup": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\desktop-1.1-2026-10-31\\previous-published-1.0.zip"
+}

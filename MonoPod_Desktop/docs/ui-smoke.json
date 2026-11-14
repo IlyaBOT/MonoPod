@@ -1,0 +1,44 @@
+[
+  {
+    "scale": 1.0,
+    "exit_code": 0,
+    "files": [
+      "main.png",
+      "tab-1.png",
+      "tab-2.png",
+      "tab-3.png",
+      "tab-4.png",
+      "ui.txt"
+    ],
+    "details": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+    "kind": "Logical layout scaling on a 96-DPI host, not an OS DPI setting change."
+  },
+  {
+    "scale": 1.25,
+    "exit_code": 0,
+    "files": [
+      "main.png",
+      "tab-1.png",
+      "tab-2.png",
+      "tab-3.png",
+      "tab-4.png",
+      "ui.txt"
+    ],
+    "details": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+    "kind": "Logical layout scaling on a 96-DPI host, not an OS DPI setting change."
+  },
+  {
+    "scale": 1.5,
+    "exit_code": 0,
+    "files": [
+      "main.png",
+      "tab-1.png",
+      "tab-2.png",
+      "tab-3.png",
+      "tab-4.png",
+      "ui.txt"
+    ],
+    "details": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+    "kind": "Logical layout scaling on a 96-DPI host, not an OS DPI setting change."
+  }
+]

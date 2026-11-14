@@ -1,0 +1,23 @@
+SyncFiles.cpp
+sync_test.cpp
+Создание кода...
+SyncFiles.cpp
+UsbSync.cpp
+usb_test.cpp
+Создание кода...
+Theme.cpp
+theme_loader_test.cpp
+Создание кода...
+dev_console_protocol_test.cpp
+backlight_math_test.cpp
+wifi_signal_native_test.cpp
+monofont_native_test.cpp
+
+PASS actual SyncFiles.cpp: paths, permissions, streaming, CRC, replacement, abort, rename failure, power recovery, ranges, delete
+ 
+PASS actual UsbSync.cpp + SyncFiles.cpp: explicit Sync, INFO, binary handshake, LIST/STAT/READ, MKDIR/RENAME/DELETE/RMDIR, smoothing, END
+ 
+theme parsed; M, � present; 4-bit coverage ok
+ 
+theme parsed; M, � present; 4-bit coverage ok
+ 

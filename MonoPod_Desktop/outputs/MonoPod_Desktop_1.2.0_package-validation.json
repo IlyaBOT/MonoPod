@@ -1,0 +1,36 @@
+{
+  "version": "1.2.0",
+  "portable": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.2.0_win-x64.zip",
+    "bytes": 70715885,
+    "entries": 546,
+    "sha256": "d7ec51c78f95a7372a164483c1f7e9d57e1078c68f525e683e4b93a8f7831edd",
+    "crc_and_entry_hashes": "passed"
+  },
+  "source": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.2.0_source.zip",
+    "bytes": 1233812,
+    "entries": 247,
+    "sha256": "f0eb25fe7b244bf21b0baa9adcbc8f3e8fe3c68e5ff528ad77062ca58ca37e5c",
+    "crc_and_entry_hashes": "passed"
+  },
+  "firmware_source": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_v0.10.6.6_NTP_extension_source.zip",
+    "bytes": 394171,
+    "entries": 120,
+    "sha256": "f03aa613bd0cde6a66853b18e177d389bb297174e0ba93180799775b7ca62851",
+    "crc_and_entry_hashes": "passed"
+  },
+  "firmware_application": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_v0.10.6.6_NTP_S3_N16R8_application.bin",
+    "bytes": 1477616,
+    "sha256": "087f1f4755b1ca60fd4610c1854caf7d0aead6e0a640df2f1d5ee56623481662",
+    "board": "ESP32-S3 N16R8",
+    "partition_layout": "two 7 MiB slots in 16 MB flash",
+    "flashed": false
+  },
+  "running_previous_desktop_preserved": true,
+  "physical_ota_clock_ntp_test_performed": false,
+  "standard_copied_files_verified": 546,
+  "standard_launch_updated": true
+}

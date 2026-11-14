@@ -1,0 +1,114 @@
+{
+  "firmware": "0.10.0",
+  "base": "0.9.1.1",
+  "boot_regression_fixed_in_source": true,
+  "physical_test": "UNVERIFIED",
+  "builds": [
+    {
+      "profile": "s3",
+      "fqbn": "esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PSRAM=opi,PartitionScheme=app3M_fat9M_16MB",
+      "arduino_esp32": "3.3.12",
+      "program_bytes": 1454610,
+      "static_ram_bytes": 63020,
+      "physical_test": "UNVERIFIED",
+      "status": "success",
+      "source_snapshot_matches": true,
+      "timing": {
+        "jobs": 8,
+        "elapsed_seconds": 189.2396041,
+        "exit_code": 0,
+        "type": "incremental"
+      },
+      "artifacts": [
+        {
+          "file": "boot_app0.bin",
+          "size": 8192,
+          "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.bin",
+          "size": 1454752,
+          "sha256": "14cb9f97893b10f58de3b394bedb53cb32ae68a0e85cb2da5f4a1b2a22a3317b"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.bootloader.bin",
+          "size": 19968,
+          "sha256": "84bb365666003b051f564d04380d0cf5d9d85c420ddafe9fc863071b49e49bfc"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.elf",
+          "size": 22081884,
+          "sha256": "f69776c53a9384a67efa8bbca97e4b3a0e878c4ff5c662875ce6e6c64e747d60"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.map",
+          "size": 20082359,
+          "sha256": "3b31be7c5e65ce209b117d1242ea6935b35d4fd722df625a98cf4e4d6601b80f"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.merged.bin",
+          "size": 16777216,
+          "sha256": "f31aad555276655ff310606a635ed14ff0ee388c220e2184566e407cea2b9510"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.partitions.bin",
+          "size": 3072,
+          "sha256": "ace02503447d0f470692e65fa76002f2d77a92dc81cd3813d8aa66718d716da9"
+        }
+      ]
+    },
+    {
+      "profile": "esp32",
+      "fqbn": "esp32:esp32:esp32:PartitionScheme=huge_app",
+      "arduino_esp32": "3.3.12",
+      "program_bytes": 1455019,
+      "static_ram_bytes": 58428,
+      "physical_test": "UNVERIFIED",
+      "status": "success",
+      "source_snapshot_matches": true,
+      "timing": {
+        "elapsed_seconds": 133.1034609,
+        "exit_code": 0,
+        "type": "incremental",
+        "jobs": 4
+      },
+      "artifacts": [
+        {
+          "file": "boot_app0.bin",
+          "size": 8192,
+          "sha256": "f94c5d786a7a8fab06ac5d10e33bf37711a6697636dc037559ea19cc410a17f0"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.bin",
+          "size": 1455168,
+          "sha256": "64d59f3a65e4345e94532b062319199766f4f2896451ffdd0864bed07de84fca"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.bootloader.bin",
+          "size": 24992,
+          "sha256": "47bbbfca119fe87190f63a67af9d85adff6433bcf3812ec92a9b9c9416a53ad1"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.elf",
+          "size": 20946500,
+          "sha256": "fc6f2889578cc2bfa960995e88de17b3251814c86e6bc2045ef4659f1be2f133"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.map",
+          "size": 18964869,
+          "sha256": "f6aab3d56540b9fad1da291b1368c38a89c0afe23bb0a91f815ce091fb60478e"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.merged.bin",
+          "size": 4194304,
+          "sha256": "bb5cdad9e10b6b5f8ff92fef71f54071a34b76acf9ef2cec3df3831072c77b32"
+        },
+        {
+          "file": "DIY_iPod_Mono.ino.partitions.bin",
+          "size": 3072,
+          "sha256": "aaae2888c5a6a348004b5b436f47abb25ae32e72d9003902955a998eda723edd"
+        }
+      ]
+    }
+  ]
+}

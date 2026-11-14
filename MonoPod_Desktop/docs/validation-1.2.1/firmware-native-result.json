@@ -1,0 +1,31 @@
+{
+  "exit_code": 0,
+  "checks": [
+    {
+      "name": "clock_validation",
+      "exit_code": 0,
+      "output": "PASS actual ClockConfigValidation.h: 32 cases\n"
+    },
+    {
+      "name": "clock_service",
+      "exit_code": 0,
+      "output": "PASS actual ClockService.cpp with host NVS/Wi-Fi/SNTP/time adapters: 24 cases\n"
+    },
+    {
+      "name": "wheel_arduino_macros",
+      "exit_code": 0,
+      "output": "WheelDetents: 4 native tests passed\n"
+    },
+    {
+      "name": "clock_timezone_default",
+      "exit_code": 0,
+      "output": "PASS real Config.h Moscow default: 15:50 UTC -> 18:50 UTC+03:00 via host C runtime; no clock writes\n"
+    }
+  ],
+  "hardware_io": false,
+  "header_sha256": "877c8a0aa2fd7e9369e62164c3f6efb4fe321ce42908fc51dc507c6ee8215378",
+  "service_sha256": "7b0c8ee2a0b1bfda1c95b492b9743cb8c7dd0ceeaf6fbcd84626c49fdace53c9",
+  "config_sha256": "bd439b13e7083e03c0bdcf050ad62f85567ccd7c606faa5948c8d2f4510c39ef",
+  "default_timezone_test": "Real Config.h and host C runtime in a child process; no PC/device clock writes or ESP32 runtime validation.",
+  "service_host_adapter": "sys/time.h replaced by ClockNativePlatform.h; NVS, Wi-Fi, SNTP and OS time are stubbed."
+}

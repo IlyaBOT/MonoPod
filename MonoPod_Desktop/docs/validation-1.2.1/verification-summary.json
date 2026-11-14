@@ -1,0 +1,113 @@
+{
+  "desktop_version": "1.2.1",
+  "desktop_tests": {
+    "total": "255",
+    "executed": "255",
+    "passed": "255",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "native_firmware_tests": {
+    "exit_code": 0,
+    "checks": [
+      {
+        "name": "clock_validation",
+        "exit_code": 0,
+        "output": "PASS actual ClockConfigValidation.h: 32 cases\n"
+      },
+      {
+        "name": "clock_service",
+        "exit_code": 0,
+        "output": "PASS actual ClockService.cpp with host NVS/Wi-Fi/SNTP/time adapters: 24 cases\n"
+      },
+      {
+        "name": "wheel_arduino_macros",
+        "exit_code": 0,
+        "output": "WheelDetents: 4 native tests passed\n"
+      },
+      {
+        "name": "clock_timezone_default",
+        "exit_code": 0,
+        "output": "PASS real Config.h Moscow default: 15:50 UTC -> 18:50 UTC+03:00 via host C runtime; no clock writes\n"
+      }
+    ],
+    "hardware_io": false,
+    "header_sha256": "877c8a0aa2fd7e9369e62164c3f6efb4fe321ce42908fc51dc507c6ee8215378",
+    "service_sha256": "7b0c8ee2a0b1bfda1c95b492b9743cb8c7dd0ceeaf6fbcd84626c49fdace53c9",
+    "config_sha256": "bd439b13e7083e03c0bdcf050ad62f85567ccd7c606faa5948c8d2f4510c39ef",
+    "default_timezone_test": "Real Config.h and host C runtime in a child process; no PC/device clock writes or ESP32 runtime validation.",
+    "service_host_adapter": "sys/time.h replaced by ClockNativePlatform.h; NVS, Wi-Fi, SNTP and OS time are stubbed."
+  },
+  "smoke": {
+    "version": "1.2.1.0",
+    "physical_device_used": false,
+    "runs": [
+      {
+        "scale": "100",
+        "exit_code": 0,
+        "pid": 39216,
+        "ui": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+        "output": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\timezone-fix-2026-11-01\\smoke-100"
+      },
+      {
+        "scale": "150",
+        "exit_code": 0,
+        "pid": 46188,
+        "ui": "Started; tabs=5; dpi=96; filesColumns=16; themePalette=12",
+        "output": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\timezone-fix-2026-11-01\\smoke-150"
+      }
+    ]
+  },
+  "core_sha256": "1881e890a25e1f93582824697164fd87537ed56b5ebbeb7413c642b7f4a2fbb9",
+  "desktop_sha256": "48ca8312298583ba268458cd563401835fc8c98f9eb4e963638be18136ad277c",
+  "firmware_source": "I:\\DIY_iPod_Mono\\MonoPod_v0.10.6.9",
+  "modified_desktop_files": [
+    "Directory.Build.props",
+    "MonoPod.Core/ClockConfiguration.cs",
+    "MonoPod.Desktop.Tests/UiDeviceFeatureTests.cs",
+    "MonoPod.Desktop/Forms/MainForm.DeviceFeatures.cs",
+    "MonoPod.Desktop/Forms/MainForm.cs",
+    "MonoPod.Desktop/MonoPod.Desktop.csproj",
+    "MonoPod.Desktop/app.manifest",
+    "README.md",
+    "docs/PROTOCOL.md",
+    "docs/USER_GUIDE_RU.md"
+  ],
+  "created_desktop_files": [
+    "docs/RELEASE_1.2.1_RU.md",
+    "MonoPod.Core/PosixTimeZone.Display.cs",
+    "MonoPod.Desktop.Tests/PosixTimeZoneDisplayTests.cs"
+  ],
+  "preservation": {
+    "changed_existing_firmware_files": [
+      "DIY_iPod_Mono/Config.h",
+      "tools/run_clock_native_tests.py"
+    ],
+    "all_other_existing_firmware_files_unchanged": true,
+    "legacy_source_unchanged": true,
+    "firmware_full_build_performed": false,
+    "physical_device_used": false
+  },
+  "example": {
+    "unix": 1793548200,
+    "utc": "2026-11-01 15:50:00",
+    "wire_timezone": "UTC-3",
+    "local": "2026-11-01 18:50:00",
+    "display_offset": "UTC+03:00"
+  },
+  "clock_wire_protocol_changed": false,
+  "full_firmware_build_performed": false,
+  "physical_device_used": false,
+  "flashed": false
+}

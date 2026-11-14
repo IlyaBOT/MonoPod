@@ -1,0 +1,20 @@
+
+C:\Users\IlyaBOT\AppData\Local\arduino\sketches\1FDC6AE6386A315C1F7B9BA40EB8C704\DIY_iPod_Mono.ino.elf:     file format elf32-xtensa-le
+
+
+Disassembly of section .flash.text:
+
+42006c0c <MediaLibrary::scanFolder(String const&, unsigned char)>:
+42006c0c:	228136        	entry	a1, 0x1140
+42006c0f:	748040        	extui	a8, a4, 0, 8
+42006c12:	5189      	s32i.n	a8, a1, 20
+42006c14:	e50381        	l32r	a8, 42000020 <_stext> (3fca3eb8 <__stack_chk_guard>)
+42006c17:	2129      	s32i.n	a2, a1, 8
+42006c19:	0020c0        	memw
+42006c1c:	0898      	l32i.n	a9, a8, 0
+42006c1e:	e63581        	l32r	a8, 420004f4 <_stext+0x4d4> (10fc <XtosCoreStateSize+0xd5c>)
+42006c21:	3139      	s32i.n	a3, a1, 12
+42006c23:	20c882        	addi	a8, a8, 32
+42006c26:	881a      	add.n	a8, a8, a1
+42006c28:	0020c0        	memw
+42006c2b:	99          	.byte	0x99

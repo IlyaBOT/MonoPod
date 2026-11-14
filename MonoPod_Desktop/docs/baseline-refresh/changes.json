@@ -1,0 +1,40 @@
+{
+  "baseline": "I:\\DIY_iPod_Mono\\MonoPod_v0.9.1.1",
+  "changed": [
+    "CHANGELOG_v0.9.1.1.md",
+    "CHANGELOG_v0.9.1.md",
+    "README.md",
+    "DIY_iPod_Mono\\Display.cpp",
+    "DIY_iPod_Mono\\Display.h",
+    "DIY_iPod_Mono\\DIY_iPod_Mono.ino",
+    "DIY_iPod_Mono\\MonoFont.h",
+    "DIY_iPod_Mono\\UI.cpp",
+    "DIY_iPod_Mono\\WiFiNetworks.cpp",
+    "DIY_iPod_Mono\\WiFiSync.cpp",
+    "DIY_iPod_Mono\\WiFiSync.h",
+    "docs\\MonoPod_v0.9.1_Font_UI_RU.md",
+    "docs\\WiFi_Sync_LAN_v0.9.1.1_RU.md",
+    "Studio\\device_api.py",
+    "Studio\\monopod_studio.py",
+    "tests\\monofont_native_test.cpp",
+    "tests\\test_v085_sync_mode.py",
+    "tests\\test_v089_wifi_restore.py",
+    "tests\\test_v091_fonts_statusbar.py",
+    "tests\\test_v092_wifi_sync_lan.py",
+    "tools\\generate_monofont.py",
+    "Wokwi_ILI9341\\Display.cpp",
+    "Wokwi_ILI9341\\Display.h",
+    "Wokwi_ILI9341\\MonoFont.h",
+    "Wokwi_ILI9341\\sketch.ino",
+    "Wokwi_ILI9341\\UI.cpp",
+    "Wokwi_ILI9341\\WiFiNetworks.cpp",
+    "Wokwi_ILI9341\\WiFiSync.cpp",
+    "Wokwi_ILI9341\\WiFiSync.h",
+    "tests\\stubs\\pgmspace.h"
+  ],
+  "conflicts": [
+    "DIY_iPod_Mono\\Display.cpp",
+    "DIY_iPod_Mono\\Display.h",
+    "DIY_iPod_Mono\\DIY_iPod_Mono.ino"
+  ]
+}

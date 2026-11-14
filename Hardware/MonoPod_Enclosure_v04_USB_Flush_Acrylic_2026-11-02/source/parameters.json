@@ -1,0 +1,354 @@
+{
+  "version": "0.4",
+  "units": "mm",
+  "case": {
+    "width": 94.0,
+    "height": 148.0,
+    "depth": 26.0,
+    "corner_radius": 8.0,
+    "edge_radius": 0.6,
+    "front_thickness": 2.4,
+    "wall": 2.0,
+    "rear_thickness": 2.0,
+    "lip_wall": 1.2,
+    "lip_height": 2.0,
+    "seam_clearance": 0.25,
+    "closure_xy": [
+      [
+        -40.0,
+        -65.0
+      ],
+      [
+        40.0,
+        -65.0
+      ],
+      [
+        -40.0,
+        65.0
+      ],
+      [
+        40.0,
+        65.0
+      ]
+    ],
+    "closure_boss_diameter": 7.2,
+    "closure_root_diameter": 8.4,
+    "closure_root_height": 3.0,
+    "closure_end_gap": 0.0,
+    "closure_pilot_depth": 6.3
+  },
+  "wheel": {
+    "x": 0.0,
+    "y": -31.0,
+    "face_recess": 0.6,
+    "radial_gap": 0.25,
+    "ring_radial_clearance": 0.25,
+    "ring_axial_clearance": 0.1,
+    "lug_radial_clearance": 0.25,
+    "boss_diameter": 7.2,
+    "pilot_depth": 1.85,
+    "lug_radius": 4.0
+  },
+  "display": {
+    "x": 0.0,
+    "y": 35.0,
+    "rotation_degrees": 90.0,
+    "pcb_width": 35.0,
+    "pcb_height": 56.0,
+    "pcb_thickness": 1.6,
+    "pcb_front_depth": 6.0,
+    "hole_pitch_x": 30.0,
+    "hole_pitch_y": 50.0,
+    "hole_diameter": 2.8,
+    "glass_width": 34.0,
+    "glass_height": 43.0,
+    "glass_above_pcb": 3.4,
+    "glass_y_offset": 0.0,
+    "active_width": 28.0,
+    "active_height": 35.0,
+    "window_width": 29.0,
+    "window_height": 36.0,
+    "window_radius": 0.8,
+    "rear_component_height": 3.0,
+    "boss_diameter": 6.4,
+    "pilot_depth": 2.65
+  },
+  "mainboard": {
+    "width": 70.0,
+    "height": 90.0,
+    "thickness": 1.6,
+    "x": 0.0,
+    "hole_diameter": 2.2,
+    "boss_diameter": 5.6,
+    "pilot_depth": 3.7,
+    "component_height": 7.0,
+    "rear_solder_height": 2.0,
+    "stack_to_wheel_face": 22.0,
+    "mount_from_left_bottom": [
+      [
+        67.0,
+        3.0
+      ],
+      [
+        3.0,
+        87.0
+      ],
+      [
+        67.0,
+        87.0
+      ]
+    ],
+    "jack_tip_recess": 1.0
+  },
+  "tp4056": {
+    "pcb_width": 17.0,
+    "pcb_length": 28.0,
+    "module_height": 4.0,
+    "pcb_thickness": 1.0,
+    "usb_left_from_board_left": 6.5,
+    "usb_tip_beyond_board": 6.5,
+    "mount_standoff": 0.2,
+    "usb_axis_above_pcb_rear": 2.5,
+    "usb_protrusion": 1.5,
+    "usb_width": 8.8,
+    "usb_height": 3.0,
+    "usb_metal_length": 7.0,
+    "aperture_width": 9.6,
+    "aperture_height": 3.8,
+    "tunnel_wall": 1.6,
+    "body_clearance": 0.3
+  },
+  "jack": {
+    "body_width": 11.5,
+    "body_length": 14.2,
+    "body_height": 6.45,
+    "body_x_offset": -0.25,
+    "axis_above_body_bottom": 3.0,
+    "thread_diameter": 6.0,
+    "thread_length": 3.55,
+    "bore_diameter": 3.6,
+    "panel_hole_diameter": 6.3,
+    "panel_thickness": 1.6,
+    "nut_diameter": 8.2,
+    "nut_thickness": 1.6,
+    "body_clearance": 0.3,
+    "pin_length": 3.0,
+    "gap_from_usb_right": 8.0,
+    "tip_beyond_board": 7.5,
+    "mount_standoff": 0.2,
+    "nut_access_diameter": 11.0,
+    "seat_outer_diameter": 13.0
+  },
+  "hold": {
+    "x": 0.0,
+    "center_depth": 17.0,
+    "travel": 3.0,
+    "body_length_x": 15.7,
+    "body_width_z": 7.4,
+    "body_depth_y": 6.5,
+    "flange_length": 23.3,
+    "flange_width_z": 5.5,
+    "flange_thickness": 0.5,
+    "hole_pitch": 19.0,
+    "hole_diameter": 2.2,
+    "lever_width_x": 3.8,
+    "lever_width_z": 2.0,
+    "lever_length_y": 5.0,
+    "terminal_length_y": 3.0,
+    "standoff_height": 2.4,
+    "boss_diameter": 5.2,
+    "pilot_depth": 3.7,
+    "window_clearance": 0.2,
+    "lever_gap": 0.0,
+    "neck_length_x": 7.0,
+    "neck_width_z": 4.4,
+    "neck_inner_protrusion": 0.4,
+    "cap_length_x": 14.0,
+    "cap_width_z": 8.4,
+    "cap_thickness_y": 1.8,
+    "cap_wall_gap": 0.2,
+    "pocket_end_gap": 0.2,
+    "cap_corner_radius": 1.2,
+    "grip_rib_count": 3,
+    "grip_rib_width": 0.7,
+    "grip_rib_height": 0.25,
+    "grip_rib_pitch": 2.0
+  },
+  "fasteners": {
+    "m2_pilot": 1.7,
+    "m25_pilot": 2.1,
+    "m2_clearance": 2.2,
+    "m25_clearance": 2.8,
+    "wheel_screw": 4.0,
+    "display_screw": 5.0,
+    "mainboard_screw": 5.0,
+    "hold_screw": 4.0,
+    "closure_screw": 8.0,
+    "m2_head_diameter": 4.0,
+    "m25_head_diameter": 5.0,
+    "head_height": 2.0,
+    "minimum_blind_floor": 0.6,
+    "connector_insert_screw": 4.0
+  },
+  "coupons": {
+    "window_border": 5.0,
+    "wheel_border": 5.0,
+    "wheel_step_extras": [
+      0.0,
+      0.1,
+      0.2
+    ],
+    "clearances": [
+      0.15,
+      0.2,
+      0.25,
+      0.3
+    ],
+    "lever_gaps": [
+      -0.05,
+      0.0,
+      0.1,
+      0.2
+    ],
+    "hold_hole_pitches": [
+      15.0,
+      19.0
+    ],
+    "jack_panel_thicknesses": [
+      1.2,
+      1.6,
+      2.0,
+      2.4
+    ],
+    "jack_holes": [
+      6.1,
+      6.3,
+      6.5
+    ],
+    "usb_recesses": [
+      1.5,
+      2.0,
+      2.5
+    ],
+    "m2_pilots": [
+      1.6,
+      1.7,
+      1.8
+    ],
+    "m25_pilots": [
+      2.0,
+      2.1,
+      2.2
+    ],
+    "jack_plate_width": 24.0,
+    "jack_plate_height": 24.0,
+    "hold_patch_width": 34.0,
+    "hold_patch_height": 20.0,
+    "screw_bar_width": 82.0,
+    "screw_bar_height": 24.0,
+    "screw_bar_base": 2.0,
+    "screw_boss_height": 5.0,
+    "tolerance_key_width": 8.0,
+    "tolerance_key_height": 6.0,
+    "tolerance_frame_thickness": 3.0,
+    "bottom_patch_margin": 4.0,
+    "bottom_patch_length": 35.0,
+    "bottom_patch_front_depth": 12.0,
+    "marker_diameter": 0.8,
+    "marker_depth": 0.35,
+    "stack_gauge_jaw_length": 35.0,
+    "stack_gauge_width": 10.0,
+    "stack_gauge_wall": 2.4,
+    "stl_linear_tolerance": 0.035,
+    "stl_angular_tolerance": 0.1,
+    "insert_clearances": [
+      0.15,
+      0.2,
+      0.25,
+      0.3
+    ],
+    "connector_aperture_extras": [
+      0.0,
+      0.2,
+      0.4
+    ],
+    "usb_cable_side_clearances": [
+      0.3,
+      0.4,
+      0.5
+    ]
+  },
+  "acrylic": {
+    "stock_width": 200.0,
+    "stock_height": 100.0,
+    "thickness": 1.0,
+    "overlap": 3.0,
+    "corner_radius": 2.0,
+    "pocket_side_clearance": 0.2,
+    "front_lip_thickness": 0.8,
+    "adhesive_gap": 0.2,
+    "adhesive_inner_margin": 0.5,
+    "stop_pad_diameter": 1.2,
+    "minimum_display_air_gap": 0.4,
+    "fit_clearances": [
+      0.15,
+      0.2,
+      0.25,
+      0.3
+    ],
+    "sheet_margin": 5.0,
+    "sheet_part_gap": 3.0,
+    "svg_stroke_width": 0.01,
+    "mount_style": "flush_carrier",
+    "face_recess": 0.1
+  },
+  "connector_insert": {
+    "width": 54.0,
+    "x": -12.0,
+    "gap": 0.2,
+    "wall_thickness": 2.0,
+    "mount_from_left": [
+      3.5,
+      50.5
+    ],
+    "mount_depth": 7.5,
+    "boss_diameter": 4.8,
+    "boss_length": 2.8,
+    "pilot_depth": 2.3,
+    "root_width": 4.8,
+    "root_min_depth": 7.5,
+    "tunnel_end_gap": 0.3,
+    "assembly_clearance": 0.3
+  },
+  "lens_carrier": {
+    "bond_width": 2.0,
+    "frame_thickness": 0.8,
+    "ear_thickness": 0.8,
+    "boss_side_clearance": 0.2,
+    "sleeve_wall": 1.4,
+    "panel_pocket_clearance": 0.2,
+    "panel_pocket_axial_clearance": 0.15,
+    "glass_side_clearance": 0.3,
+    "inner_corner_radius": 0.8,
+    "display_pilot_depth": 2.85,
+    "jig_base_thickness": 2.0,
+    "jig_border": 6.0,
+    "jig_lens_side_clearance": 0.3
+  },
+  "usb_cable": {
+    "body_width": 9.7,
+    "body_height": 5.6,
+    "body_length": 16.0,
+    "metal_tip_length": 7.0,
+    "metal_width": 8.2,
+    "metal_height": 2.4,
+    "engagement_depth": 6.0,
+    "side_clearance": 0.4,
+    "axial_clearance": 0.5,
+    "well_wall": 1.6,
+    "well_corner_radius": 0.6,
+    "well_outer_radius": 1.6,
+    "measurement_size_allowance": 0.2,
+    "tip_length_allowance": 0.2
+  }
+}

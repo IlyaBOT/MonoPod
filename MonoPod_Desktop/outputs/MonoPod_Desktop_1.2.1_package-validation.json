@@ -1,0 +1,28 @@
+{
+  "version": "1.2.1",
+  "desktop_tests_passed": 255,
+  "portable": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.2.1_win-x64.zip",
+    "bytes": 71384277,
+    "entries": 636,
+    "sha256": "4fbbbace17fbac79bcfd6b31385872e5a0d1cbd4f97d3474f8ae76a4d72ad5fa",
+    "crc_and_entry_sha256": "passed"
+  },
+  "source": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.2.1_source.zip",
+    "bytes": 1388429,
+    "entries": 264,
+    "sha256": "2846bce573f923e4bf72b1e974eab7e50227615f18d4958fd130036a7a77d50b",
+    "crc_and_entry_sha256": "passed"
+  },
+  "firmware_source": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_v0.10.6.9_timezone_fix_source.zip",
+    "bytes": 444952,
+    "entries": 148,
+    "sha256": "e9f499a5da852c5296516faf6fe6eda45a2ee95a6f25b7bdcdba44949f8ed86c",
+    "crc_and_entry_sha256": "passed"
+  },
+  "full_firmware_build_performed": false,
+  "physical_device_used": false,
+  "flashed": false
+}

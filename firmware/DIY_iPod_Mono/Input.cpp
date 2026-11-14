@@ -4,14 +4,10 @@
 #include <driver/gpio.h>
 InputManager input;
 void InputManager::begin() {
-  pinMode(Config::PIN_BUTTON_ADC, Config::BUTTON_ADC_INTERNAL_PULLUP ? INPUT_PULLUP : INPUT);
+  pinMode(Config::PIN_BUTTON_ADC, INPUT);
   analogReadResolution(12);
   analogSetPinAttenuation(Config::PIN_BUTTON_ADC,ADC_11db);
-#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
-  // Reinstate pull-up after ADC config: ESP-IDF may reconfigure GPIO pads for analog input.
-  if (Config::BUTTON_ADC_INTERNAL_PULLUP)
-    gpio_pullup_en(static_cast<gpio_num_t>(Config::PIN_BUTTON_ADC));
-#endif
+
   pinMode(Config::PIN_HOLD, INPUT); // external 10k pull-up is mandatory
   hold=(digitalRead(Config::PIN_HOLD)==LOW);
   awaitingIdle=true;idleSince=0;
@@ -36,8 +32,8 @@ uint16_t InputManager::buttonAdcMillivolts() {
 }
 Key InputManager::decodeButtonMillivolts(uint16_t mV) const {
 #if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
-  if(Config::BUTTON_ADC_INTERNAL_PULLUP){
-    // Deliberately reject inter-key gaps and implausible idle voltages.
+  {
+    // External 10k GPIO9 pull-up. Reject inter-key gaps and idle voltage.
     const Key keys[5] = {Key::Menu, Key::Previous, Key::Next, Key::PlayPause, Key::Select};
     for(uint8_t i=0;i<5;i++){
       if(mV>=Config::BUTTON_ADC_WINDOWS_MV[i][0] &&
@@ -99,7 +95,14 @@ int32_t InputManager::wheelDelta(uint8_t i) const {
 }
 void InputManager::touchCalibrate() {
 #if FEATURE_TOUCH_WHEEL
-  // 32 samples per electrode, accumulated in 64-bit integers to avoid overflow.
+  // ESP32-S3 touchRead can yield startup transients much higher than stable values.
+  // Warm up the entire sensor bank before using ANY samples as a baseline.
+  for(uint8_t n=0;n<48;n++){
+    for(uint8_t i=0;i<Config::WHEEL_COUNT;i++)
+      (void)touchRead(Config::WHEEL_PINS[i]);
+    delay(5);
+  }
+  // 32 stable samples per electrode, accumulated in 64-bit integers.
   uint64_t accum[6]={};
   for(uint8_t n=0;n<32;n++){
     for(uint8_t i=0;i<Config::WHEEL_COUNT;i++){
@@ -121,9 +124,31 @@ void InputManager::touchSample() {
 #if FEATURE_TOUCH_WHEEL
   touchValid=true;
   touchX=touchY=touchSum=touchVector=0;
+  // Recover from a bad startup calibration (e.g. baseline 160k, raw 31k).
+  // Do NOT attempt this for ordinary finger touches (they increase S3 readings).
+  bool badBaseline=false;
+  for(uint8_t i=0;i<Config::WHEEL_COUNT;i++){
+    const uint32_t reading=(uint32_t)touchRead(Config::WHEEL_PINS[i]);
+    if(reading>0 && base[i]>0 &&
+       ((uint64_t)reading*2u<(uint64_t)base[i] ||
+        (uint64_t)reading>(uint64_t)base[i]*4u))badBaseline=true;
+    raw[i]=reading;
+  }
+  if(badBaseline){
+    if(badBaselineSamples<4)++badBaselineSamples;
+    if(badBaselineSamples>=4){
+      touchCalibrate();
+      badBaselineSamples=0;
+    }
+    touchValid=false;
+    touchPresent=false;
+    touchResetTracking();
+    touchLastSample=millis();
+    return;
+  }
+  badBaselineSamples=0;
   float baselineSum=0,peakWeight=0;
   for(uint8_t i=0;i<Config::WHEEL_COUNT;i++){
-    raw[i]=(uint32_t)touchRead(Config::WHEEL_PINS[i]);
     // Invalid readings must never generate a UI event.
     if(raw[i]==0 || raw[i]==UINT32_MAX || base[i]==0)touchValid=false;
     baselineSum+=(float)base[i];

@@ -1,3 +1,5 @@
+> **Актуальное изменение v0.10.6.2:** GPIO9 теперь INPUT с внешней подтяжкой 10 кОм к 3.3 В. Устаревшие описания INPUT_PULLUP ниже неприменимы. Пороги кнопок изменены.
+
 # MonoPod v0.10.6 — INPUT_PULLUP / Background Playback / MPOD1 CLI
 
 База: MonoPod Firmware v0.10.5 (BAV3 RGB565/GRAY6 SPI). Протокол: MPOD1 v4 без смены wire-format.

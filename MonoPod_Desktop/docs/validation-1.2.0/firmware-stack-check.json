@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "elf_sha256": "fc6729ecfd7b60d697a938926b5986d9c347cc35d50b5db8ef2d5839a42091d5",
+  "recursive_scan_frame_bytes": 336,
+  "conservative_active_scan_frames": 8,
+  "frame_total_bytes": 2688,
+  "scope": "Actual ELF frame bound only; driver stack use, boot and on-device high-water are not tested."
+}

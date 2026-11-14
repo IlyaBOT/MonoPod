@@ -1,0 +1,36 @@
+--- v0.9.0/DIY_iPod_Mono/Library.cpp
++++ v0.9.0-fixed/DIY_iPod_Mono/Library.cpp
+@@ -3,6 +3,8 @@
+ #include <SPI.h>
+ #include <algorithm>
+ #include <cstring>
++#include <memory>
++#include <new>
+ #if FEATURE_SD_FORMAT
+ #define DISABLE_FS_H_WARNING
+ #include <SdFat.h>
+@@ -37,7 +39,10 @@
+   }
+   if(start>=f.size()){f.close();return 0;}
+   f.seek(start);
+-  uint8_t b[4096];int n=f.read(b,sizeof(b));
++  constexpr size_t probeBytes=4096;
++  std::unique_ptr<uint8_t[]> b(new(std::nothrow) uint8_t[probeBytes]);
++  if(!b){f.close();return 0;}
++  int n=f.read(b.get(),probeBytes);
+   uint32_t secs=0;
+   for(int i=0;i+4<n;i++){
+     if(b[i]!=0xff || (b[i+1]&0xe0)!=0xe0)continue;
+@@ -55,9 +60,9 @@
+     const int mono=((b[i+3]>>6)&3)==3;
+     const int side=(version==3?(mono?17:32):(mono?9:17));
+     const int off=i+4+((b[i+1]&1)?0:2)+side;
+-    if(off+12<n && (memcmp(b+off,"Xing",4)==0 || memcmp(b+off,"Info",4)==0)){
+-      const uint32_t flags=bigEndian4(b+off+4);
+-      if(flags&1){const uint32_t frames=bigEndian4(b+off+8);
++    if(off+12<n && (memcmp(b.get()+off,"Xing",4)==0 || memcmp(b.get()+off,"Info",4)==0)){
++      const uint32_t flags=bigEndian4(b.get()+off+4);
++      if(flags&1){const uint32_t frames=bigEndian4(b.get()+off+8);
+         if(frames)secs=(uint32_t)(((uint64_t)frames*samplesPerFrame+sampleRate/2)/sampleRate);
+       }
+     }

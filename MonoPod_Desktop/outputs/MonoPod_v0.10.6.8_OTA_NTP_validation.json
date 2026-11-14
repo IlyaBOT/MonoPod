@@ -1,0 +1,12 @@
+{
+  "firmware": "0.10.6.8",
+  "source_zip": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_v0.10.6.8_OTA_NTP_source.zip",
+  "source_sha256": "8c3754ed260246b8946521c71a4a3e5d7f8bb0d3b3cbfd492c64d7eea415b53c",
+  "entries": 143,
+  "application": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_v0.10.6.8_OTA_NTP_S3_N16R8_application.bin",
+  "application_bytes": 1484992,
+  "application_sha256": "69e9e86c71479ea52bf4def1c2007d9541299425cfa59b39c1a37f01370079c0",
+  "zip_crc_and_file_hashes": "passed",
+  "hardware_flashed": false,
+  "original_audio_and_ota_preserved": true
+}

@@ -1,0 +1,283 @@
+--- before/Desktop/Directory.Build.props
++++ after/Desktop/Directory.Build.props
+@@ -1 +1 @@
+-<Project><PropertyGroup><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><LangVersion>12</LangVersion><Deterministic>true</Deterministic><Version>1.2.0</Version><AssemblyVersion>1.2.0.0</AssemblyVersion><FileVersion>1.2.0.0</FileVersion><InformationalVersion>1.2.0</InformationalVersion></PropertyGroup></Project>
++<Project><PropertyGroup><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><LangVersion>12</LangVersion><Deterministic>true</Deterministic><Version>1.2.1</Version><AssemblyVersion>1.2.1.0</AssemblyVersion><FileVersion>1.2.1.0</FileVersion><InformationalVersion>1.2.1</InformationalVersion></PropertyGroup></Project>
+--- before/Desktop/docs/USER_GUIDE_RU.md
++++ after/Desktop/docs/USER_GUIDE_RU.md
+@@ -1,19 +1,21 @@
+-# MonoPod Desktop — использование
+-
+-1. Запустите `publish\win-x64\MonoPod.Desktop.exe`. Папку публикации переносите целиком. Python и установленный .NET Runtime не нужны.
+-2. Для USB подключите **Native USB-C**, выберите USB и COM-порт. USB-UART с `$STATUS` служит диагностической консолью, не синхронизацией. Connect проверяет HELLO и показывает прошивку; USB-подключение не включает Sync автоматически.
+-3. Нажмите **Start Sync** для доступа к microSD. Плеер остановит аудио и покажет SYNC. Для Wi-Fi сначала откройте Wi-Fi Sync на самом плеере, выберите Wi-Fi в Desktop и введите адрес, показанный плеером. При STA это адрес домашней сети; 192.168.4.1 относится только к резервному AP.
+-4. Files: откройте папку двойным щелчком или через дерево; используйте Path/Go/Up/Refresh. Папки располагаются первыми независимо от направления сортировки. Доступны New Folder, Upload Files, Download, Rename, Delete и контекстное меню. Удаление запрашивает подтверждение; папка должна быть пустой. Системные каталоги защищены прошивкой.
+-5. Music → Refresh Library рекурсивно читает /Music. Add Music показывает локальные теги перед импортом. MP3/WAV/FLAC/raw AAC разрешаются согласно возможностям прошивки. M4A/ALAC не поддерживаются. Повторный импорт предлагает Replace/Skip/Cancel с политикой для очереди. Теги, длительность, кодек и параметры показаны отдельными столбцами. `—` означает отсутствие достоверной длительности. Название файла не выдаётся за тег Title.
+-6. Themes: выберите локальный TTF/OTF, размеры и сглаживание, задайте 12 цветов через HEX или ColorDialog. Выбирайте Main Menu / Settings / Now Playing / Sync Mode для предпросмотра. Read Device Theme читает установленную тему с устройства. Import/Export MPT поддерживает MPT1 и MPT2; экспорт MPT1 сохраняет только 4 старых цвета. Save/Load profile сохраняет JSON с параметрами и глифами. Upload Theme дожидается актуального предпросмотра, использует выбранный транспорт и проверяет тему. В Desktop 1.1 после установки Sync остаётся активным: можно продолжить работу с файлами или завершить её кнопкой End Sync. По Wi-Fi используется специальный маршрут темы; вручную загружать theme.mpt через Files не нужно.
+-7. Во время передачи видны процент, скорость и оставшееся время. Cancel safely отменяет очередь и сохраняет подключение. При отмене до отправки данных USB-порт остаётся открытым. Если прерван бинарный блок, Desktop 1.1.2 ждёт безопасный интервал до 18 секунд с последней записи, заново открывает порт и восстанавливает прежний режим Sync автоматически. Дождитесь сообщения «Transfer cancelled. USB connection kept»; затем можно работать с файлами без ручного Connect. Очередь не возобновляется, отменённый файл повторно не отправляется. Старый проверенный файл остаётся до commit. Возобновление с середины файла не поддерживается. Если отмена совпала с финальным commit, проверьте целевой файл перед повтором.
+-8. End Sync или Disconnect безопасно освобождают устройство; закрытие во время операции запрашивает отмену. Для Wi-Fi End Sync останавливает сервер, поэтому повторное подключение требует снова открыть Wi-Fi Sync на плеере.
+-9. Device → **Synchronize time with PC** устанавливает текущее время компьютера, часовой пояс и выбранные настройки NTP. Та же команда есть в Settings: **Apply clock settings and synchronize now**. По USB при необходимости временно включается Sync и затем возвращается прежний неактивный режим. Это может приостановить воспроизведение. По Wi-Fi нужен открытый Wi-Fi Sync.
+-10. В Settings все автоматические действия по умолчанию выключены. **Automatically start Sync and load the music index on connection** запускает Sync, пересоздаёт индекс и читает медиатеку в Music. **Automatically synchronize device time with this PC on connection** включает установку времени при подключении. **Device: automatically synchronize time over NTP when joining Wi-Fi** сохраняет NTP-настройки на плеере при подключении или по Apply; после этого плеер синхронизирует время самостоятельно, даже без Desktop. Сервер по умолчанию `pool.ntp.org`. Для отключения уже сохранённого NTP снимите флажок и нажмите Apply. Часовой пояс берётся из Windows; **Select timezone manually** включает ручной выбор из списка. Старые прошивки с `clock_sync` понимают установку времени и встроенный NTP, а изменение сервера требует capability `ntp_server` из подготовленного расширения 0.10.6.6.
+-11. Device → **Firmware Update…** доступен по Wi-Fi Sync. Откройте Wi-Fi Sync на плеере, подключитесь по показанному IP, проверьте версию/ID/плату и OTA-слот. Выберите локальный application/sketch `.bin`, введите шестизначный OTA PIN с экрана плеера и подтвердите предупреждение о питании. PIN не является паролем Wi-Fi и нигде не сохраняется. Проценты показывают отправленные байты; только отдельный ответ устройства подтверждает проверку образа и запланированную перезагрузку. После reboot вручную снова откройте Wi-Fi Sync на плеере и нажмите Connect: Desktop сверит ID и покажет версии до/после. При таймауте или отмене HTTP результат может быть неизвестен; приложение не обещает откат и не повторяет обновление. Нужна доверенная локальная сеть. Первичная установка двойной таблицы разделов выполняется через USB, без участия OTA.
+-
+-Начиная с исправления 1.1.1 USB записывает блоки небольшими порциями для совместимости с малой очередью приёмника 0.10.6, поэтому передача медленнее. После ошибки связи приложение выдерживает таймаут старого бинарного приёмника, заново подключается и пытается завершить Sync, затем отключается. При пользовательском Cancel версия 1.1.2 восстанавливает подключение и оставляет ранее активный Sync включённым. До окончания восстановления не открывайте тот же COM-порт в другой программе. Если восстановление не удалось, Desktop явно сообщает об ошибке: проверьте подключение и выполните Connect / End Sync. Потеря последнего подтверждения не доказывает, что сохранение файла не состоялось.
+-
+-Настройки — `%AppData%\MonoPod\Desktop\settings.json`: транспорт, адреса, COM, локальный каталог, предупреждение USB, вкладка, столбцы и параметры темы. Settings → Reset application settings сохраняет defaults и закрывает приложение. Log → Save log экспортирует текущую сессию. Wi-Fi-пароли Desktop не собирает.
+-
+-Desktop 1.1 проверен по коду прошивки v0.10.6 и протоколу MPOD1 v4. Поддержка старой прошивки ограничена её capabilities. Для USB выбирайте Native CDC, а не USB-UART: приложение не перебирает порты с переключением DTR автоматически. Desktop не прошивает устройство автоматически. Сборка и программные проверки не заменяют испытания на физическом ESP32-S3.
++# MonoPod Desktop — использование
++
++1. Запустите `publish\win-x64\MonoPod.Desktop.exe`. Папку публикации переносите целиком. Python и установленный .NET Runtime не нужны.
++2. Для USB подключите **Native USB-C**, выберите USB и COM-порт. USB-UART с `$STATUS` служит диагностической консолью, не синхронизацией. Connect проверяет HELLO и показывает прошивку; USB-подключение не включает Sync автоматически.
++3. Нажмите **Start Sync** для доступа к microSD. Плеер остановит аудио и покажет SYNC. Для Wi-Fi сначала откройте Wi-Fi Sync на самом плеере, выберите Wi-Fi в Desktop и введите адрес, показанный плеером. При STA это адрес домашней сети; 192.168.4.1 относится только к резервному AP.
++4. Files: откройте папку двойным щелчком или через дерево; используйте Path/Go/Up/Refresh. Папки располагаются первыми независимо от направления сортировки. Доступны New Folder, Upload Files, Download, Rename, Delete и контекстное меню. Удаление запрашивает подтверждение; папка должна быть пустой. Системные каталоги защищены прошивкой.
++5. Music → Refresh Library рекурсивно читает /Music. Add Music показывает локальные теги перед импортом. MP3/WAV/FLAC/raw AAC разрешаются согласно возможностям прошивки. M4A/ALAC не поддерживаются. Повторный импорт предлагает Replace/Skip/Cancel с политикой для очереди. Теги, длительность, кодек и параметры показаны отдельными столбцами. `—` означает отсутствие достоверной длительности. Название файла не выдаётся за тег Title.
++6. Themes: выберите локальный TTF/OTF, размеры и сглаживание, задайте 12 цветов через HEX или ColorDialog. Выбирайте Main Menu / Settings / Now Playing / Sync Mode для предпросмотра. Read Device Theme читает установленную тему с устройства. Import/Export MPT поддерживает MPT1 и MPT2; экспорт MPT1 сохраняет только 4 старых цвета. Save/Load profile сохраняет JSON с параметрами и глифами. Upload Theme дожидается актуального предпросмотра, использует выбранный транспорт и проверяет тему. В Desktop 1.1 после установки Sync остаётся активным: можно продолжить работу с файлами или завершить её кнопкой End Sync. По Wi-Fi используется специальный маршрут темы; вручную загружать theme.mpt через Files не нужно.
++7. Во время передачи видны процент, скорость и оставшееся время. Cancel safely отменяет очередь и сохраняет подключение. При отмене до отправки данных USB-порт остаётся открытым. Если прерван бинарный блок, Desktop 1.1.2 ждёт безопасный интервал до 18 секунд с последней записи, заново открывает порт и восстанавливает прежний режим Sync автоматически. Дождитесь сообщения «Transfer cancelled. USB connection kept»; затем можно работать с файлами без ручного Connect. Очередь не возобновляется, отменённый файл повторно не отправляется. Старый проверенный файл остаётся до commit. Возобновление с середины файла не поддерживается. Если отмена совпала с финальным commit, проверьте целевой файл перед повтором.
++8. End Sync или Disconnect безопасно освобождают устройство; закрытие во время операции запрашивает отмену. Для Wi-Fi End Sync останавливает сервер, поэтому повторное подключение требует снова открыть Wi-Fi Sync на плеере.
++9. Device → **Synchronize time with PC** устанавливает текущее время компьютера, часовой пояс и выбранные настройки NTP. Та же команда есть в Settings: **Apply clock settings and synchronize now**. По USB при необходимости временно включается Sync и затем возвращается прежний неактивный режим. Это может приостановить воспроизведение. По Wi-Fi нужен открытый Wi-Fi Sync.
++10. В Settings все автоматические действия по умолчанию выключены. **Automatically start Sync and load the music index on connection** запускает Sync, пересоздаёт индекс и читает медиатеку в Music. **Automatically synchronize device time with this PC on connection** включает установку времени при подключении. **Device: automatically synchronize time over NTP when joining Wi-Fi** сохраняет NTP-настройки на плеере при подключении или по Apply; после этого плеер синхронизирует время самостоятельно, даже без Desktop. Сервер по умолчанию `pool.ntp.org`. Для отключения уже сохранённого NTP снимите флажок и нажмите Apply. Часовой пояс берётся из Windows; **Select timezone manually** включает ручной выбор из списка. Старые прошивки с `clock_sync` понимают установку времени и встроенный NTP, а изменение сервера требует capability `ntp_server` из подготовленного расширения 0.10.6.6.
++11. Device → **Firmware Update…** доступен по Wi-Fi Sync. Откройте Wi-Fi Sync на плеере, подключитесь по показанному IP, проверьте версию/ID/плату и OTA-слот. Выберите локальный application/sketch `.bin`, введите шестизначный OTA PIN с экрана плеера и подтвердите предупреждение о питании. PIN не является паролем Wi-Fi и нигде не сохраняется. Проценты показывают отправленные байты; только отдельный ответ устройства подтверждает проверку образа и запланированную перезагрузку. После reboot вручную снова откройте Wi-Fi Sync на плеере и нажмите Connect: Desktop сверит ID и покажет версии до/после. При таймауте или отмене HTTP результат может быть неизвестен; приложение не обещает откат и не повторяет обновление. Нужна доверенная локальная сеть. Первичная установка двойной таблицы разделов выполняется через USB, без участия OTA.
++
++Начиная с Desktop 1.2.1 строка **Device time** показывает местное время в прочитанном с плеера часовом поясе: например, `2026-11-01 18:50:00 (UTC+03:00)` для Москвы. Служебная строка POSIX `UTC-3` обозначает именно UTC+03:00; раньше Desktop выводил рядом с ней время UTC, что создавало видимость сдвига на три часа. При неизвестном формате пояса явно показывается **Device UTC time** с предложением применить настройки. Выбор другого пояса в списке действует на плеер только после Apply или включённой автоматической синхронизации при подключении.
++
++Начиная с исправления 1.1.1 USB записывает блоки небольшими порциями для совместимости с малой очередью приёмника 0.10.6, поэтому передача медленнее. После ошибки связи приложение выдерживает таймаут старого бинарного приёмника, заново подключается и пытается завершить Sync, затем отключается. При пользовательском Cancel версия 1.1.2 восстанавливает подключение и оставляет ранее активный Sync включённым. До окончания восстановления не открывайте тот же COM-порт в другой программе. Если восстановление не удалось, Desktop явно сообщает об ошибке: проверьте подключение и выполните Connect / End Sync. Потеря последнего подтверждения не доказывает, что сохранение файла не состоялось.
++
++Настройки — `%AppData%\MonoPod\Desktop\settings.json`: транспорт, адреса, COM, локальный каталог, предупреждение USB, вкладка, столбцы и параметры темы. Settings → Reset application settings сохраняет defaults и закрывает приложение. Log → Save log экспортирует текущую сессию. Wi-Fi-пароли Desktop не собирает.
++
++Desktop 1.1 проверен по коду прошивки v0.10.6 и протоколу MPOD1 v4. Поддержка старой прошивки ограничена её capabilities. Для USB выбирайте Native CDC, а не USB-UART: приложение не перебирает порты с переключением DTR автоматически. Desktop не прошивает устройство автоматически. Сборка и программные проверки не заменяют испытания на физическом ESP32-S3.
+--- before/Desktop/MonoPod.Core/ClockConfiguration.cs
++++ after/Desktop/MonoPod.Core/ClockConfiguration.cs
+@@ -30,7 +30,7 @@
+     }
+ }
+ 
+-public static class PosixTimeZone
++public static partial class PosixTimeZone
+ {
+     // Windows names such as 'Russian Standard Time' are not understood by newlib.
+     // Encode the current Windows adjustment rule as POSIX TZ, including DST.
+--- before/Desktop/MonoPod.Desktop/app.manifest
++++ after/Desktop/MonoPod.Desktop/app.manifest
+@@ -1 +1 @@
+-<?xml version="1.0" encoding="utf-8"?><assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1"><assemblyIdentity version="1.2.0.0" name="MonoPod.Desktop.app"/><trustInfo xmlns="urn:schemas-microsoft-com:asm.v3"><security><requestedPrivileges><requestedExecutionLevel level="asInvoker" uiAccess="false"/></requestedPrivileges></security></trustInfo><compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1"><application><supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/></application></compatibility></assembly>
++<?xml version="1.0" encoding="utf-8"?><assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1"><assemblyIdentity version="1.2.1.0" name="MonoPod.Desktop.app"/><trustInfo xmlns="urn:schemas-microsoft-com:asm.v3"><security><requestedPrivileges><requestedExecutionLevel level="asInvoker" uiAccess="false"/></requestedPrivileges></security></trustInfo><compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1"><application><supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/></application></compatibility></assembly>
+--- before/Desktop/MonoPod.Desktop/Forms/MainForm.cs
++++ after/Desktop/MonoPod.Desktop/Forms/MainForm.cs
+@@ -105,7 +105,7 @@
+     {
+         prefs = preferences ?? Preferences.Load();
+         this.smoke = smoke;
+-        Text = "MonoPod Desktop 1.2.0";
++        Text = "MonoPod Desktop 1.2.1";
+         Width = 1280;
+         Height = 820;
+         MinimumSize = new(920, 620);
+@@ -156,7 +156,7 @@
+         Item(tools, "Settings", () => tabs.SelectedIndex = 3);
+         var help = Menu("Help");
+         Item(help, "User guide", () => OpenDoc("USER_GUIDE_RU.md"));
+-        Item(help, "About", () => MessageBox.Show(this, "MonoPod Desktop 1.2.0\r\nNative Windows Forms · .NET 8\r\nMonoPod firmware 0.10.6.6 / MPOD1 v4 + OTA v1\r\nUSB CDC and local HTTP sync.", "About MonoPod"));
++        Item(help, "About", () => MessageBox.Show(this, "MonoPod Desktop 1.2.1\r\nNative Windows Forms · .NET 8\r\nMonoPod firmware 0.10.6.6 / MPOD1 v4 + OTA v1\r\nUSB CDC and local HTTP sync.", "About MonoPod"));
+         MainMenuStrip = menu;
+         var top = new FlowLayoutPanel
+         {
+@@ -375,7 +375,7 @@
+         };
+         ShowInfo();
+         SetState();
+-        log.Write("MonoPod Desktop 1.2.0 started.");
++        log.Write("MonoPod Desktop 1.2.1 started.");
+     }
+ 
+     static DataGridView Grid()
+--- before/Desktop/MonoPod.Desktop/Forms/MainForm.DeviceFeatures.cs
++++ after/Desktop/MonoPod.Desktop/Forms/MainForm.DeviceFeatures.cs
+@@ -60,9 +60,15 @@
+     void ShowClockInfo()
+     {
+         if (device == null) { clockInfo.Text = "Connect to read the device clock."; return; }
+-        string value = device.ClockUnix is >= 1600000000 and <= 4102444800
+-            ? DateTimeOffset.FromUnixTimeSeconds(device.ClockUnix).ToString("yyyy-MM-dd HH:mm:ss 'UTC'") : "not set";
+-        clockInfo.Text = $"Device clock: {value}; timezone: {device.Timezone}\r\nNTP: {(device.NtpEnabled ? "on" : "off")}; server: {device.NtpServer}";
++        string value = "Device time: not set";
++        if (device.ClockUnix is >= 1600000000 and <= 4102444800)
++        {
++            var instant = DateTimeOffset.FromUnixTimeSeconds(device.ClockUnix);
++            value = PosixTimeZone.TryGetLocalTime(device.Timezone, instant, out var local, out var offset)
++                ? $"Device time: {local:yyyy-MM-dd HH:mm:ss} ({PosixTimeZone.FormatUtcOffset(offset)})"
++                : $"Device UTC time: {instant:yyyy-MM-dd HH:mm:ss}; timezone unavailable — apply clock settings.";
++        }
++        clockInfo.Text = $"{value}\r\nNTP: {(device.NtpEnabled ? "on" : "off")}; server: {device.NtpServer}";
+     }
+ 
+     async Task SyncDeviceClock(CancellationToken ct, bool setPcTime = true)
+--- before/Desktop/MonoPod.Desktop/MonoPod.Desktop.csproj
++++ after/Desktop/MonoPod.Desktop/MonoPod.Desktop.csproj
+@@ -1 +1 @@
+-<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode><AssemblyName>MonoPod.Desktop</AssemblyName><Version>1.2.0</Version><AssemblyVersion>1.2.0.0</AssemblyVersion><FileVersion>1.2.0.0</FileVersion><InformationalVersion>1.2.0</InformationalVersion><PublishSingleFile>false</PublishSingleFile><PublishTrimmed>false</PublishTrimmed><PublishDir>..\publish\win-x64\</PublishDir><ApplicationManifest>app.manifest</ApplicationManifest></PropertyGroup><ItemGroup><ProjectReference Include="..\MonoPod.Core\MonoPod.Core.csproj" /></ItemGroup><ItemGroup><Content Include="..\docs\*.md" Link="docs\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup></Project>
++<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode><AssemblyName>MonoPod.Desktop</AssemblyName><Version>1.2.1</Version><AssemblyVersion>1.2.1.0</AssemblyVersion><FileVersion>1.2.1.0</FileVersion><InformationalVersion>1.2.1</InformationalVersion><PublishSingleFile>false</PublishSingleFile><PublishTrimmed>false</PublishTrimmed><PublishDir>..\publish\win-x64\</PublishDir><ApplicationManifest>app.manifest</ApplicationManifest></PropertyGroup><ItemGroup><ProjectReference Include="..\MonoPod.Core\MonoPod.Core.csproj" /></ItemGroup><ItemGroup><Content Include="..\docs\*.md" Link="docs\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup></Project>
+--- before/Desktop/MonoPod.Desktop.Tests/UiDeviceFeatureTests.cs
++++ after/Desktop/MonoPod.Desktop.Tests/UiDeviceFeatureTests.cs
+@@ -8,6 +8,50 @@
+ 
+ public sealed partial class UiThemeRegressionTests
+ {
++    [Theory]
++    [InlineData(1f)]
++    [InlineData(1.5f)]
++    public Task DeviceClockShowsMoscowLocalTimeFromDeviceZoneInsteadOfUtcOrUnsavedSelection(float scale) => Sta(() =>
++    {
++        using var settings = new SettingsScope();
++        settings.Preferences.ManualTimeZone = true;
++        settings.Preferences.ManualTimeZoneId = "UTC"; // Not yet sent to the player.
++        using var form = new MainForm(smoke:true, preferences:settings.Preferences);
++        var instant = new DateTimeOffset(2026,11,1,15,50,0,TimeSpan.Zero);
++        SetField(form,"device",new DeviceInfo { Firmware="0.10.6.9", ClockUnix=instant.ToUnixTimeSeconds(), Timezone="UTC-3", NtpEnabled=true });
++        Invoke(form,"ShowClockInfo");
++        string text = Field<Label>(form,"clockInfo").Text;
++        Assert.Contains("Device time: 2026-11-01 18:50:00 (UTC+03:00)",text);
++        Assert.DoesNotContain("UTC-3",text);
++        Assert.Contains("NTP: on; server: pool.ntp.org",text);
++        Field<TabControl>(form,"tabs").SelectedIndex=3;
++        form.Opacity=0;form.ShowInTaskbar=false;form.Show();
++        if(scale!=1f)form.Scale(new System.Drawing.SizeF(scale,scale));
++        form.PerformLayout();
++        string? output = Environment.GetEnvironmentVariable("MONOPOD_UI_TEST_OUTPUT");
++        if(output!=null)
++        {
++            Directory.CreateDirectory(output);
++            using var bitmap = new System.Drawing.Bitmap(form.Width,form.Height);
++            form.DrawToBitmap(bitmap,new System.Drawing.Rectangle(System.Drawing.Point.Empty,form.Size));
++            bitmap.Save(Path.Combine(output,$"clock-moscow-{(int)(scale*100)}.png"));
++        }
++        return Task.CompletedTask;
++    });
++
++    [Theory]
++    [InlineData(0,"UTC-3","Device time: not set")]
++    [InlineData(1793548200,"Unsupported zone","Device UTC time:")]
++    public Task UnknownDeviceClockDoesNotPretendToUseTheSelectedZone(long unix, string zone, string expected) => Sta(() =>
++    {
++        using var settings = new SettingsScope();
++        using var form = new MainForm(smoke:true,preferences:settings.Preferences);
++        SetField(form,"device",new DeviceInfo { ClockUnix=unix,Timezone=zone });
++        Invoke(form,"ShowClockInfo");
++        Assert.Contains(expected,Field<Label>(form,"clockInfo").Text);
++        return Task.CompletedTask;
++    });
++
+     [Theory]
+     [InlineData(1f)]
+     [InlineData(1.5f)]
+--- before/Desktop/README.md
++++ after/Desktop/README.md
+@@ -1,33 +1,34 @@
+-# MonoPod Desktop 1.2.0
+-
+-Native C# / .NET 8 Windows Forms client for MonoPod. No Python, browser engine or web UI is used at runtime.
+-
+-Open `MonoPod.Desktop.sln` in Visual Studio 2022 17.8 or later (17.14 tested). Start project: `MonoPod.Desktop`. Windows 10/11 x64.
+-
+-```powershell
+-dotnet restore
+-dotnet build -c Release
+-dotnet test -c Release
+-dotnet publish -c Release -r win-x64 --self-contained true
+-```
+-
+-Portable application: `publish\win-x64\MonoPod.Desktop.exe`. Keep all files in that directory together. The self-contained output includes the .NET runtime. Build tools can use .NET SDK 8 or a newer compatible SDK; the app targets .NET 8.
+-
+-Desktop 1.2.0 adds manual local-file Wi-Fi OTA for firmware 0.10.6.6 / OTA v1, PC clock synchronization over USB or Wi-Fi, device NTP settings and optional connection actions. Media-index and time automation are off by default; timezone follows Windows unless manually selected. Existing USB CDC MPOD1 v4, themes, paced writes and cancellation recovery remain covered by regressions. The firmware's NTP-server extension was added to `..\MonoPod_v0.10.6.6`; original sources were backed up. Legacy Studio and older firmware trees were preserved. No device was flashed or used for OTA/NTP testing in this release. The earlier 32 KiB physical transfer/readback belongs to Desktop 1.1.1.
+-
+-Features: USB CDC MPOD1 v4 / local Wi-Fi HTTP; paginated microSD explorer; streaming verified transfers and atomic replacement; Unicode paths; music metadata in independent columns; MPT1/MPT2 theme editor and 160×128 preview; upload queue; cancellation; JSON preferences; exportable log. Older firmware is capability-limited and displays Unsupported for unavailable operations.
+-
+-OTA: Device → Firmware Update while connected to Wi-Fi Sync; choose the application/sketch `.bin`, enter the screen PIN and explicitly confirm. Upload completion, image acceptance and running-version verification are separate stages. After reboot, reopen Wi-Fi Sync on MonoPod and reconnect. PINs are never saved in preferences or logs.
+-
+-- [OTA, clock and NTP: 1.2.0](docs/RELEASE_1.2_RU.md)
+-- [Keep USB connected after cancellation: 1.1.2](docs/CANCEL_CONNECTION_FIX_RU.md)
+-- [USB BAV timeout hotfix 1.1.1](docs/BAV_USB_FIX_RU.md)
+-- [Desktop 1.1 changes and validation](docs/RELEASE_1.1_RU.md)
+-- [Historical Desktop 1.0 report](docs/FINAL_REPORT_RU.md)
+-- [User guide](docs/USER_GUIDE_RU.md)
+-- [Architecture](docs/ARCHITECTURE.md)
+-- [Protocol and MPT byte layout](docs/PROTOCOL.md)
+-- [Build instructions](docs/BUILD.md)
+-- [Verification and hardware checklist](docs/VALIDATION_RU.md)
+-
+-`Legacy/Studio` contains the latest original Python Studio; `Legacy/Studio_v0.9.0` preserves the initially found reference. They are development references and are not part of the published application.
++# MonoPod Desktop 1.2.1
++
++Native C# / .NET 8 Windows Forms client for MonoPod. No Python, browser engine or web UI is used at runtime.
++
++Open `MonoPod.Desktop.sln` in Visual Studio 2022 17.8 or later (17.14 tested). Start project: `MonoPod.Desktop`. Windows 10/11 x64.
++
++```powershell
++dotnet restore
++dotnet build -c Release
++dotnet test -c Release
++dotnet publish -c Release -r win-x64 --self-contained true
++```
++
++Portable application: `publish\win-x64\MonoPod.Desktop.exe`. Keep all files in that directory together. The self-contained output includes the .NET runtime. Build tools can use .NET SDK 8 or a newer compatible SDK; the app targets .NET 8.
++
++Desktop 1.2.1 displays the device's local clock and civil UTC offset (Moscow: UTC+03:00), decoding the POSIX timezone returned by the player. Version 1.2.0 introduced manual local-file Wi-Fi OTA for firmware 0.10.6.6 / OTA v1, PC clock synchronization over USB or Wi-Fi, device NTP settings and optional connection actions. Media-index and time automation are off by default; timezone follows Windows unless manually selected. Existing USB CDC MPOD1 v4, themes, paced writes and cancellation recovery remain covered by regressions. Legacy Studio and older firmware trees were preserved. No device was flashed or used for OTA/NTP testing in this release. The earlier 32 KiB physical transfer/readback belongs to Desktop 1.1.1.
++
++Features: USB CDC MPOD1 v4 / local Wi-Fi HTTP; paginated microSD explorer; streaming verified transfers and atomic replacement; Unicode paths; music metadata in independent columns; MPT1/MPT2 theme editor and 160×128 preview; upload queue; cancellation; JSON preferences; exportable log. Older firmware is capability-limited and displays Unsupported for unavailable operations.
++
++OTA: Device → Firmware Update while connected to Wi-Fi Sync; choose the application/sketch `.bin`, enter the screen PIN and explicitly confirm. Upload completion, image acceptance and running-version verification are separate stages. After reboot, reopen Wi-Fi Sync on MonoPod and reconnect. PINs are never saved in preferences or logs.
++
++- [Local time and Moscow timezone fix: 1.2.1](docs/RELEASE_1.2.1_RU.md)
++- [OTA, clock and NTP: 1.2.0](docs/RELEASE_1.2_RU.md)
++- [Keep USB connected after cancellation: 1.1.2](docs/CANCEL_CONNECTION_FIX_RU.md)
++- [USB BAV timeout hotfix 1.1.1](docs/BAV_USB_FIX_RU.md)
++- [Desktop 1.1 changes and validation](docs/RELEASE_1.1_RU.md)
++- [Historical Desktop 1.0 report](docs/FINAL_REPORT_RU.md)
++- [User guide](docs/USER_GUIDE_RU.md)
++- [Architecture](docs/ARCHITECTURE.md)
++- [Protocol and MPT byte layout](docs/PROTOCOL.md)
++- [Build instructions](docs/BUILD.md)
++- [Verification and hardware checklist](docs/VALIDATION_RU.md)
++
++`Legacy/Studio` contains the latest original Python Studio; `Legacy/Studio_v0.9.0` preserves the initially found reference. They are development references and are not part of the published application.
+--- before/0.10.6.9/DIY_iPod_Mono/Config.h
++++ after/0.10.6.9/DIY_iPod_Mono/Config.h
+@@ -167,7 +167,7 @@
+ constexpr char BT_TARGET_NAME[] = ""; // only built for original ESP32
+ #endif
+ constexpr uint16_t SCREEN_W = 160, SCREEN_H = 128;
+-constexpr char TIMEZONE_TZ[] = "UTC3"; // POSIX TZ string for user timezone
++constexpr char TIMEZONE_TZ[] = "UTC-3"; // Moscow UTC+03:00; POSIX uses the opposite offset sign. Saved NVS timezone takes precedence.
+ }
+ // Real prototype ADC, six capacitive wheel electrodes and Wi-Fi Sync.
+ #ifndef FEATURE_BATTERY_ADC
+--- before/0.10.6.9/tools/run_clock_native_tests.py
++++ after/0.10.6.9/tools/run_clock_native_tests.py
+@@ -24,6 +24,10 @@
+ implementation = (root / 'DIY_iPod_Mono/ClockService.cpp').read_text(encoding='utf-8')
+ assert '#include <sys/time.h>' in implementation
+ (stage / 'ClockService.cpp').write_text(implementation.replace('#include <sys/time.h>', '#include "ClockNativePlatform.h"'), encoding='utf-8')
++default_config = work / 'default-config'
++default_config.mkdir(exist_ok=True)
++shutil.copy2(root / 'DIY_iPod_Mono/Config.h', default_config / 'Config.h')
++(default_config / 'Arduino.h').write_text('#pragma once\n#include <cstddef>\n#include <cstdint>\n', encoding='utf-8')
+ if os.name == 'nt':
+     vswhere = Path(os.environ.get('ProgramFiles(x86)', r'C:\Program Files (x86)')) / 'Microsoft Visual Studio/Installer/vswhere.exe'
+     install = subprocess.check_output([str(vswhere), '-latest', '-products', '*', '-requires',
+@@ -34,6 +38,7 @@
+     ('clock_validation', [source], root / 'DIY_iPod_Mono'),
+     ('clock_service', [root / 'tests/clock_service_test.cpp', stage / 'ClockService.cpp'], stage),
+     ('wheel_arduino_macros', [root / 'tests/wheel_arduino_macro_test.cpp'], root / 'DIY_iPod_Mono'),
++    ('clock_timezone_default', [root / 'tests/clock_timezone_default_test.cpp'], default_config),
+ ]:
+     executable=work / (name + ('.exe' if os.name=='nt' else ''))
+     if os.name=='nt':
+@@ -55,6 +60,8 @@
+ result = {'exit_code': max(item['exit_code'] for item in results), 'checks':results, 'hardware_io': False,
+     'header_sha256': hashlib.sha256((root / 'DIY_iPod_Mono/ClockConfigValidation.h').read_bytes()).hexdigest(),
+     'service_sha256':hashlib.sha256(implementation.encode('utf-8')).hexdigest(),
++    'config_sha256':hashlib.sha256((root / 'DIY_iPod_Mono/Config.h').read_bytes()).hexdigest(),
++    'default_timezone_test':'Real Config.h and host C runtime in a child process; no PC/device clock writes or ESP32 runtime validation.',
+     'service_host_adapter':'sys/time.h replaced by ClockNativePlatform.h; NVS, Wi-Fi, SNTP and OS time are stubbed.'}
+ (work / 'result.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
+ raise SystemExit(result['exit_code'])

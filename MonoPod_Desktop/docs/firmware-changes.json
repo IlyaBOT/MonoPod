@@ -1,0 +1,207 @@
+[
+  {
+    "path": "badapple.bav",
+    "kind": "new",
+    "sha256": "98f24beb1c5979ab7a9287047b75ca9bee107589f4dbb477b31c4084e2981023"
+  },
+  {
+    "path": "CHANGELOG_v0.10.0.md",
+    "kind": "new",
+    "sha256": "bc549d87fae6f321524a62b48a6ca56b72dd3a3c6e6751953c7330a1735ffedf"
+  },
+  {
+    "path": "DIY_iPod_Mono\\Display.cpp",
+    "kind": "modified",
+    "sha256": "220ef6f72a54b97385ae12980880d4fb899f2c052fb51ef1e95f1808e8d1e391"
+  },
+  {
+    "path": "DIY_iPod_Mono\\Display.h",
+    "kind": "modified",
+    "sha256": "a9c3d973458e58172918fcf0899cc9978c7e965f6b354fa142870f1339889520"
+  },
+  {
+    "path": "DIY_iPod_Mono\\DIY_iPod_Mono.ino",
+    "kind": "modified",
+    "sha256": "0a775514db43aff61ee6b8af604d1208206ede55d90d90027a657aa39e2f337e"
+  },
+  {
+    "path": "DIY_iPod_Mono\\Library.cpp",
+    "kind": "modified",
+    "sha256": "9dfbf54691abf7669bacec31deb8ae29301fc37fbc9922a9ed88a6c4b1288b54"
+  },
+  {
+    "path": "DIY_iPod_Mono\\SyncFiles.cpp",
+    "kind": "new",
+    "sha256": "01dc36b7abea2090882bf90fe2808a24254327dc49146b6a9e840f1daedcae3f"
+  },
+  {
+    "path": "DIY_iPod_Mono\\SyncFiles.h",
+    "kind": "new",
+    "sha256": "8ed2bd716c329ad81c0bf05727a41b649cb76b2e2cadeef0619c670ac6b9a2af"
+  },
+  {
+    "path": "DIY_iPod_Mono\\SyncMode.cpp",
+    "kind": "modified",
+    "sha256": "c1e3aa91611781fa1900f0bdf3bd73ad75fceec832f939ec7961d2cee5ea0c17"
+  },
+  {
+    "path": "DIY_iPod_Mono\\Theme.cpp",
+    "kind": "modified",
+    "sha256": "024fb81d36dc563605863a0f672f6eeb5481961d09a3f6ddbe7a4b058fd569e8"
+  },
+  {
+    "path": "DIY_iPod_Mono\\Theme.h",
+    "kind": "modified",
+    "sha256": "2bdb254cbfc612f9138ce90ddd184604d62aec5b19529edd4acc386e844fce57"
+  },
+  {
+    "path": "DIY_iPod_Mono\\UI.cpp",
+    "kind": "modified",
+    "sha256": "47bab10c2eca92b416a40c84397b408db96f037770f2f7f4b502f7fab6caf8b0"
+  },
+  {
+    "path": "DIY_iPod_Mono\\UsbSync.cpp",
+    "kind": "modified",
+    "sha256": "68d12ce9dd0d6dd49e34e0e785e630c4fea4bb53dc8bc903beff17fb563923ec"
+  },
+  {
+    "path": "DIY_iPod_Mono\\UsbSync.h",
+    "kind": "modified",
+    "sha256": "620d48d9647fe57ea20139ef4a8d59a89aeeb5288befa028bfa785a8a8f38d5a"
+  },
+  {
+    "path": "DIY_iPod_Mono\\WiFiSync.cpp",
+    "kind": "modified",
+    "sha256": "a2f5cbd889bf822cc9dc77423c1187a827f1d75504b7ef1692d0c5ff5aa78f76"
+  },
+  {
+    "path": "DIY_iPod_Mono\\WiFiSync.h",
+    "kind": "modified",
+    "sha256": "b06784cc6fdc1137b3f750836e92b6f15e2deb5f78c1316770736c85b3571abf"
+  },
+  {
+    "path": "README.md",
+    "kind": "modified",
+    "sha256": "98f0c742e1af758bfe4486aba251e9c392f4f34a026272868447460c6dc80d56"
+  },
+  {
+    "path": "tests\\conftest.py",
+    "kind": "new",
+    "sha256": "e98dc34a8c330158240bd9dcf0ca7a1bbe84d5eed16745130cbb001cde71ecd2"
+  },
+  {
+    "path": "tests\\stubs\\SD.h",
+    "kind": "modified",
+    "sha256": "2fa689d6623834b43a9c0016ca83bb79de8309f8bea523ecdc699c7b6044e735"
+  },
+  {
+    "path": "tests\\test_v07_ui.py",
+    "kind": "modified",
+    "sha256": "d9ffe4800dc9bf94b89c7cd4190767d3f723dbafa516cafae20786278de2dc1d"
+  },
+  {
+    "path": "tests\\test_v083_usb_sync.py",
+    "kind": "modified",
+    "sha256": "c8fb1407dc7e68229860cbfd49e99edf95532f2a59af8ded44cfdedcfee168cd"
+  },
+  {
+    "path": "tests\\test_v085_sync_mode.py",
+    "kind": "modified",
+    "sha256": "7d0b90d590942e216480354aa595c0057aae10cabdfe72f66cd64f6ebf87fb8d"
+  },
+  {
+    "path": "tests\\test_v087_dev_console.py",
+    "kind": "modified",
+    "sha256": "baee8b2296bbbf20ca382cabe0d4fca8e5807b172678e7493722acfd8239ba07"
+  },
+  {
+    "path": "tests\\test_v089_wifi_restore.py",
+    "kind": "modified",
+    "sha256": "57d206fd1a8205978b793b205ee0ca83be55faeef0a7b628982684e165833268"
+  },
+  {
+    "path": "tests\\test_v091_fonts_statusbar.py",
+    "kind": "modified",
+    "sha256": "4fe9cdebac86d50b6f51e2c0533eec7ff66699e3a816f0d86e9716bdda422b93"
+  },
+  {
+    "path": "tests\\test_v092_wifi_sync_lan.py",
+    "kind": "modified",
+    "sha256": "2b2681f1e7048445e378a543644acc5d606b606519159dfc8be16c883e77191e"
+  },
+  {
+    "path": "tests\\theme_loader_test.cpp",
+    "kind": "modified",
+    "sha256": "287cf1789edc3eac019402abfa861cb002331718f09d8e30ca42d71e85ef3617"
+  },
+  {
+    "path": "Wokwi_ILI9341\\Display.cpp",
+    "kind": "modified",
+    "sha256": "220ef6f72a54b97385ae12980880d4fb899f2c052fb51ef1e95f1808e8d1e391"
+  },
+  {
+    "path": "Wokwi_ILI9341\\Display.h",
+    "kind": "modified",
+    "sha256": "a9c3d973458e58172918fcf0899cc9978c7e965f6b354fa142870f1339889520"
+  },
+  {
+    "path": "Wokwi_ILI9341\\Library.cpp",
+    "kind": "modified",
+    "sha256": "9dfbf54691abf7669bacec31deb8ae29301fc37fbc9922a9ed88a6c4b1288b54"
+  },
+  {
+    "path": "Wokwi_ILI9341\\sketch.ino",
+    "kind": "modified",
+    "sha256": "4fc091bf2a3838c04b1d574b65c9b627b3e043f74dfc682847d5be804e96bed7"
+  },
+  {
+    "path": "Wokwi_ILI9341\\SyncFiles.cpp",
+    "kind": "new",
+    "sha256": "01dc36b7abea2090882bf90fe2808a24254327dc49146b6a9e840f1daedcae3f"
+  },
+  {
+    "path": "Wokwi_ILI9341\\SyncFiles.h",
+    "kind": "new",
+    "sha256": "8ed2bd716c329ad81c0bf05727a41b649cb76b2e2cadeef0619c670ac6b9a2af"
+  },
+  {
+    "path": "Wokwi_ILI9341\\SyncMode.cpp",
+    "kind": "modified",
+    "sha256": "c1e3aa91611781fa1900f0bdf3bd73ad75fceec832f939ec7961d2cee5ea0c17"
+  },
+  {
+    "path": "Wokwi_ILI9341\\Theme.cpp",
+    "kind": "modified",
+    "sha256": "024fb81d36dc563605863a0f672f6eeb5481961d09a3f6ddbe7a4b058fd569e8"
+  },
+  {
+    "path": "Wokwi_ILI9341\\Theme.h",
+    "kind": "modified",
+    "sha256": "2bdb254cbfc612f9138ce90ddd184604d62aec5b19529edd4acc386e844fce57"
+  },
+  {
+    "path": "Wokwi_ILI9341\\UI.cpp",
+    "kind": "modified",
+    "sha256": "47bab10c2eca92b416a40c84397b408db96f037770f2f7f4b502f7fab6caf8b0"
+  },
+  {
+    "path": "Wokwi_ILI9341\\UsbSync.cpp",
+    "kind": "modified",
+    "sha256": "68d12ce9dd0d6dd49e34e0e785e630c4fea4bb53dc8bc903beff17fb563923ec"
+  },
+  {
+    "path": "Wokwi_ILI9341\\UsbSync.h",
+    "kind": "modified",
+    "sha256": "620d48d9647fe57ea20139ef4a8d59a89aeeb5288befa028bfa785a8a8f38d5a"
+  },
+  {
+    "path": "Wokwi_ILI9341\\WiFiSync.cpp",
+    "kind": "modified",
+    "sha256": "a2f5cbd889bf822cc9dc77423c1187a827f1d75504b7ef1692d0c5ff5aa78f76"
+  },
+  {
+    "path": "Wokwi_ILI9341\\WiFiSync.h",
+    "kind": "modified",
+    "sha256": "b06784cc6fdc1137b3f750836e92b6f15e2deb5f78c1316770736c85b3571abf"
+  }
+]

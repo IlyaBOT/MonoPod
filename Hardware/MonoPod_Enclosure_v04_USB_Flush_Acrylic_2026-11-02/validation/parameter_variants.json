@@ -1,0 +1,130 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "default_assembly_including_carrier_cable_and_installation",
+      "passed": true
+    },
+    {
+      "name": "70x90_board_22mm_stack_protected_longer_jack_and_2mm_usb_recess",
+      "passed": true
+    },
+    {
+      "name": "measured_9p7_by_5p6_hood_and_7mm_tip_fit_with_explicit_measurement_reserve",
+      "passed": true
+    },
+    {
+      "name": "jack_protection_moves_entire_soldered_board_by_one_transform",
+      "passed": true
+    },
+    {
+      "name": "wider_cable_changes_well_without_moving_connectors_or_board",
+      "passed": true
+    },
+    {
+      "name": "tip_length_measurement_range_6.8",
+      "passed": true
+    },
+    {
+      "name": "tip_length_measurement_range_7.2",
+      "passed": true
+    },
+    {
+      "name": "user_protrusion_range_tp4056_6",
+      "passed": true
+    },
+    {
+      "name": "user_protrusion_range_tp4056_7",
+      "passed": true
+    },
+    {
+      "name": "user_protrusion_range_jack_7",
+      "passed": true
+    },
+    {
+      "name": "user_protrusion_range_jack_8",
+      "passed": true
+    },
+    {
+      "name": "case_width_changes_actual_solid",
+      "passed": true
+    },
+    {
+      "name": "rotation_moves_lens_carrier_display_and_mounts_together",
+      "passed": true
+    },
+    {
+      "name": "flat_lens_is_42_by_35_by_1_recessed_point_one_with_real_air_gaps",
+      "passed": true
+    },
+    {
+      "name": "two_mm_rear_bond_ring_and_full_through_panel_opening",
+      "passed": true
+    },
+    {
+      "name": "carrier_and_display_share_four_m25x5_screws_with_through_ears",
+      "passed": true
+    },
+    {
+      "name": "measured_1p1_mm_sheet_rebuilds_carrier_and_preserves_clearance",
+      "passed": true
+    },
+    {
+      "name": "lens_fit_gap_changes_real_front_opening",
+      "passed": true
+    },
+    {
+      "name": "glue_jig_has_real_point_one_mm_lens_support_step",
+      "passed": true
+    },
+    {
+      "name": "rear_lip_alternative_remains_usable_with_m25x4_and_no_carrier",
+      "passed": true
+    },
+    {
+      "name": "reject_unprotected_jack",
+      "passed": true
+    },
+    {
+      "name": "reject_thin_usb_web",
+      "passed": true
+    },
+    {
+      "name": "reject_inadequate_cable_side_allowance",
+      "passed": true
+    },
+    {
+      "name": "reject_too_short_metal_tip_hits_charger_pcb",
+      "passed": true
+    },
+    {
+      "name": "reject_short_shared_display_screw",
+      "passed": true
+    },
+    {
+      "name": "reject_lens_frame_hits_tft",
+      "passed": true
+    },
+    {
+      "name": "reject_bond_land_too_narrow",
+      "passed": true
+    },
+    {
+      "name": "reject_case_too_shallow",
+      "passed": true
+    },
+    {
+      "name": "reject_wheel_pilot_breaks_front",
+      "passed": true
+    },
+    {
+      "name": "reject_jack_nut_insufficient_thread",
+      "passed": true
+    }
+  ],
+  "parameters_sha256": "cb38dc0024b650240416a5355e9757d352c1c9eadeb9236c2d09487b2415f60b",
+  "generator_sha256": "8751b5befecce9379a49001fdfbfa714d6050b4be949acbfa72fdc5dcf22e533",
+  "verifier_sha256": "033583329d0dac52672d541a375c3d9ca926a4e36f4a1c14400221e86a27ade0",
+  "physical_fit_verified": false,
+  "note": "Actual geometry rebuilt. USB engagement is a provisional envelope, not electrical-contact proof."
+}

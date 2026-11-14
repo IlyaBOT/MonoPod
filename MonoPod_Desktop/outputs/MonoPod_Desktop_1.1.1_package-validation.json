@@ -1,0 +1,31 @@
+{
+  "version": "1.1.1",
+  "portable": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.1.1_win-x64.zip",
+    "bytes": 70233204,
+    "entries": 488,
+    "sha256": "35d6903a8c3359cb250ca37143b010a4db8aa46217d414d19dc6fd8224709640",
+    "crc_and_entry_hashes": "passed"
+  },
+  "source": {
+    "path": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\outputs\\MonoPod_Desktop_1.1.1_source.zip",
+    "bytes": 980108,
+    "entries": 204,
+    "sha256": "225786636c5e162c300bbfa455c1d5b0ce2d649212b7bbe88d4f5a76628d8339",
+    "crc_and_entry_hashes": "passed"
+  },
+  "physical_test": {
+    "passed": true,
+    "remote": "/Desktop_USB_test_20261031.bin",
+    "bytes": 32768,
+    "crc": "EE1EBC69",
+    "sha256": "A06FA47C2671DEF27679FE048A287AEB2823C07A1E15D6395E02B3CEC681C73D",
+    "deleted": true,
+    "elapsed_seconds": 10.5163719,
+    "bav_stat_unchanged": true,
+    "sync_mode": "none",
+    "firmware": "0.10.6"
+  },
+  "running_1_1_folder_preserved": true,
+  "updated_standard_launch": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\publish\\win-x64\\MonoPod.Desktop.exe"
+}

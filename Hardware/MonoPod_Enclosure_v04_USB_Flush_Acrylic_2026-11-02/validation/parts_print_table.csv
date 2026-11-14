@@ -1,0 +1,52 @@
+﻿part,group,print_x_mm,print_y_mm,print_z_mm,volume_mm3,pose,note
+front_panel,main,94.0,148.0,24.0,30044.76,front_down,
+back_chassis,main,94.0,148.0,23.6,46016.82,rear_down,
+hold_slider_cap,main,14.0,8.4,4.4,261.92,hold_outside_down,
+bottom_connector_insert,main,54.0,21.2,4.55,2270.0,bottom_outside_down,"Надевается снаружи после установки всей припаянной сборки. 2xM2x4, гайка джека снаружи в углублении."
+display_lens_carrier,main,59.6,39.6,4.7,889.17,front_down,Плоский акрил приклеить сзади по полосе 2 мм; общие с TFT четыре M2.5x5. Печать клеевой плоскостью на столе.
+front_panel_rear_lip_alternative,alternative,94.0,148.0,24.0,30724.05,front_down,"Альтернатива: прежний передний бортик и акрил на глубине 1 мм. Без display_lens_carrier, TFT крепить M2.5x4."
+display_window_coupon,coupon,66.0,45.0,5.2,3638.98,front_down,"Полное окно, четыре стойки и отверстия дисплея; M2.5x4."
+acrylic_seat_coupon,coupon,66.0,45.0,5.2,3638.98,front_down,Примерка плоского акрила заподлицо с display_lens_carrier и TFT; номинальный зазор 0.2 на сторону.
+acrylic_seat_gap_0p15,coupon,66.0,45.0,5.2,3655.8,front_down,Тот же лазерный акрил; карман с зазором 0.15 на сторону. Вариант 0.20 представлен основным acrylic_seat_coupon.
+acrylic_seat_gap_0p25,coupon,66.0,45.0,5.2,3622.15,front_down,Тот же лазерный акрил; карман с зазором 0.25 на сторону. Вариант 0.20 представлен основным acrylic_seat_coupon.
+acrylic_seat_gap_0p30,coupon,66.0,45.0,5.2,3605.32,front_down,Тот же лазерный акрил; карман с зазором 0.30 на сторону. Вариант 0.20 представлен основным acrylic_seat_coupon.
+clickwheel_mount_coupon,coupon,60.0,60.0,2.45,4346.14,front_down,"Полный интерфейс каркаса 42x42, выборка и глухие пилоты; M2.5x4."
+clickwheel_depth_extra_0p00,coupon,60.0,60.0,2.45,4390.71,front_down,1 точек: ступень 1.15 + осевой запас 0.00; другие размеры как у панели.
+clickwheel_depth_extra_0p10,coupon,60.0,60.0,2.45,4345.79,front_down,2 точек: ступень 1.15 + осевой запас 0.10; другие размеры как у панели.
+clickwheel_depth_extra_0p20,coupon,60.0,60.0,2.45,4300.86,front_down,3 точек: ступень 1.15 + осевой запас 0.20; другие размеры как у панели.
+clickwheel_window_gap_0p15,coupon,60.0,60.0,2.45,4362.7,front_down,1 точек: радиальный зазор вокруг колеса 0.15 на сторону.
+clickwheel_window_gap_0p20,coupon,60.0,60.0,2.45,4354.16,front_down,2 точек: радиальный зазор вокруг колеса 0.20 на сторону.
+clickwheel_window_gap_0p25,coupon,60.0,60.0,2.45,4345.61,front_down,3 точек: радиальный зазор вокруг колеса 0.25 на сторону.
+clickwheel_window_gap_0p30,coupon,60.0,60.0,2.45,4337.04,front_down,4 точек: радиальный зазор вокруг колеса 0.30 на сторону.
+bottom_edge_coupon,coupon,94.0,35.0,23.6,11349.31,rear_down,Поддон для нижней части всей припаянной сборки; использовать с bottom_connector_insert. Для примерки верх платы временно поддержать на той же высоте.
+bottom_insert_gap_0p15,coupon,54.1,21.3,4.55,2285.06,bottom_outside_down,Зазор вставки 0.15 к неизменённому bottom_edge_coupon; оси разъёмов и винтов сохранены.
+bottom_insert_gap_0p25,coupon,53.9,21.1,4.55,2254.98,bottom_outside_down,Зазор вставки 0.25 к неизменённому bottom_edge_coupon; оси разъёмов и винтов сохранены.
+bottom_insert_gap_0p30,coupon,53.8,21.0,4.55,2240.0,bottom_outside_down,Зазор вставки 0.30 к неизменённому bottom_edge_coupon; оси разъёмов и винтов сохранены.
+bottom_aperture_extra_0p20,coupon,54.0,21.2,4.55,2257.36,bottom_outside_down,Окна USB и джека расширены на 0.20 по полному размеру; плата и оси НЕ смещены.
+bottom_aperture_extra_0p40,coupon,54.0,21.2,4.55,2244.31,bottom_outside_down,Окна USB и джека расширены на 0.40 по полному размеру; плата и оси НЕ смещены.
+bottom_insert_recess_1p50,coupon,54.0,21.2,4.05,2219.95,bottom_outside_down,Для утопления USB 1.50 СДВИНУТЬ ВСЮ ПЛАТУ по Y на -0.50; отдельно зарядник не перемещается. Шаблон отверстий основной версии тогда не подходит.
+bottom_insert_recess_2p50,coupon,54.0,21.2,5.05,2320.06,bottom_outside_down,Для утопления USB 2.50 СДВИНУТЬ ВСЮ ПЛАТУ по Y на +0.50; отдельно зарядник не перемещается. Шаблон отверстий основной версии тогда не подходит.
+usb_cable_well_gap_0p30,coupon,54.0,21.2,4.55,2269.93,bottom_outside_down,"Корпус кабеля 9.7x5.6, зазор 0.30 на сторону. Джек, оси, положение платы и креплений неизменны."
+usb_cable_well_gap_0p50,coupon,54.0,21.2,4.55,2270.04,bottom_outside_down,"Корпус кабеля 9.7x5.6, зазор 0.50 на сторону. Джек, оси, положение платы и креплений неизменны."
+lens_gluing_jig,coupon,54.0,47.0,2.1,5108.03,front_down,"Опора при вклейке: наружная панель лежит на плоском бортике, акрил — на выступе 0.1 мм. Покрыть тонкой разделительной плёнкой; её толщину учесть при примерке. Не приклеивать рамку к кондуктору."
+jack_panel_thickness_1p20,coupon,24.0,24.0,1.2,649.51,front_down,"1 точек: толщина 1.20, отверстие 6.30; гайка снаружи."
+jack_panel_thickness_1p60,coupon,24.0,24.0,1.6,865.89,front_down,"2 точек: толщина 1.60, отверстие 6.30; гайка снаружи."
+jack_panel_thickness_2p00,coupon,24.0,24.0,2.0,1082.28,front_down,"3 точек: толщина 2.00, отверстие 6.30; гайка снаружи."
+jack_panel_thickness_2p40,coupon,24.0,24.0,2.4,1298.66,front_down,"4 точек: толщина 2.40, отверстие 6.30; гайка снаружи."
+jack_hole_diameter_coupon,coupon,60.0,24.0,1.6,2147.78,front_down,"1/2/3 точки: отверстия 6.1, 6.3, 6.5"
+hold_switch_coupon,coupon,34.0,20.0,4.4,1345.48,hold_outside_down,"Окно, две бобышки и пилоты: актуальные размеры hold из JSON; M2x4 изнутри."
+hold_window_gap_0p15,coupon,34.0,20.0,4.4,1348.5,hold_outside_down,Боковой зазор окна 0.15; применяется с основным колпачком.
+hold_window_gap_0p20,coupon,34.0,20.0,4.4,1345.48,hold_outside_down,Боковой зазор окна 0.20; применяется с основным колпачком.
+hold_window_gap_0p25,coupon,34.0,20.0,4.4,1342.42,hold_outside_down,Боковой зазор окна 0.25; применяется с основным колпачком.
+hold_window_gap_0p30,coupon,34.0,20.0,4.4,1339.32,hold_outside_down,Боковой зазор окна 0.30; применяется с основным колпачком.
+hold_mount_pitch_15p00,coupon,34.0,20.0,4.4,1343.13,hold_outside_down,Пробная компактная версия: шаг отверстий 15.00; габарит рычага проверить.
+hold_cap_lever_gap_m0p05,coupon,14.0,8.4,4.4,263.75,hold_outside_down,Посадка кармана рычага: -0.05 на сторону; основной hold_slider_cap +0.00.
+hold_cap_lever_gap_0p10,coupon,14.0,8.4,4.4,258.08,hold_outside_down,Посадка кармана рычага: +0.10 на сторону; основной hold_slider_cap +0.00.
+hold_cap_lever_gap_0p20,coupon,14.0,8.4,4.4,253.99,hold_outside_down,Посадка кармана рычага: +0.20 на сторону; основной hold_slider_cap +0.00.
+screw_boss_coupon,coupon,82.0,24.0,7.0,4832.86,front_down,"1..6 точек: M2 [1.6, 1.7, 1.8]; M2.5 [2.0, 2.1, 2.2]. Для подбора пилота использовать M2x3/4 и M2.5x3/4."
+mainboard_hole_template_coupon,coupon,69.6,89.599,2.0,1911.75,front_down,"Три M2-точки mainboard.mount_from_left_bottom от левого нижнего угла платы; отверстия оценочные, проверить до печати корпуса."
+stack_height_gauge,coupon,35.0,26.8,10.0,2208.0,bottom_outside_down,"Свободный просвет между губками 22 мм. Проверить сборку от самой нижней точки пайки до лица колеса, не давить на колесо и детали. Печатается боком без поддержек."
+closure_front_boss_coupon,coupon,20.0,20.0,10.4,1255.52,front_down,"Передний пробник стыка: тот же пилот и глубина, короткая стойка для проверки M2.5x8."
+closure_rear_plate_coupon,coupon,20.0,20.0,2.0,780.81,rear_down,Задняя пластина стыка. Соединить с closure_front_boss_coupon винтом M2.5x8; затягивать до контакта опор.
+tolerance_frame_coupon,coupon,76.0,20.0,3.0,3701.82,front_down,"1..4 точек: зазор на сторону [0.15, 0.2, 0.25, 0.3]; использовать tolerance_key, без масштабирования."
+tolerance_key,coupon,12.0,12.0,8.0,666.98,front_down,Один ключ 8.00 x 8.00; последовательно примерить во все четыре окна.

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="2a4bae5d-a066-4eb4-899a-bd8a3f506999" name="IlyaBOT@DESKTOP-RAOG22F 2026-11-02 23:24:05" runUser="DESKTOP-RAOG22F\IlyaBOT" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T23:24:05.9606787+03:00" queuing="2026-11-02T23:24:05.9606791+03:00" start="2026-11-02T23:24:02.4368972+03:00" finish="2026-11-02T23:24:05.9656506+03:00" />
+  <TestSettings name="default" id="f1b7d9bb-9ec6-4b28-8feb-71d4a7ebc70f">
+    <Deployment runDeploymentRoot="IlyaBOT_DESKTOP-RAOG22F_2026-11-02_23_24_05" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="c8d39087-3ea0-433a-a143-fea67171810c" testId="64fd8bae-de67-eade-1581-e08a13cfe077" testName="MonoPod.Desktop.Tests.UiThemeRegressionTests.DbGridIsVirtualAndFiltersLocallyAndRefreshesOncePerBatch" computerName="DESKTOP-RAOG22F" duration="00:00:01.9763985" startTime="2026-11-02T23:24:05.8805436+03:00" endTime="2026-11-02T23:24:05.8805611+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8d39087-3ea0-433a-a143-fea67171810c" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="MonoPod.Desktop.Tests.UiThemeRegressionTests.DbGridIsVirtualAndFiltersLocallyAndRefreshesOncePerBatch" storage="i:\diy_ipod_mono\monopod_desktop\monopod.desktop.tests\bin\release\net8.0-windows\monopod.desktop.tests.dll" id="64fd8bae-de67-eade-1581-e08a13cfe077">
+      <Execution id="c8d39087-3ea0-433a-a143-fea67171810c" />
+      <TestMethod codeBase="I:\DIY_iPod_Mono\MonoPod_Desktop\MonoPod.Desktop.Tests\bin\Release\net8.0-windows\MonoPod.Desktop.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="MonoPod.Desktop.Tests.UiThemeRegressionTests" name="DbGridIsVirtualAndFiltersLocallyAndRefreshesOncePerBatch" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="64fd8bae-de67-eade-1581-e08a13cfe077" executionId="c8d39087-3ea0-433a-a143-fea67171810c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Список результатов" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Все загруженные результаты" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 8.0.18)&#xD;
+[xUnit.net 00:00:00.81]   Discovering: MonoPod.Desktop.Tests&#xD;
+[xUnit.net 00:00:00.88]   Discovered:  MonoPod.Desktop.Tests&#xD;
+[xUnit.net 00:00:00.89]   Starting:    MonoPod.Desktop.Tests&#xD;
+[xUnit.net 00:00:02.91]   Finished:    MonoPod.Desktop.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
