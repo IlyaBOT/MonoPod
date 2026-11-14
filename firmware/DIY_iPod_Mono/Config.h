@@ -86,6 +86,7 @@ constexpr uint8_t PIN_KEY_PREVIOUS = 13;
 constexpr uint8_t PIN_KEY_NEXT = 14;
 constexpr uint8_t PIN_KEY_PLAY = 27;
 constexpr uint8_t PIN_KEY_SELECT = 32;
+constexpr uint8_t ENCODER_A = 15, ENCODER_B = 40; // disabled in Rev A (developer-only)
 #else
 // Original ESP32-WROVER prototype wiring (unchanged).
 constexpr uint8_t PIN_SPI_SCK  = 18;

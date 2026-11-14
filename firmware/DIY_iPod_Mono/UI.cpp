@@ -12,6 +12,7 @@
 #include "Settings.h"
 #include "ClockService.h"
 #include "Input.h"
+#include "DevConsole.h"
 #include "Feedback.h"
 #include "SyncMode.h"
 #include "UsbSync.h"
@@ -448,7 +449,7 @@ void PlayerUI::event(Key key){
     return;
   }
   if(key==Key::HoldChanged){dirty=true;return;}
-  if(input.held())return;
+  if(input.held() && !devConsole.hardwareDisabled())return;
   if(page==Page::WiFiPassword){passwordEvent(key);return;}
 #if FEATURE_BLUETOOTH
   if(page==Page::BluetoothPin||page==Page::BluetoothPairConfirm||page==Page::BluetoothDelete){bluetoothEvent(key);return;}
@@ -537,7 +538,7 @@ void PlayerUI::paint(){
     dirty=false;lastRender=millis();return;
   }
   display.clear();
-  display.header(title(),input.held(),player.active()&&!player.paused(),wifiNetworks.connected());
+  display.header(title(),input.held() && !devConsole.hardwareDisabled(),player.active()&&!player.paused(),wifiNetworks.connected());
   if(page==Page::WiFiPassword){paintKeyboard();}
 #if FEATURE_BLUETOOTH
   else if(page==Page::BluetoothPin || page==Page::BluetoothPairConfirm || page==Page::BluetoothDelete){paintBluetoothDialog();}
@@ -614,7 +615,7 @@ void PlayerUI::paint(){
     display.footer("MENU: Back");
   }else if(page==Page::Clock){display.clock(clockService.dateTime());display.footer("Set via Wi-Fi Sync");}
   else if(page==Page::About){
-    display.smallText(7,27,"MonoPod v0.8.5",display.foreground(),display.background());
+    display.smallText(7,27,"MonoPod v0.8.7",display.foreground(),display.background());
     display.smallText(7,44,(MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3 N16R8":"ESP32-WROVER"),display.foreground(),display.background());
     display.smallText(7,61,"160x128 UI",display.foreground(),display.background());
     display.smallText(7,78,"Tracks: "+String(media.size()),display.foreground(),display.background());

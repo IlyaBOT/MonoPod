@@ -29,6 +29,17 @@ void InputManager::begin() {
   for(int i=0;i<Config::WHEEL_COUNT;i++)base[i]=(uint32_t)(accum[i]/32ULL);
 #endif
 }
+void InputManager::resetState(){
+  keyStable=keyLast=Key::None;
+  changed=pressed=lastRepeat=millis();
+  selectLongSent=false;
+  wheelTouch=false;angleDelta=0;
+#if !WOKWI_SIMULATION
+  hold=(digitalRead(Config::PIN_HOLD)==LOW);
+#else
+  hold=false;
+#endif
+}
 Key InputManager::readButtons() {
 #if WOKWI_SIMULATION
   if(!digitalRead(Config::PIN_KEY_MENU))return Key::Menu;

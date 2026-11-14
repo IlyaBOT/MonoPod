@@ -1,6 +1,6 @@
-# MonoPod v0.8.6 — PWM backlight and explicit USB/Wi-Fi Sync Mode
+# MonoPod v0.8.7 — UART development console, PWM backlight, explicit USB/Wi-Fi Sync Mode
 
-**MonoPod v0.8.6** uses a **shared, exclusive Sync Mode** for its custom USB CDC protocol and Wi-Fi/HTTP transfer via MonoPod Studio. An ordinary USB connection or Wi-Fi association no longer causes a Sync transition. It does **not** yet emulate a genuine iPod for Apple iTunes.
+**MonoPod v0.8.7** uses a **shared, exclusive Sync Mode** for its custom USB CDC protocol and Wi-Fi/HTTP transfer via MonoPod Studio. An ordinary USB connection or Wi-Fi association no longer causes a Sync transition. It does **not** yet emulate a genuine iPod for Apple iTunes.
 
 - Firmware: `DIY_iPod_Mono/DIY_iPod_Mono.ino` (ESP32-S3 N16R8 primary; ESP32 original alternate)
 - USB MonoPod Studio sync: `Studio/usb_sync.py`, native S3 USB CDC; see `docs/MonoPod_Sync_Mode_v0.8.5_RU.md`.
@@ -24,3 +24,7 @@ ESP32-S3 N16R8, ST7735S 160×128, microSD FAT32, PCM5102A, TDA1308 (needs verifi
 **Battery safety**: TP4056 has no integrated power-path controller. Charge with player power off in this breadboard configuration. Do not backfeed 3V3 with the DevKit USB supply; verify power isolation before connection.
 
 For older functions see historical `CHANGELOG_*` and `docs/MonoPod_Design_Document_v0.8.3_RU.md`.
+
+## v0.8.7 development console
+
+While Click Wheel hardware is under construction, send `$DISABLE_HARDWARE_CONTROL=1` over **UART0 Serial0** (USB-UART Type-C, 115200, newline) to suspend hardware controls at runtime. Use `$MENU`, `$SELECT`, `$UP`, `$DOWN`, `$SCROLL=DOWN,5`, `$PREV`, `$NEXT`, `$PLAY`, `$STATUS`, `$BATTERY`, `$SD`, `$HELP`. Re-enable with `$DISABLE_HARDWARE_CONTROL=0`. The **native USB CDC is reserved for MPOD1** and must not receive these console commands. Full guide: `docs/MonoPod_UART_Development_Console_v0.8.7_RU.md`.

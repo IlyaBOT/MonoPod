@@ -7,6 +7,7 @@
 #include "Settings.h"
 #include "Library.h"
 #include "Input.h"
+#include "DevConsole.h"
 #include "Display.h"
 #include "Backlight.h"
 #include "AudioEngine.h"
@@ -28,7 +29,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.8.5 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.8.7 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -61,6 +62,7 @@ void setup(){
   randomSeed(esp_random());
   ui.begin();
   if(!media.sdOK())ui.notify("No microSD card");
+  devConsole.begin();
   MONOPOD_LOG.println("Ready. Use resistor-ladder keys or touch wheel.");
 }
 void loop(){
@@ -68,8 +70,15 @@ void loop(){
 #if FEATURE_WIFI_SYNC
   wifiSync.loop();
 #endif
-  Key k=input.poll();
-  if(k!=Key::None)ui.event(k);
+  devConsole.loop();
+  // Runtime override: skip ALL hardware polling, including floating HOLD/ADC/touch.
+  // No compile-time define or reboot required.
+  if(!devConsole.hardwareDisabled()){
+    Key k=input.poll();
+    if(k!=Key::None)ui.event(k);
+  }
+  Key virtualKey=devConsole.pollKey();
+  if(virtualKey!=Key::None)ui.event(virtualKey);
 #if FEATURE_BLUETOOTH
   // Remote keys are forwarded from the Bluetooth callback through a nonblocking queue.
   Key btRemote=BluetoothAudioOutput::pollRemote();

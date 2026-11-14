@@ -1,8 +1,0 @@
-MonoPod ClickWheel R1
-44.0mm round FR4 1.6mm, ONE copper side F.Cu, 35um.
-No B.Cu copper, pads, traces or planes. Green solder mask, white top silk, ENIG finish.
-10x PTH finished 1.0mm; 4x NPTH finished 2.2mm.
-0.30mm signal tracks,0.35mm power/GND,0.25mm clearance.
-No connector populated. Optional pin header inserted from underside, soldered on top.
-HOLD FOR RELEASE: verify actual user kit switch terminals and plastic/mechanical fit.
-Gerber files are manufacturing coordinates, not mirrored.

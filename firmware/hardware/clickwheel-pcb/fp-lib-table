@@ -1,1 +1,0 @@
-(fp_lib_table (version 7) (lib (name "ClickWheel") (type "KiCad") (uri "${KIPRJMOD}/libraries/ClickWheel.pretty") (options "") (descr "Portable project footprints")))

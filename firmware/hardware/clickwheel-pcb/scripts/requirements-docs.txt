@@ -1,4 +1,0 @@
-reportlab
-PyMuPDF
-Pillow
-pygerber==2.4.3

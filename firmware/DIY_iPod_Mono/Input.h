@@ -4,6 +4,7 @@
 class InputManager {
 public:
   void begin();
+  void resetState();
   Key poll();
   bool held() const {return hold;}
   uint32_t wheelRaw(uint8_t i) const {return raw[i];}

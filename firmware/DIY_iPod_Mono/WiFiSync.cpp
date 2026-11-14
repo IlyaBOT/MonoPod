@@ -194,7 +194,7 @@ void WiFiSyncService::begin(){
   server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
   server.on("/api/theme",HTTP_POST,[this](){themeFinished();},[this](){themeUpload();});
   server.on("/api/info",HTTP_GET,[this](){
-    String body="{\"firmware\":\"MonoPod v0.8.5\",\"tracks\":"+String((unsigned)media.size())+
+    String body="{\"firmware\":\"MonoPod v0.8.7\",\"tracks\":"+String((unsigned)media.size())+
       ",\"sd_ready\":"+String(media.sdOK()?"true":"false")+
       ",\"sd_total_mb\":"+String((uint32_t)(media.totalBytes()/1024/1024))+
       ",\"sd_used_mb\":"+String((uint32_t)(media.usedBytes()/1024/1024))+
