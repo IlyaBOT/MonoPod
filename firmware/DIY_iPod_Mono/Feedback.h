@@ -9,6 +9,9 @@ public:
   void begin();
   void loop();
   void quiet();
+  void setRuntimeMuted(bool muted);
+  bool runtimeMuted() const {return suppressed;}
+  uint32_t eventCount() const {return fired;}
   void fire(FeedbackEvent event);
   void setMode(ClickerMode route);
   ClickerMode nextMode(ClickerMode current) const;
@@ -17,6 +20,8 @@ public:
 private:
   ClickerMode selected=ClickerMode::Off;
   bool localReady=false;
+  bool suppressed=false;
+  uint32_t fired=0;
   bool piezoPlaying=false;
   bool secondPulsePending=false;
   uint16_t secondPulseHz=0;

@@ -29,7 +29,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.8.7 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.8.8 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -45,8 +45,9 @@ void setup(){
   // Each SPI peripheral MUST have its own CS; both high when idle.
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
+  const bool sdMounted=media.begin(); // IMPORTANT: initialize SD SPI mode BEFORE first TFT transaction
   display.begin();
-  if(!media.begin())MONOPOD_LOG.println("SD: "+media.lastError());
+  if(!sdMounted)MONOPOD_LOG.println("SD: "+media.lastError());
   else {MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
     display.reloadTheme(); // load optional bitmap theme from microSD
   }

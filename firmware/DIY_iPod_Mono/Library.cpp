@@ -31,11 +31,27 @@ bool MediaLibrary::isAudio(const String &name) {
 }
 String MediaLibrary::parent(const String &p) {int at=p.lastIndexOf('/');return at>0 ? p.substring(0,at) : String("/");}
 bool MediaLibrary::begin() {
+  if(mounted)eject();
+  // SD must enter SPI mode BEFORE the TFT communicates on their shared bus.
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
-  mounted=SD.begin(Config::PIN_SD_CS,SPI,Config::SPI_SD_HZ);
-  if(!mounted) {error="microSD mount failed";return false;}
-  rescan();return true;
+  activeSpiHz=0;
+  const uint32_t rates[]={4000000,1000000,400000};
+  for(const uint32_t hz:rates){
+    digitalWrite(Config::PIN_TFT_CS,HIGH);
+    MONOPOD_LOG.printf("SD: mount SPI %lu Hz...\n",(unsigned long)hz);
+    mounted=SD.begin(Config::PIN_SD_CS,SPI,hz);
+    if(mounted){
+      activeSpiHz=hz;
+      MONOPOD_LOG.printf("SD: mounted type=%u size=%llu B\n",(unsigned)SD.cardType(),
+        (unsigned long long)SD.cardSize());
+      rescan();return true;
+    }
+    SD.end();
+    delay(30);
+  }
+  error="microSD mount failed (SPI 4M/1M/400k; inspect MISO, CS, power, filesystem)";
+  return false;
 }
 void MediaLibrary::rescan() {
   tracks.clear();if(!mounted)return;
@@ -168,6 +184,7 @@ void MediaLibrary::readPlaylistNames(std::vector<String>& out)const {
 void MediaLibrary::eject(){
   tracks.clear();
   if(mounted){SD.end();mounted=false;}
+  activeSpiHz=0;
   error="Card safely ejected";
 }
 bool MediaLibrary::formatCard(){

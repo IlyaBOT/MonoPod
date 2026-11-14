@@ -163,7 +163,11 @@ void PlayerUI::build(){
 #endif
   case Page::Storage:
     add(media.sdOK()?"Eject Card":"Mount Card",0,false);
+#if FEATURE_SD_FORMAT
     add("Format Card",1,false);
+#else
+    add("Format unavailable",1,false);
+#endif
     add("Rescan Music",2,false);break;
   default:break;
   }
@@ -273,12 +277,21 @@ void PlayerUI::open(){
     if(selected==0){
       if(media.sdOK()){player.stop();if(wifiSync.active())wifiSync.end();media.eject();showMessage("Safe to remove");}
       else {if(media.remount())showMessage("Card mounted");else showMessage(media.lastError());}
-    }else if(selected==1)navigate(Page::StorageFormat1);
+    }else if(selected==1){
+#if FEATURE_SD_FORMAT
+      navigate(Page::StorageFormat1);
+#else
+      showMessage("Format disabled in firmware");
+#endif
+    }
     else if(selected==2){player.stop();media.rescan();showMessage("Library updated");}
     build();dirty=true;return;
   }
   if(page==Page::StorageFormat1){navigate(Page::StorageFormat2);return;}
   if(page==Page::StorageFormat2){
+#if !FEATURE_SD_FORMAT
+    showMessage("SD format disabled");back();back();return;
+#endif
     player.stop();
     if(wifiSync.active())wifiSync.end();
     if(media.formatCard())showMessage("Format complete");

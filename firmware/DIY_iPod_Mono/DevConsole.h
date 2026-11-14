@@ -10,10 +10,11 @@ public:
   bool hardwareDisabled() const {return disabled;}
 private:
   static constexpr size_t CONSOLE_LINE_CAPACITY = 95;
-  char line[LINE_MAX+1]={};
+  char line[CONSOLE_LINE_CAPACITY+1]={};
   uint8_t length=0;
   bool overflow=false;
   bool disabled=false;  // runtime-only; resets to false after reboot
+  bool clickerMuteRequested=false;
   Key queued=Key::None;
   uint8_t repeats=0;
   uint32_t lastKeyAt=0;

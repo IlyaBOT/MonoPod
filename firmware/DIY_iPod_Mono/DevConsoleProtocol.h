@@ -5,13 +5,14 @@
 #include <string.h>
 
 namespace DevConsoleProtocol {
-enum class Type : uint8_t { Invalid, SetHardwareDisabled, Key, Scroll, Help, Status, Battery, Sd };
+enum class Type : uint8_t { Invalid, SetHardwareDisabled, Key, Scroll, Help, Status, Battery, Sd, SdRetry, ClickerMute, ClickerStatus };
 enum class Button : uint8_t { None, Up, Down, Menu, Select, SelectLong, Previous, Next, PlayPause };
 struct Command {
   Type type=Type::Invalid;
   Button button=Button::None;
   uint8_t count=0;
   bool disableHardware=false;
+  bool muteClicker=false;
 };
 inline Button buttonOf(const char* s) {
   if(!strcmp(s,"UP"))return Button::Up;
@@ -43,6 +44,11 @@ inline Command parse(const char* line) {
   if(!strcmp(body,"STATUS")){c.type=Type::Status;return c;}
   if(!strcmp(body,"BATTERY")){c.type=Type::Battery;return c;}
   if(!strcmp(body,"SD")){c.type=Type::Sd;return c;}
+  if(!strcmp(body,"SD_RETRY")){c.type=Type::SdRetry;return c;}
+  if(!strcmp(body,"CLICKER_STATUS")){c.type=Type::ClickerStatus;return c;}
+  if(!strcmp(body,"CLICKER_MUTE=1")||!strcmp(body,"CLICKER_MUTE=0")){
+    c.type=Type::ClickerMute;c.muteClicker=body[strlen(body)-1]=='1';return c;
+  }
   if(!strncmp(body,"KEY=",4))body+=4;
   // $SCROLL=UP,5 and $SCROLL=DOWN,5 are bounded, non-blocking key sequences.
   if(!strncmp(body,"SCROLL=",7)){

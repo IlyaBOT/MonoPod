@@ -55,14 +55,26 @@ void FeedbackController::begin(){
 }
 void FeedbackController::silencePiezo(){
 #if FEATURE_PIEZO
-  if(localReady)ledcWriteTone(Config::PIN_PIEZO,0);
+  if(localReady){
+    ledcWriteTone(Config::PIN_PIEZO,0);
+    ledcWrite(Config::PIN_PIEZO,0); // explicit zero duty on Arduino-ESP32 3.x
+  }
 #endif
   piezoPlaying=false;
   secondPulsePending=false;
 }
-void FeedbackController::quiet(){silencePiezo();}
-void FeedbackController::setMode(ClickerMode mode){
+void FeedbackController::quiet(){
   silencePiezo();
+#if FEATURE_AUDIO
+  player.stopHeadphoneClick();
+#endif
+}
+void FeedbackController::setRuntimeMuted(bool muted){
+  suppressed=muted;
+  if(muted)quiet();
+}
+void FeedbackController::setMode(ClickerMode mode){
+  quiet();
   if(!available(mode))mode=available(ClickerMode::Speaker)?ClickerMode::Speaker:
                                available(ClickerMode::Headphones)?ClickerMode::Headphones:
                                ClickerMode::Off;
@@ -115,8 +127,9 @@ void FeedbackController::localEffect(FeedbackEvent event,uint32_t now){
 #endif
 }
 void FeedbackController::fire(FeedbackEvent event){
-  if(syncMode.active())return;
+  if(syncMode.active() || suppressed)return;
   if(selected==ClickerMode::Off)return;
+  ++fired;
   uint32_t now=millis();
   if(event==FeedbackEvent::Scroll){
     if(lastScrollAt && now-lastScrollAt<Config::FEEDBACK_SCROLL_MIN_MS)return;

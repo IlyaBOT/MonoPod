@@ -6,6 +6,9 @@
 #include "Library.h"
 #include "SyncMode.h"
 #include "UI.h"
+#include "Feedback.h"
+#include "AudioEngine.h"
+#include "Settings.h"
 
 DevelopmentConsole devConsole;
 namespace {
@@ -40,7 +43,8 @@ void DevelopmentConsole::printHelp(){
   MONOPOD_LOG.println("[DEV] $MENU $SELECT $SELECT_LONG $UP $DOWN $PREV $NEXT $PLAY");
   MONOPOD_LOG.println("[DEV] $KEY=MENU|SELECT|SELECT_LONG|UP|DOWN|PREV|NEXT|PLAY_PAUSE");
   MONOPOD_LOG.println("[DEV] $SCROLL=UP,5 | $SCROLL=DOWN,5 (max 32)");
-  MONOPOD_LOG.println("[DEV] $STATUS $BATTERY $SD $HELP");
+  MONOPOD_LOG.println("[DEV] $STATUS $BATTERY $SD $SD_RETRY $HELP");
+  MONOPOD_LOG.println("[DEV] $CLICKER_MUTE=1|0 $CLICKER_STATUS");
   MONOPOD_LOG.println("[DEV] End commands with newline. No NVS persistence.");
 }
 void DevelopmentConsole::printStatus(){
@@ -55,19 +59,38 @@ void DevelopmentConsole::handle(const char* command){
   case Type::Status:printStatus();return;
   case Type::Battery:
 #if FEATURE_BATTERY_ADC
-    MONOPOD_LOG.printf("[DEV] BAT_ADC=%lu mV VBAT=%.3f V PERCENT=%d GPIO=%u\n",
+    MONOPOD_LOG.printf("[DEV] BAT_ADC=%lu mV RAW=%u VBAT=%.3f V PERCENT=%d GPIO=%u\n",
       (unsigned long)analogReadMilliVolts(Config::PIN_BATTERY_ADC),
+      (unsigned)analogRead(Config::PIN_BATTERY_ADC),
       (double)battery.voltage(),battery.level(),(unsigned)Config::PIN_BATTERY_ADC);
 #else
     MONOPOD_LOG.printf("[DEV] BATTERY_ADC=DISABLED PERCENT=%d\n",battery.level());
 #endif
     return;
   case Type::Sd:
-    MONOPOD_LOG.printf("[DEV] SD=%s TRACKS=%u ERROR=%s\n",
-      media.sdOK()?"OK":"MISSING",(unsigned)media.size(),media.lastError().c_str());
+    MONOPOD_LOG.printf("[DEV] SD=%s TRACKS=%u SPI_HZ=%lu TOTAL=%llu ERROR=%s\n",
+      media.sdOK()?"OK":"NOT_MOUNTED",(unsigned)media.size(),
+      (unsigned long)media.mountedFrequency(),(unsigned long long)media.totalBytes(),media.lastError().c_str());
+    return;
+  case Type::SdRetry:
+    if(syncMode.active() || player.active()){MONOPOD_LOG.println("[DEV] ERR SD_BUSY (stop playback/sync first)");return;}
+    MONOPOD_LOG.println("[DEV] SD: non-destructive remount attempt...");
+    if(media.begin()){MONOPOD_LOG.println("[DEV] SD MOUNT OK");ui.redraw();}
+    else MONOPOD_LOG.println("[DEV] SD MOUNT FAILED: "+media.lastError());
+    return;
+  case Type::ClickerStatus:
+    MONOPOD_LOG.printf("[DEV] CLICKER=%s ROUTE=%s EVENTS=%lu HW_CONTROL=%s\n",
+      feedback.runtimeMuted()?"MUTED":"ACTIVE",feedback.modeName(settings.data.clicker),
+      (unsigned long)feedback.eventCount(),disabled?"DISABLED":"ENABLED");
+    return;
+  case Type::ClickerMute:
+    clickerMuteRequested=c.muteClicker;
+    feedback.setRuntimeMuted(clickerMuteRequested || disabled);
+    MONOPOD_LOG.printf("[DEV] CLICKER=%s\n",feedback.runtimeMuted()?"MUTED":"ACTIVE");
     return;
   case Type::SetHardwareDisabled:
     disabled=c.disableHardware;
+    feedback.setRuntimeMuted(disabled || clickerMuteRequested);
     repeats=0;queued=Key::None;keySequenceStarted=false;
     input.resetState();
     ui.redraw();
@@ -100,7 +123,7 @@ void DevelopmentConsole::loop(){
     }
     if(byte<32||byte>126)continue; // ASCII command vocabulary only
     if(overflow)continue;
-    if(length>=LINE_MAX){length=0;overflow=true;continue;}
+    if(length>=CONSOLE_LINE_CAPACITY){length=0;overflow=true;continue;}
     line[length++]=(char)byte;
   }
 }

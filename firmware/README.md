@@ -28,3 +28,7 @@ For older functions see historical `CHANGELOG_*` and `docs/MonoPod_Design_Docume
 ## v0.8.7 development console
 
 While Click Wheel hardware is under construction, send `$DISABLE_HARDWARE_CONTROL=1` over **UART0 Serial0** (USB-UART Type-C, 115200, newline) to suspend hardware controls at runtime. Use `$MENU`, `$SELECT`, `$UP`, `$DOWN`, `$SCROLL=DOWN,5`, `$PREV`, `$NEXT`, `$PLAY`, `$STATUS`, `$BATTERY`, `$SD`, `$HELP`. Re-enable with `$DISABLE_HARDWARE_CONTROL=0`. The **native USB CDC is reserved for MPOD1** and must not receive these console commands. Full guide: `docs/MonoPod_UART_Development_Console_v0.8.7_RU.md`.
+
+## v0.8.8 (ESP32-S3 hardware troubleshooting)
+
+See `docs/MonoPod_v0.8.8_Hardware_Diagnostics_RU.md`. Runtime `$DISABLE_HARDWARE_CONTROL=1` now mutes active click outputs; new `$CLICKER_MUTE=1|0`, `$CLICKER_STATUS`, `$SD_RETRY`. SD is initialized before the display and retried at lower SPI speeds. No automatic formatting. ADC GPIO4 now reports `RAW` as well as calibrated millivolts. For 100k/100k battery divider add **100nF GPIO4 to ground** near MCU.

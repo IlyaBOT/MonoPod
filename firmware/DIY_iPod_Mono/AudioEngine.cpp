@@ -35,6 +35,9 @@ void AudioEngine::headphoneClick(uint16_t frequency,uint8_t durationMs){
   (void)frequency; (void)durationMs;
 #endif
 }
+void AudioEngine::stopHeadphoneClick(){
+  if(clickMix)clickMix->cancelClick();
+}
 void AudioEngine::setVolume(uint8_t v){
   float gain=(constrain((int)v,0,(int)Config::MAX_VOLUME)/100.0f);
   // Square-law attenuation; safety cap applied via Config::MAX_VOLUME.

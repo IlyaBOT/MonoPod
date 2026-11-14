@@ -3,6 +3,7 @@
 BatteryMonitor battery;
 void BatteryMonitor::begin(){
 #if FEATURE_BATTERY_ADC
+  pinMode(Config::PIN_BATTERY_ADC,INPUT);
   analogReadResolution(12);
   analogSetPinAttenuation(Config::PIN_BATTERY_ADC, ADC_11db);
   sample();
@@ -18,8 +19,15 @@ void BatteryMonitor::loop(){
 void BatteryMonitor::sample(){
 #if FEATURE_BATTERY_ADC
   sampledAt=millis();
+  // High-impedance 100k/100k divider: 100nF GPIO4->GND is required for ADC sample/hold.
+  // Reapply channel attenuation and discard an initial conversion. No fabricated scale factor.
+  analogSetPinAttenuation(Config::PIN_BATTERY_ADC, ADC_11db);
+  (void)analogReadMilliVolts(Config::PIN_BATTERY_ADC);
   uint32_t total=0;
-  for(int i=0;i<12;++i)total+=analogReadMilliVolts(Config::PIN_BATTERY_ADC);
+  for(int i=0;i<12;++i){
+    total+=analogReadMilliVolts(Config::PIN_BATTERY_ADC);
+    delayMicroseconds(120);
+  }
   // ADC input = Vbat * 100k/(100k+100k).  Real resistor tolerances need calibration.
   volts=(total/12.0f)*2.0f/1000.0f;
   if(volts<2.90f || volts>4.30f){percent=-1;return;}

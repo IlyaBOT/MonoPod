@@ -11,6 +11,7 @@ public:
   bool begin();
   void setVolume(uint8_t v);
   void headphoneClick(uint16_t freq,uint8_t durationMs);
+  void stopHeadphoneClick();
   bool play(size_t libraryIndex,const std::vector<size_t>& context);
   void stop();
   void pauseToggle();

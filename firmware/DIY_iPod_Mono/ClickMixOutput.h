@@ -15,7 +15,8 @@ public:
   bool ConsumeSample(int16_t sample[2]) override;
   bool stop() override; // keep transport alive across tracks
   void setTarget(AudioOutput *target);
-  void trigger(uint16_t frequencyHz,uint8_t durationMs);
+  void trigger(uint16_t hz,uint8_t ms);
+  void cancelClick();
   void serviceIdle(uint16_t maxFrames=128);
 private:
   AudioOutput *target_;

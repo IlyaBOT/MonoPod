@@ -29,6 +29,9 @@ void ClickMixOutput::trigger(uint16_t hz,uint8_t ms) {
   phase_=0;
   increment_=(uint32_t)(((uint64_t)hz<<32)/(uint32_t)sampleRate_);
 }
+void ClickMixOutput::cancelClick(){
+  remaining_=0; duration_=0; phase_=0;
+}
 int16_t ClickMixOutput::currentClick() const {
   if(!remaining_ || !duration_)return 0;
   // Triangle-like click envelope: small, short, and free of large DC offsets.
