@@ -7,7 +7,7 @@ def test_s3_button_pullup_and_original_branch_preserved():
     assert c.count('BUTTON_ADC_INTERNAL_PULLUP = false;')==2
     assert 'INPUT_PULLUP' not in i
     assert 'pinMode(Config::PIN_BUTTON_ADC, INPUT);' in i
-    assert 'BUTTON_ADC_WINDOWS_MV' in i
+    assert 'buttonSupplyCompensation.observe(readingMv)' in i
 
 def test_background_audio_status_and_home_menu():
     ino=(P/'DIY_iPod_Mono.ino').read_text()

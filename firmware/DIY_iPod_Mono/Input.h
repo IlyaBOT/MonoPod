@@ -2,6 +2,7 @@
 #include "Types.h"
 #include "Config.h"
 #include "WheelDetents.h"
+#include "ButtonAdcCompensation.h"
 class InputManager {
 public:
   void begin();
@@ -12,6 +13,9 @@ public:
   bool lastEventFromWheel() const {return eventFromWheel;}
 private:
   bool hold=false;
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+  ButtonAdcCompensation::Ladder buttonSupplyCompensation;
+#endif
   Key keyStable=Key::None,keyLast=Key::None;
   uint32_t changed=0,pressed=0,lastRepeat=0,lastWheel=0;
   bool selectLongSent=false;

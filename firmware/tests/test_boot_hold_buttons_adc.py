@@ -30,7 +30,8 @@ def test_adc_decoder_stays_active_but_debug_streaming_is_gone():
     inp=(R/"Input.cpp").read_text()
     dbg=(R/"DevConsole.cpp").read_text()
     ino=(R/"DIY_iPod_Mono.ino").read_text()
-    assert "return decodeButtonMillivolts(buttonAdcMillivolts());" in inp
+    assert "return decodeButtonMillivolts(readingMv);" in inp
+    assert "buttonSupplyCompensation.observe(readingMv);" in inp
     assert "input.buttonAdcMillivolts()" not in dbg
     assert "$BTNS_ADC" not in dbg
     assert "$BUTTON_ADC" not in dbg

@@ -5,6 +5,9 @@
 InputManager input;
 void InputManager::begin() {
   pinMode(Config::PIN_BUTTON_ADC, INPUT);
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+  buttonSupplyCompensation.reset();
+#endif
   analogReadResolution(12);
   analogSetPinAttenuation(Config::PIN_BUTTON_ADC,ADC_11db);
 
@@ -32,14 +35,15 @@ uint16_t InputManager::buttonAdcMillivolts() {
 }
 Key InputManager::decodeButtonMillivolts(uint16_t mV) const {
 #if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
-  {
-    // External 20k GPIO9 pull-up. Reject inter-key gaps and idle voltage.
-    const Key keys[5] = {Key::Menu, Key::Previous, Key::Next, Key::PlayPause, Key::Select};
-    for(uint8_t i=0;i<5;i++){
-      if(mV>=Config::BUTTON_ADC_WINDOWS_MV[i][0] &&
-         mV<=Config::BUTTON_ADC_WINDOWS_MV[i][1])return keys[i];
-    }
-    return Key::None;
+  // Compare measured fraction of GPIO9 idle voltage (3V3 rail), rather than
+  // fixed mV thresholds. ADC's own internal reference is not rail-ratiometric.
+  switch (buttonSupplyCompensation.decode(mV)) {
+    case ButtonAdcCompensation::Button::Menu: return Key::Menu;
+    case ButtonAdcCompensation::Button::Previous: return Key::Previous;
+    case ButtonAdcCompensation::Button::Next: return Key::Next;
+    case ButtonAdcCompensation::Button::PlayPause: return Key::PlayPause;
+    case ButtonAdcCompensation::Button::Select: return Key::Select;
+    default: return Key::None;
   }
 #endif
   if(mV<200)return Key::Menu;
@@ -50,7 +54,12 @@ Key InputManager::decodeButtonMillivolts(uint16_t mV) const {
   return Key::None;
 }
 Key InputManager::readButtons() {
-  return decodeButtonMillivolts(buttonAdcMillivolts());
+  const uint16_t readingMv = buttonAdcMillivolts();
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+  // Update only from released GPIO9. While held, reuse the latest estimate.
+  buttonSupplyCompensation.observe(readingMv);
+#endif
+  return decodeButtonMillivolts(readingMv);
 }
 void InputManager::touchResetTracking() {
   wheelTouch=false;

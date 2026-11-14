@@ -72,12 +72,12 @@ constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, external 20k pull-up to 3V3
 // MENU=0, PREV=5.1k, NEXT=10k, PLAY=20k, SELECT=39.9k.
 // Required: one physical 20k resistor between GPIO9 and 3V3.
 constexpr bool BUTTON_ADC_INTERNAL_PULLUP = false;
-// Measured GPIO9 levels with external 20k pull-up (mV): MENU=0, PREV=654..657, NEXT=1064..1085, PLAY=1604..1702, SELECT=2194..2217.
-// Idle/transient 3148 mV is NOT a PLAY press.
-// Windows allow analog tolerances and preserve gaps between keys.
-constexpr uint16_t BUTTON_ADC_WINDOWS_MV[5][2] = {
-  { 0, 120 }, { 530, 800 }, { 940, 1220 }, { 1480, 1840 }, { 2040, 2410 }
-};
+// GPIO9 button levels scale with the 3V3 rail. Fixed mV windows are invalid
+// with an unregulated battery prototype (3V3 was measured at only 2.9V).
+// ButtonAdcCompensation.h decodes the voltage as permille of GPIO9's RELEASED
+// level, automatically relearned whenever no button is pressed. No extra wire.
+// This cannot compensate sudden supply changes WHILE a button is held, nor
+// protect the ESP32-S3 when VDD falls below the rated 3.0V minimum.
 constexpr uint8_t PIN_BATTERY_ADC = 4; // ADC1, 100k/100k divider
 constexpr uint8_t PIN_HOLD = 21; // external 10k pull-up
 constexpr uint8_t WHEEL_PINS[6] = {1,2,5,6,7,8}; // all actual S3 touch channels
@@ -121,14 +121,14 @@ constexpr uint8_t PIN_HAPTIC_SCL = 33;
 // Debounce / release guard apply to both ESP32 and ESP32-S3.
 constexpr uint16_t BUTTON_ADC_DEBOUNCE_MS = 60;
 constexpr uint16_t BUTTON_ADC_RELEASE_GUARD_MS = 100;
-constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
-constexpr uint16_t PIEZO_ACTION_HZ = 2700;
+constexpr uint16_t PIEZO_SCROLL_HZ = 100;
+constexpr uint16_t PIEZO_ACTION_HZ = 868;
 // Single SD SPI frequency, no diagnostic probing or speed fallback.
 // Conservative starting speed for breadboard wiring; tune after real testing.
 constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable
 // ST7735S was at 16MHz. 20/26.67MHz are optional OVERCLOCK values,
 // not guaranteed by ST7735S datasheet. Keep stable default first.
-constexpr uint32_t SPI_TFT_HZ = 16000000; // experimentally test 20000000 later
+constexpr uint32_t SPI_TFT_HZ = 20000000; // experimentally test 20000000 later
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.
@@ -140,20 +140,20 @@ constexpr bool TFT_BL_ACTIVE_LOW = false; // direct GPIO15 LED/BL, active-high; 
 constexpr bool TFT_BL_BRIGHTNESS_CONTROL = false;
 constexpr uint32_t TFT_BL_PWM_HZ = 16000;
 constexpr uint8_t TFT_BL_PWM_BITS = 10;
-constexpr uint16_t TFT_BL_FADE_ON_MS = 250;
-// Calibration from prototype measurement: Vbat=4.23 V when GPIO4=2.10 V.
+constexpr uint16_t TFT_BL_FADE_ON_MS = 350;
+// Calibration from prototype measurement: Vbat=4.22 V when GPIO4=2.10 V.
 // Applied to analogReadMilliVolts() output, not raw 12-bit ADC counts.
 // Effective conversion: Vbat = ADC_mV * BATTERY_ADC_RATIO / 1000 + BATTERY_ADC_OFFSET_V.
-constexpr float BATTERY_ADC_RATIO = 4.23f / 2.10f;
+constexpr float BATTERY_ADC_RATIO = 4.22f / 2.10f;
 constexpr float BATTERY_ADC_OFFSET_V = 0.0f;
-constexpr float BATTERY_FULL_VOLTAGE = 4.23f;
+constexpr float BATTERY_FULL_VOLTAGE = 4.22f;
 // Voltage-only charge indication (NOT proof of current flowing into the cell).
 // Starts STRICTLY above 2.15 V at GPIO4, clears below 2.13 V (20 mV hysteresis).
 // Use a TP4056 CHRG/STAT signal for reliable charging detection on future PCB.
 constexpr uint16_t BATTERY_CHARGE_ADC_ON_MV = 2150;
 constexpr uint16_t BATTERY_CHARGE_ADC_OFF_MV = 2130;
 constexpr uint32_t BATTERY_SAMPLE_INTERVAL_MS = 60000UL;
-constexpr uint16_t TFT_BL_FADE_OFF_MS = 400;
+constexpr uint16_t TFT_BL_FADE_OFF_MS = 500;
 // Minimum visible splash duration; SD library scan and STA connection overlap it.
 constexpr uint32_t BOOT_LOGO_MIN_MS = 1850UL;
 constexpr uint8_t MAX_VOLUME = 100; // clamp 0..100, no wraparound
@@ -167,7 +167,7 @@ constexpr char WIFI_AP_PASS[] = "MonoPod2026!"; // CHANGE before enabling Wi-Fi 
 constexpr char BT_TARGET_NAME[] = ""; // only built for original ESP32
 #endif
 constexpr uint16_t SCREEN_W = 160, SCREEN_H = 128;
-constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
+constexpr char TIMEZONE_TZ[] = "UTC-3"; // Moscow UTC+03:00; POSIX uses the opposite offset sign. Saved NVS timezone takes precedence.
 }
 // Real prototype ADC, six capacitive wheel electrodes and Wi-Fi Sync.
 #ifndef FEATURE_BATTERY_ADC
