@@ -34,7 +34,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC reserved for MPOD1 v4
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.10.6.3 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.10.6.6 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32)
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -43,7 +43,7 @@ void setup(){
   MONOPOD_LOG.printf("Board profile=%s | Bluetooth Classic=%s\n",
     MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3 N16R8":"ESP32-WROVER",FEATURE_BLUETOOTH?"enabled":"compiled out");
 #endif
-  MONOPOD_LOG.println("Build: Boot-HOLD-ADC-BTNS fixes");
+  MONOPOD_LOG.println("Build: wheel interpolation / adaptive detents / precise seek / reliable clicks");
   settings.begin();
   backlight.begin(settings.data.backlightBrightness);
   battery.begin();
@@ -126,7 +126,7 @@ void loop(){
   // No compile-time define or reboot required.
   if(!devConsole.hardwareDisabled()){
     Key k=input.poll();
-    if(k!=Key::None){devConsole.physicalKey(k);ui.event(k);}
+    if(k!=Key::None)ui.event(k,input.lastEventFromWheel());
   }
   Key virtualKey=devConsole.pollKey();
   if(virtualKey!=Key::None)ui.event(virtualKey);

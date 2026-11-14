@@ -3,7 +3,7 @@
 #include <vector>
 class PlayerUI {
 public:
-  void begin();void event(Key key);void loop();
+  void begin();void event(Key key,bool physicalWheel=false);void loop();
   void redraw(){dirty=true;}
   void notify(const String& text);
 private:
@@ -21,10 +21,12 @@ private:
   enum class NowOverlay : uint8_t {Progress, Volume, Seek};
   NowOverlay nowOverlay=NowOverlay::Progress;
   uint32_t overlayUpdatedAt=0,lastWheelTurnAt=0;
+  uint8_t wheelBurst=0;int8_t wheelDirection=0;
+  uint32_t seekPreviewSeconds=0,lastSeekCommittedSeconds=UINT32_MAX;
   uint32_t lastNowTime=UINT32_MAX;
   int lastNowTrack=-1;
   int lastHiddenTrack=-1;
-  int seekPreview=-1,lastSeekCommitted=-1;
+  int seekPreview=-1;
   bool dirty=true,blank=false,brightnessEditing=false;
   uint32_t selectedSince=0,lastMarqueeFrame=UINT32_MAX,lastHiddenRefresh=0;
   uint32_t nowTitleSince=0,lastTitleFrame=UINT32_MAX;
@@ -52,7 +54,7 @@ private:
   bool btYes=false;
 #endif
   void build();int listItemCount() const;void navigate(Page next);void back();void open();void paint();
-  void adjust(int delta);bool listPage()const;String title()const;
+  void adjust(int delta,bool physicalWheel=false);bool listPage()const;String title()const;
   void chooseTrack(size_t idx,const std::vector<size_t>& q);
   void updateNowPlayingOverlay();
   void passwordEvent(Key key);void paintKeyboard();

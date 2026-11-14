@@ -6,6 +6,7 @@
 #include "IpodIdentity.h"
 #include "WiFiSync.h"
 #include "ClockService.h"
+#include "ClockConfigValidation.h"
 #include <errno.h>
 UsbSyncService usbSync;
 #if FEATURE_USB_SYNC
@@ -24,12 +25,25 @@ void UsbSyncService::command(const String& cmd){
  if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
  if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
  if(cmd.startsWith("MPOD1 X CLOCK ")){
-  int p=14;String epochText=token(cmd,p),tzText=token(cmd,p),ntpText=token(cmd,p);
+  int p=14;String epochText=token(cmd,p),tzText=token(cmd,p),ntpText=token(cmd,p),serverText=token(cmd,p);
   uint32_t epoch=0,enabled=0;
-  if(!uintArg(epochText,epoch)||epoch<1600000000UL||tzText.length()>126 ||
+  if(!uintArg(epochText,epoch)||epoch<1600000000UL||epoch>4102444800UL||tzText.length()>126 ||
      !uintArg(ntpText,enabled)||enabled>1){reply("ERR CLOCK_ARGUMENTS");return;}
   String tz=SyncFiles::fromHex(tzText);
-  if(!clockService.setTimezone(tz)||!clockService.setNtpEnabled(enabled==1)){
+  String ntpServer=clockService.ntpServer();
+  if(serverText.length()){
+    ntpServer="";
+    if(!(serverText.length()%2)&&serverText.length()<=506){
+      for(size_t i=0;i<serverText.length();i+=2){
+        auto digit=[](char c)->int {if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;if(c>='A'&&c<='F')return c-'A'+10;return -1;};
+        int hi=digit(serverText[i]),lo=digit(serverText[i+1]);
+        if(hi<0||lo<0||!(hi*16+lo)||hi*16+lo>127){ntpServer="";break;}
+        ntpServer+=(char)(hi*16+lo);
+      }
+    }
+  }
+  if(!ClockConfigValidation::timezone(tz.c_str())||!ClockConfigValidation::ntpServer(ntpServer.c_str())||
+     !clockService.setTimezone(tz)||!clockService.setNtpServer(ntpServer)||!clockService.setNtpEnabled(enabled==1)){
     reply("ERR CLOCK_TIMEZONE");return;
   }
   clockService.setUnix((time_t)epoch);

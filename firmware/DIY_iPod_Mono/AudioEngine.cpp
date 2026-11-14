@@ -2,6 +2,7 @@
 #include "Config.h"
 #include "Library.h"
 #include "Settings.h"
+#include <math.h>
 #include <AudioGeneratorMP3.h>
 #include <AudioGeneratorWAV.h>
 #if FEATURE_FLAC
@@ -40,8 +41,9 @@ void AudioEngine::stopHeadphoneClick(){
 }
 void AudioEngine::setVolume(uint8_t v){
   float gain=(constrain((int)v,0,(int)Config::MAX_VOLUME)/100.0f);
-  // Square-law attenuation; safety cap applied via Config::MAX_VOLUME.
-  gain=gain*gain;
+  // 1.5-power taper: 30% remains audible (older square-law mapped it
+  // to just 9% amplitude). 0 stays exactly silent; 100 stays unity gain.
+  gain=gain*sqrtf(gain);
   if(i2s)i2s->SetGain(gain);
 #if FEATURE_BLUETOOTH
   btOutput.SetGain(gain);
@@ -101,22 +103,32 @@ uint32_t AudioEngine::remainingSeconds() const {
   uint32_t elapsed=elapsedSeconds();
   return duration>elapsed?duration-elapsed:0;
 }
-bool AudioEngine::seekPercent(uint8_t pct){
+bool AudioEngine::seekSeconds(uint32_t seconds){
   if(!active() || !source || !decoder)return false;
-  pct=constrain((int)pct,0,99); // keep seek away from EOF
+  const uint32_t duration=durationSeconds();
+  if(duration==0)return false;
   String path=media.at((size_t)activeTrack).path;path.toLowerCase();
-  // Seeking arbitrary compressed frames requires frame sync; MPEG is experimental here.
   if(!path.endsWith(".mp3") && !path.endsWith(".wav"))return false;
-  uint32_t length=source->getSize();if(length<128)return false;
-  uint32_t pos=(uint32_t)(((uint64_t)length*pct)/100ULL);
-  // Retain AudioEngine queue; restart decoder then seek its file source.
-  int index=activeTrack;
+  const uint32_t length=source->getSize();if(length<128)return false;
+  seconds=min(seconds,duration-1); // avoid EOF and unexpected next-track
+  const uint32_t position=(uint32_t)((uint64_t)length*seconds/duration);
+  const int index=activeTrack;
+  const bool wasPaused=pausedState;
+  // Approximate offset for CBR MP3/WAV. VBR MP3 requires a frame/TOC index
+  // for sample-accurate seeking. Preserve pause and never under/overflow time.
   if(!startFile((size_t)index))return false;
-  bool ok=source->seek((int32_t)pos,SEEK_SET);
-  if(!ok){startFile((size_t)index);return false;}
-  uint32_t duration=durationSeconds();seekBaseSeconds=duration?(uint32_t)(((uint64_t)duration*pct)/100ULL):0;
-  playStarted=millis();pausedMs=0;pausedState=false;
+  if(!source->seek((int32_t)position,SEEK_SET)){
+    startFile((size_t)index);return false;
+  }
+  seekBaseSeconds=seconds;playStarted=millis();pausedMs=0;
+  pausedState=wasPaused;pauseStarted=playStarted;
   return true;
+}
+bool AudioEngine::seekPercent(uint8_t pct){
+  pct=(uint8_t)constrain((int)pct,0,99);
+  const uint32_t duration=durationSeconds();
+  if(duration==0)return false;
+  return seekSeconds((uint32_t)((uint64_t)duration*pct/100u));
 }
 uint8_t AudioEngine::approximateProgress() const {
   if(!source || !source->getSize())return 0;
@@ -167,7 +179,8 @@ bool AudioEngine::switchBluetooth(bool on){
   if(on){
     if(clickMix)clickMix->setTarget(&btOutput);
     sink=clickMix;
-    btOutput.SetGain((settings.data.volume/100.0f)*(settings.data.volume/100.0f));
+    const float g=(settings.data.volume/100.0f);
+    btOutput.SetGain(g*sqrtf(g));
     bluetoothOn=true;
   } else {
     if(clickMix)clickMix->setTarget(i2s);

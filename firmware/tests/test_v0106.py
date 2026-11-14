@@ -4,9 +4,9 @@ P=Path(__file__).resolve().parents[1]/'DIY_iPod_Mono'
 def test_s3_button_pullup_and_original_branch_preserved():
     c=(P/'Config.h').read_text()
     i=(P/'Input.cpp').read_text()
-    assert 'BUTTON_ADC_INTERNAL_PULLUP = true;' in c
-    assert 'BUTTON_ADC_INTERNAL_PULLUP = false;' in c
-    assert 'INPUT_PULLUP' in i and 'gpio_pullup_en' in i
+    assert c.count('BUTTON_ADC_INTERNAL_PULLUP = false;')==2
+    assert 'INPUT_PULLUP' not in i
+    assert 'pinMode(Config::PIN_BUTTON_ADC, INPUT);' in i
     assert 'BUTTON_ADC_WINDOWS_MV' in i
 
 def test_background_audio_status_and_home_menu():

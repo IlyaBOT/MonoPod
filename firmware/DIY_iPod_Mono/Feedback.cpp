@@ -105,7 +105,7 @@ void FeedbackController::loop(){
 void FeedbackController::localEffect(FeedbackEvent event,uint32_t now){
 #if FEATURE_PIEZO
   silencePiezo();
-  if(event==FeedbackEvent::Scroll)startTone(Config::PIEZO_SCROLL_HZ,1); // ~3 sharp cycles; a tap, not a tone
+  if(event==FeedbackEvent::Scroll)startTone(Config::PIEZO_SCROLL_HZ,3); // audible, brief mechanical tick
   else if(event==FeedbackEvent::Menu)startTone(2400,12);
   else if(event==FeedbackEvent::Select)startTone(Config::PIEZO_ACTION_HZ,17);
   else {
@@ -132,13 +132,8 @@ void FeedbackController::fire(FeedbackEvent event){
   // Physical MENU / SELECT / transport switches already provide tactile feedback.
   if(event!=FeedbackEvent::Scroll || selected==ClickerMode::Off)return;
   uint32_t now=millis();
-  if(event==FeedbackEvent::Scroll){
-    if(lastScrollAt && now-lastScrollAt<Config::FEEDBACK_SCROLL_MIN_MS)return;
-    lastScrollAt=now;
-  }else{
-    if(lastActionAt && now-lastActionAt<Config::FEEDBACK_ACTION_MIN_MS)return;
-    lastActionAt=now;
-  }
+  // No time-based click suppression: every accepted wheel detent has its
+  // own audible event, including slow one-track movements.
   ++fired;
   if(selected==ClickerMode::Speaker || selected==ClickerMode::Both) localEffect(event,now);
   if(selected==ClickerMode::Headphones || selected==ClickerMode::Both){

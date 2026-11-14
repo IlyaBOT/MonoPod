@@ -8,6 +8,7 @@
 #include "UI.h"
 #include "Settings.h"
 #include "ClockService.h"
+#include "ClockConfigValidation.h"
 #include <WiFi.h>
 WiFiSyncService wifiSync;
 #if FEATURE_WIFI_SYNC
@@ -15,14 +16,15 @@ namespace {
 bool number(const String& s,uint32_t& value,int base=10){if(s.isEmpty()||s.length()>10)return false;for(size_t i=0;i<s.length();i++)if(base==10?!isdigit((unsigned char)s[i]):!isxdigit((unsigned char)s[i]))return false;unsigned long long v=strtoull(s.c_str(),nullptr,base);if(v>0xffffffffULL)return false;value=v;return true;}
 }
 String WiFiSyncService::ip()const{return running?(usingSta?WiFi.localIP():WiFi.softAPIP()).toString():"Offline";}
-bool WiFiSyncService::busy()const{return uploadActive||SyncFiles::busy();}
-bool WiFiSyncService::allowed(){if(!SyncFiles::gate(SyncTransport::WiFi)){server.send(409,"text/plain",SyncFiles::error);return false;}return true;}
+bool WiFiSyncService::busy()const{return uploadActive||SyncFiles::busy()||wifiOta.busy();}
+bool WiFiSyncService::allowed(){if(wifiOta.busy()){server.send(409,"text/plain","OTA_ACTIVE");return false;}if(!SyncFiles::gate(SyncTransport::WiFi)){server.send(409,"text/plain",SyncFiles::error);return false;}return true;}
 void WiFiSyncService::result(bool ok){if(ok)server.send(200,"application/json","{\"ok\":true}");else{String e=SyncFiles::error;int code=e=="NOT_FOUND"?404:e=="SD_WRITE"||e=="SD_READ"?500:e=="NO_SPACE"?507:409;server.send(code,"text/plain",e);}}
 void WiFiSyncService::upload(){
  HTTPUpload& u=server.upload();
  if(u.status==UPLOAD_FILE_START){
   if(uploadActive){uploadError="Only one multipart file is allowed";SyncFiles::abort();return;}
   uploadActive=true;uploadOk=false;uploadError="";
+  if(wifiOta.busy()){uploadError="OTA_ACTIVE";return;}
   if(!SyncFiles::gate(SyncTransport::WiFi)){uploadError=SyncFiles::error;return;}
   bool theme=server.uri()=="/api/theme";
   String path=theme?"/MonoPod/theme.mpt":server.arg("path");uint32_t size=0,crc=0;
@@ -40,7 +42,49 @@ void WiFiSyncService::finished(){
  if(!ok)SyncFiles::abort();uploadActive=false;uploadOk=false;
  if(ok){server.send(200,"application/json","{\"ok\":true}");ui.redraw();}else server.send(422,"text/plain",uploadError.length()?uploadError:"NO_UPLOAD");
 }
+void WiFiSyncService::otaUpload(){
+ HTTPUpload& u=server.upload();
+ if(u.status==UPLOAD_FILE_START){
+  otaUploadSeen=true;otaUploadOk=false;
+  // Headers are required so multipart form-field order cannot bypass validation.
+  otaUploadOk=wifiOta.start(server.header("X-MonoPod-OTA-PIN"),
+    server.header("X-MonoPod-OTA-Size"),server.header("X-MonoPod-OTA-SHA256"),
+    uploadActive||SyncFiles::busy()||usbSync.busy());
+  ui.redraw();ui.loop();
+ }else if(u.status==UPLOAD_FILE_WRITE){
+  if(otaUploadOk){
+   const uint8_t before=wifiOta.percent();
+   otaUploadOk=wifiOta.write(u.buf,u.currentSize);
+   if(otaUploadOk && wifiOta.percent()/10!=before/10){ui.redraw();ui.loop();}
+  }
+ }else if(u.status==UPLOAD_FILE_END){
+  // Final verification is in otaFinished, after the multipart stream ends.
+ }else if(u.status==UPLOAD_FILE_ABORTED){
+  wifiOta.abort("CLIENT_ABORTED");otaUploadOk=false;
+ }
+}
+void WiFiSyncService::otaFinished(){
+ if(!otaUploadSeen){server.send(400,"application/json","{\"ok\":false,\"error\":\"NO_FILE\"}");return;}
+ bool ok=otaUploadOk && wifiOta.finish();
+ const String error=wifiOta.error();
+ otaUploadSeen=false;otaUploadOk=false;
+ if(ok){
+  server.sendHeader("Connection","close");
+  server.send(200,"application/json","{\"ok\":true,\"status\":\"verified\",\"rebooting\":true}");
+ }else{
+  if(wifiOta.inProgress()&&!wifiOta.restartPending())wifiOta.abort("INCOMPLETE_IMAGE");
+  int status=error=="INVALID_PIN"||error=="PIN_LOCKED_RESTART_SYNC"?403:
+    error=="NO_OTA_PARTITION"?409:error=="TRANSFER_ACTIVE"?409:422;
+  server.send(status,"application/json",String("{\"ok\":false,\"error\":\"")+error+"\"}");
+ }
+ ui.redraw();
+}
 void WiFiSyncService::routes(){
+ // Custom request headers are not exposed unless explicitly collected.
+ const char* otaHeaders[]={"X-MonoPod-OTA-PIN","X-MonoPod-OTA-Size","X-MonoPod-OTA-SHA256"};
+ server.collectHeaders(otaHeaders,3);
+ server.on("/api/ota/info",HTTP_GET,[this](){server.send(200,"application/json",wifiOta.info());});
+ server.on("/api/ota/upload",HTTP_POST,[this](){otaFinished();},[this](){otaUpload();});
  server.on("/api/info",HTTP_GET,[this](){server.send(200,"application/json",SyncFiles::info());});
  server.on("/api/storage",HTTP_GET,[this](){if(allowed())server.send(200,"application/json",SyncFiles::info());});
  server.on("/api/fs/list",HTTP_GET,[this](){if(!allowed())return;uint32_t offset=0,limit=32;if((server.hasArg("offset")&&!number(server.arg("offset"),offset))||(server.hasArg("limit")&&!number(server.arg("limit"),limit))||limit>32||!limit){server.send(400,"text/plain","INVALID_ARGUMENTS");return;}String json=SyncFiles::list(server.arg("path"),offset,limit,SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
@@ -76,8 +120,12 @@ void WiFiSyncService::routes(){
    }
    const time_t epoch=(time_t)strtoll(raw.c_str(),nullptr,10);
    const String option=server.arg("ntp");
+   const String ntpServer=server.hasArg("ntp_server")?server.arg("ntp_server"):clockService.ntpServer();
    if(epoch<1600000000 || epoch>4102444800LL || (option!="0" && option!="1") ||
+      !ClockConfigValidation::timezone(server.arg("timezone").c_str()) ||
+      !ClockConfigValidation::ntpServer(ntpServer.c_str()) ||
       !clockService.setTimezone(server.arg("timezone")) ||
+      !clockService.setNtpServer(ntpServer) ||
       !clockService.setNtpEnabled(option=="1")){
      server.send(400,"text/plain","Invalid clock settings");return;
    }
@@ -91,9 +139,9 @@ void WiFiSyncService::begin(){
  SyncFiles::recover();if(!syncMode.enter(SyncTransport::WiFi))return;
  usingSta=WiFi.status()==WL_CONNECTED;
  if(!usingSta){wifiNetworks.suspendForSync();WiFi.mode(WIFI_AP);if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){syncMode.leave(SyncTransport::WiFi);wifiNetworks.resumeAfterSync();ui.notify("Wi-Fi AP failed");return;}}
- if(!routesReady){routes();routesReady=true;}server.begin();running=true;stopRequested=false;
+ if(!routesReady){routes();routesReady=true;}wifiOta.newSession();server.begin();running=true;stopRequested=false;
  MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP at http://%s:80\n",usingSta?"LAN":"AP",ip().c_str());ui.redraw();
 }
-void WiFiSyncService::end(){if(!running||busy())return;server.stop();if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}running=false;stopRequested=false;media.rescan();syncMode.leave(SyncTransport::WiFi);if(!usingSta)wifiNetworks.resumeAfterSync();ui.begin();}
-void WiFiSyncService::loop(){if(running){if(usingSta)wifiNetworks.tick();server.handleClient();SyncFiles::tick();if(uploadActive&&!SyncFiles::busy()){uploadActive=false;uploadOk=false;}if(stopRequested)end();}}
+void WiFiSyncService::end(){if(!running||busy())return;wifiOta.stopSession();server.stop();if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}running=false;stopRequested=false;media.rescan();syncMode.leave(SyncTransport::WiFi);if(!usingSta)wifiNetworks.resumeAfterSync();ui.begin();}
+void WiFiSyncService::loop(){if(running){if(usingSta)wifiNetworks.tick();server.handleClient();SyncFiles::tick();wifiOta.loop();if(uploadActive&&!SyncFiles::busy()){uploadActive=false;uploadOk=false;}if(stopRequested)end();}}
 #endif

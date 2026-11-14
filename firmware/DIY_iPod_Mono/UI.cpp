@@ -23,12 +23,12 @@
 #include "IpodIdentity.h"
 #include <time.h>
 PlayerUI ui;
-void PlayerUI::begin(){page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;lastPlaybackState=-1;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
+void PlayerUI::begin(){wheelBurst=0;lastWheelTurnAt=0;page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;lastPlaybackState=-1;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
 void PlayerUI::notify(const String& msg){blank=false;lastTouch=millis();backlight.wake();showMessage(msg);}
 void PlayerUI::navigate(Page next){
   history.push_back({page,selected,scroll,activeCategory,filter});
   if(page==Page::WiFiNetworks && next!=Page::WiFiNetworks)wifiNetworks.leave();
-  page=next;selected=0;scroll=0;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;brightnessEditing=false;nowOverlay=NowOverlay::Progress;seekPreview=-1;lastNowTime=UINT32_MAX;lastNowTrack=-1;
+  page=next;selected=0;scroll=0;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;brightnessEditing=false;nowOverlay=NowOverlay::Progress;seekPreview=-1;seekPreviewSeconds=0;lastSeekCommittedSeconds=UINT32_MAX;wheelBurst=0;lastWheelTurnAt=0;lastNowTime=UINT32_MAX;lastNowTrack=-1;
   if(page==Page::WiFiNetworks)wifiNetworks.enter();
 #if FEATURE_BLUETOOTH
   if(page==Page::Bluetooth){BluetoothAudioOutput::ensureStarted();}
@@ -235,10 +235,16 @@ void PlayerUI::open(){
   if(page==Page::NowPlaying){
     // SELECT toggles scrub mode; wheel no longer changes volume until timeout.
     if(nowOverlay==NowOverlay::Seek){
-      if(seekPreview>=0 && !player.seekPercent((uint8_t)seekPreview))showMessage("Seek unsupported");
+      if(seekPreview>=0 && seekPreviewSeconds!=lastSeekCommittedSeconds &&
+         !player.seekSeconds(seekPreviewSeconds))showMessage("Seek unsupported");
       nowOverlay=NowOverlay::Progress;seekPreview=-1;
     }else{
-      nowOverlay=NowOverlay::Seek;seekPreview=player.approximateProgress();lastSeekCommitted=seekPreview;
+      if(player.durationSeconds()==0){showMessage("Duration unavailable");return;}
+      nowOverlay=NowOverlay::Seek;
+      seekPreviewSeconds=player.elapsedSeconds();
+      if(seekPreviewSeconds>=player.durationSeconds())seekPreviewSeconds=player.durationSeconds()-1;
+      seekPreview=(int)((uint64_t)seekPreviewSeconds*100u/player.durationSeconds());
+      lastSeekCommittedSeconds=seekPreviewSeconds;
     }
     overlayUpdatedAt=millis();updateNowPlayingOverlay();return;
   }
@@ -402,24 +408,44 @@ void PlayerUI::open(){
     build();dirty=true;
   }
 }
-void PlayerUI::adjust(int delta){
+void PlayerUI::adjust(int delta,bool physicalWheel){
+  if(delta==0)return;
+  const uint32_t now=millis();
+  bool fast=false;
+  if(physicalWheel){
+    // A single quick movement must NEVER skip several songs. Acceleration
+    // requires three consecutive detents, same direction and <130 ms apart.
+    const int8_t dir=delta>0?1:-1;
+    if(lastWheelTurnAt && (uint32_t)(now-lastWheelTurnAt)<130 && wheelDirection==dir){
+      if(wheelBurst<3)++wheelBurst;
+    }else wheelBurst=0;
+    lastWheelTurnAt=now;wheelDirection=dir;
+    fast=wheelBurst>=2;
+  }else{wheelBurst=0;lastWheelTurnAt=0;}
   if(page==Page::NowPlaying){
-    const uint32_t now=millis();
-    const int step=(lastWheelTurnAt && now-lastWheelTurnAt<=110)?10:1;
-    lastWheelTurnAt=now;overlayUpdatedAt=now;
+    overlayUpdatedAt=now;
     if(nowOverlay==NowOverlay::Seek){
-      seekPreview=constrain((seekPreview<0?(int)player.approximateProgress():seekPreview)+delta*step,0,99);
+      const uint32_t duration=player.durationSeconds();
+      if(duration==0){showMessage("Duration unavailable");return;}
+      const int32_t maximum=(int32_t)min(duration-1, (uint32_t)INT32_MAX);
+      // Seek precision is one *second*, independent of the track's length.
+      const int32_t next=(int32_t)seekPreviewSeconds+delta*(fast?30:1);
+      seekPreviewSeconds=(uint32_t)constrain(next,0,maximum);
+      seekPreview=(int)((uint64_t)seekPreviewSeconds*100u/duration);
     }else{
       nowOverlay=NowOverlay::Volume;
-      int previous=settings.data.volume;
-      settings.data.volume=(uint8_t)constrain(previous+delta*step,0,100);
-      if(previous!=settings.data.volume){player.setVolume(settings.data.volume);settings.markDirty();}
+      const int previous=(int)settings.data.volume;
+      // Saturating arithmetic in signed int: no uint8 underflow or wraparound.
+      const int desired=constrain(previous+delta*(fast?5:1),0,100);
+      settings.data.volume=(uint8_t)desired;
+      if(previous!=desired){player.setVolume(settings.data.volume);settings.markDirty();}
     }
     updateNowPlayingOverlay();return;
   }
   const int count=listItemCount();
   if(!listPage()||count==0)return;
-  int before=selected;selected=constrain(selected+delta,0,count-1);
+  const int before=selected;
+  selected=constrain(selected+delta*(fast?3:1),0,count-1);
   if(selected!=before){selectedSince=millis();lastMarqueeFrame=UINT32_MAX;marqueeSelection=selected;}
   if(selected<scroll)scroll=selected;
   if(selected>=scroll+Display::ROW_COUNT)scroll=selected-Display::ROW_COUNT+1;
@@ -523,7 +549,7 @@ void PlayerUI::paintBluetoothDialog(){
   }
 }
 #endif // FEATURE_BLUETOOTH
-void PlayerUI::event(Key key){
+void PlayerUI::event(Key key,bool physicalWheel){
   if(key==Key::None)return;
   if(page==Page::BadApple){if(key==Key::Menu)back();return;}
   // Sync screen owns the entire input surface. Deliberate Wi-Fi exit only;
@@ -592,7 +618,7 @@ void PlayerUI::event(Key key){
     else if(key==Key::Menu||key==Key::PlayPause)back();return;
   }
   switch(key){
-  case Key::Up:adjust(-1);break;case Key::Down:adjust(1);break;
+  case Key::Up:adjust(-1,physicalWheel);break;case Key::Down:adjust(1,physicalWheel);break;
   case Key::Menu:back();break;
   case Key::Select:open();break;
   case Key::Previous:if(player.active()){player.previous();dirty=true;}else adjust(-1);break;
@@ -635,7 +661,7 @@ void PlayerUI::updateNowPlayingOverlay(){
   if(page!=Page::NowPlaying || !player.active() || blank)return;
   display.nowPlayingControls(nowOverlay==NowOverlay::Volume?1:nowOverlay==NowOverlay::Seek?2:0,
     player.approximateProgress(),settings.data.volume,
-    seekPreview>=0?seekPreview:0,player.elapsedSeconds(),player.remainingSeconds(),player.durationSeconds()!=0);
+    seekPreview>=0?seekPreview:0,player.elapsedSeconds(),player.remainingSeconds(),player.durationSeconds()!=0,nowOverlay==NowOverlay::Seek?seekPreviewSeconds:UINT32_MAX);
   lastNowTime=player.elapsedSeconds();
   lastRender=millis();
 }
@@ -646,7 +672,9 @@ void PlayerUI::paint(){
     blank=false;
     display.syncScreen(syncMode.is(SyncTransport::WiFi),
                        syncMode.is(SyncTransport::WiFi)?wifiSync.busy():usbSync.busy(),
-                       syncMode.is(SyncTransport::WiFi)?wifiSync.ip():String());
+                       syncMode.is(SyncTransport::WiFi)?wifiSync.ip():String(),
+                       syncMode.is(SyncTransport::WiFi)?wifiSync.otaLine():String(),
+                       syncMode.is(SyncTransport::WiFi)&&wifiSync.otaUpdating());
     display.endFrame();dirty=false;lastRender=millis();return;
   }
   display.clear();
@@ -695,7 +723,7 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.10.6.1";break;
+        case 3:value="0.10.6.6";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }
@@ -762,7 +790,8 @@ void PlayerUI::paint(){
       display.nowPlayingTitleMarquee(t.title,marqueeOffset(nowTitleSince,millis()));
       display.nowPlayingControls(nowOverlay==NowOverlay::Volume?1:nowOverlay==NowOverlay::Seek?2:0,
         player.approximateProgress(),settings.data.volume,seekPreview>=0?seekPreview:0,
-        player.elapsedSeconds(),player.remainingSeconds(),player.durationSeconds()!=0);
+        player.elapsedSeconds(),player.remainingSeconds(),player.durationSeconds()!=0,
+        nowOverlay==NowOverlay::Seek?seekPreviewSeconds:UINT32_MAX);
       lastNowTime=player.elapsedSeconds();
     }else display.centerText(51,"No music playing",true);
     // Bottom rows are reserved for progress/time or volume; no footer.
@@ -924,9 +953,9 @@ void PlayerUI::loop(){
       nowOverlay=NowOverlay::Progress;seekPreview=-1;updateNowPlayingOverlay();
     }else if(nowOverlay==NowOverlay::Seek && seekPreview>=0 && now-overlayUpdatedAt>=350UL){
       // Debounced seek. Avoid tearing down the MP3 decoder on every wheel detent.
-      if(seekPreview!=lastSeekCommitted){
-        if(!player.seekPercent((uint8_t)seekPreview))showMessage("Seek unavailable");
-        lastSeekCommitted=seekPreview;
+      if(seekPreviewSeconds!=lastSeekCommittedSeconds){
+        if(!player.seekSeconds(seekPreviewSeconds))showMessage("Seek unavailable");
+        else lastSeekCommittedSeconds=seekPreviewSeconds;
       }
     }else if(nowOverlay==NowOverlay::Progress && player.elapsedSeconds()!=lastNowTime){
       updateNowPlayingOverlay();

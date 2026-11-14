@@ -62,7 +62,7 @@ def test_offscreen_backlight_stays_off():
 def test_click_and_default_metadata():
     feedback = (ROOT/'Feedback.cpp').read_text()
     library = (ROOT/'Library.cpp').read_text()
-    assert 'startTone(Config::PIEZO_SCROLL_HZ,1)' in feedback
+    assert 'startTone(Config::PIEZO_SCROLL_HZ,3)' in feedback
     assert 'headphoneClick(Config::PIEZO_SCROLL_HZ,2)' in feedback
     for v in ('Unknown Artist','Unknown Album','Unknown Genre'):
         assert v in library

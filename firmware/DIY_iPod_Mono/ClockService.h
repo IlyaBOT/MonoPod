@@ -14,11 +14,15 @@ public:
   void setUnix(time_t epoch);
   bool setTimezone(const String& posix);
   bool setNtpEnabled(bool enabled);
+  bool setNtpServer(const String& server);
   bool ntpEnabled() const {return ntp_;}
   String timezone() const {return tz_;}
+  String ntpServer() const {return ntpServer_;}
 private:
   String tz_=Config::TIMEZONE_TZ;
   bool ntp_=false;
   bool ntpStarted_=false;
+  String ntpServer_="pool.ntp.org";
+  void restartNtp();
 };
 extern ClockService clockService;

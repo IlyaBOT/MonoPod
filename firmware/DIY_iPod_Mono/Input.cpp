@@ -56,34 +56,9 @@ void InputManager::touchResetTracking() {
   wheelTouch=false;
   touchCandidateSince=0;
   touchMissingSince=0;
-  angleDelta=0;
+  wheelIntegrator.reset();
   touchPresent=false;
-}
-void InputManager::touchEnable(bool enabled) {
-  touchOn=enabled;
-  touchResetTracking();
-}
-void InputManager::touchSetSensitivity(uint8_t percent) {
-  touchSensitivityPct=percent;
-  touchResetTracking();
-}
-bool InputManager::touchSetPadSensitivity(uint8_t channel, uint8_t percent) {
-  if(channel>=Config::WHEEL_COUNT || percent>80)return false;
-  touchPadPct[channel]=percent;
-  touchResetTracking();
-  return true;
-}
-void InputManager::touchSetTotalThreshold(uint8_t percent) {
-  touchTotalPct=percent;
-  touchResetTracking();
-}
-void InputManager::touchSetMinimumDelta(uint32_t rawUnits) {
-  touchMinDelta=rawUnits;
-  touchResetTracking();
-}
-void InputManager::touchSetDominance(uint8_t percent) {
-  touchDominancePct=percent;
-  touchResetTracking();
+  eventFromWheel=false;
 }
 int32_t InputManager::wheelDelta(uint8_t i) const {
   if(i>=Config::WHEEL_COUNT)return 0;
@@ -115,7 +90,6 @@ void InputManager::touchCalibrate() {
     base[i]=(uint32_t)(accum[i]/32ULL);
     raw[i]=base[i];
   }
-  touchLastSample=millis();
   touchValid=false;
   touchSum=touchVector=touchX=touchY=0;
   touchResetTracking();
@@ -144,7 +118,6 @@ void InputManager::touchSample() {
     touchValid=false;
     touchPresent=false;
     touchResetTracking();
-    touchLastSample=millis();
     return;
   }
   badBaselineSamples=0;
@@ -154,31 +127,28 @@ void InputManager::touchSample() {
     if(raw[i]==0 || raw[i]==UINT32_MAX || base[i]==0)touchValid=false;
     baselineSum+=(float)base[i];
     const float delta=(float)wheelDelta(i);
-    const uint8_t pct=touchPadPct[i]?touchPadPct[i]:touchSensitivityPct;
-    const float threshold=max((float)touchMinDelta,(float)base[i]*(float)pct/100.0f);
+    const uint8_t pct=TOUCH_SENS_PCT;
+    const float threshold=max((float)TOUCH_MIN_DELTA,(float)base[i]*(float)pct/100.0f);
     const float weight=max(0.0f,delta-threshold);
-    if(weight>peakWeight){peakWeight=weight;peakChannel=i;}
+    if(weight>peakWeight)peakWeight=weight;
     const float angle=i*(6.283185307f/(float)Config::WHEEL_COUNT);
     touchX+=weight*cosf(angle);touchY+=weight*sinf(angle);touchSum+=weight;
   }
   touchVector=hypotf(touchX,touchY);
   const float meanBase=baselineSum/(float)Config::WHEEL_COUNT;
-  // Reject low-level and spatially ambiguous noise; both are tunable over UART.
+  // Reject low-level and spatially ambiguous noise with proven fixed thresholds.
   touchPresent=touchValid && peakWeight>0 &&
-    touchSum>max(15.0f,meanBase*(float)touchTotalPct/100.0f) &&
-    touchVector>touchSum*(float)touchDominancePct/100.0f;
-  touchLastSample=millis();
+    touchSum>max(15.0f,meanBase*(float)TOUCH_TOTAL_PCT/100.0f) &&
+    touchVector>touchSum*(float)TOUCH_DOM_PCT/100.0f;
 #endif
 }
 Key InputManager::readWheel() {
 #if FEATURE_TOUCH_WHEEL
-  if(!touchOn){touchResetTracking();return Key::None;}
   const uint32_t now=millis();
   if((uint32_t)(now-lastWheel)<30)return Key::None;
   lastWheel=now;
   touchSample();
-  // A finger may cross a narrow gap or an electrode with a weaker response.
-  // A short loss of DETECT must not turn one physical swipe into several new swipes.
+  // Preserve the touch track through brief dead zones between electrodes.
   if(!touchPresent){
     if(touchMissingSince==0)touchMissingSince=now;
     if((uint32_t)(now-touchMissingSince)>130)touchResetTracking();
@@ -187,31 +157,25 @@ Key InputManager::readWheel() {
   const bool wasMissing=touchMissingSince!=0;
   const uint32_t missingMs=wasMissing?(uint32_t)(now-touchMissingSince):0;
   touchMissingSince=0;
-  const float angle=atan2f(touchY,touchX);
+  const float measured=atan2f(touchY,touchX); // interpolated six-pad angle
   if(!wheelTouch){
-    // With 30 ms polling, 90 ms could consume multiple sectors of a fast swipe.
     if(touchCandidateSince==0)touchCandidateSince=now;
     if((uint32_t)(now-touchCandidateSince)<35)return Key::None;
-    wheelTouch=true;
-    lastAngle=angle;
-    angleDelta=0;
+    wheelTouch=true;wheelIntegrator.reset();wheelIntegrator.anchor(measured);
     return Key::None;
   }
-  float d=angle-lastAngle;
-  while(d>3.14159265f)d-=6.283185307f;
-  while(d< -3.14159265f)d+=6.283185307f;
-  lastAngle=angle;
-  // Re-anchor after crossing a dead zone rather than interpreting a large
-  // uncertain displacement as a sudden reverse rotation.
-  if(wasMissing && (missingMs>75 || fabsf(d)>1.5f))return Key::None;
-  if(fabsf(d)<0.08f || fabsf(d)>1.6f)return Key::None;
-  angleDelta+=d;
-  if(angleDelta>=0.40f){angleDelta-=0.40f;return Key::Down;}
-  if(angleDelta<=-0.40f){angleDelta+=0.40f;return Key::Up;}
+  if(wasMissing && missingMs>75){
+    wheelIntegrator.anchor(measured);return Key::None;
+  }
+  const int direction=wheelIntegrator.sample(measured);
+  if(direction>0){eventFromWheel=true;return Key::Down;}
+  if(direction<0){eventFromWheel=true;return Key::Up;}
+
 #endif
   return Key::None;
 }
 Key InputManager::poll() {
+  eventFromWheel=false;
   bool nowHold=digitalRead(Config::PIN_HOLD)==LOW;
   if(hold!=nowHold){
     hold=nowHold;keyLast=keyStable=Key::None;

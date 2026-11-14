@@ -28,7 +28,8 @@ public:
   uint32_t remainingSeconds() const;
   uint32_t ordinal() const {return queuePos>=0?(uint32_t)queuePos+1:0;}
   uint32_t queueSize() const {return (uint32_t)queue.size();}
-  bool seekPercent(uint8_t percent); // WAV direct; MP3 requires decoder restart and frame resync
+  bool seekPercent(uint8_t percent); // legacy percent interface
+  bool seekSeconds(uint32_t seconds); // second-resolution seek, duration must be known
   uint8_t approximateProgress() const;
 #if FEATURE_BLUETOOTH
   bool bluetooth() const {return bluetoothOn;}

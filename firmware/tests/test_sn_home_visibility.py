@@ -32,6 +32,6 @@ def test_now_playing_home_entry_only_when_actively_playing():
 def test_version_and_actual_adc_ladder():
     ui = (ROOT / "UI.cpp").read_text()
     conf = (ROOT / "Config.h").read_text()
-    assert 'case 3:value="0.10.6.1";' in ui
-    assert 'PREV=5k1, NEXT=10k, PLAY=20k, SELECT=39k9' in conf
+    assert 'case 3:value="0.10.6.6";' in ui
+    assert 'MENU=0, PREV=5.1k, NEXT=10k, PLAY=20k, SELECT=39.9k' in conf
     assert 'BUTTON_ADC_WINDOWS_MV[5][2]' in conf

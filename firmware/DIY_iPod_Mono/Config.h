@@ -123,8 +123,6 @@ constexpr uint16_t BUTTON_ADC_DEBOUNCE_MS = 60;
 constexpr uint16_t BUTTON_ADC_RELEASE_GUARD_MS = 100;
 constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
 constexpr uint16_t PIEZO_ACTION_HZ = 2700;
-constexpr uint16_t FEEDBACK_SCROLL_MIN_MS = 45;
-constexpr uint16_t FEEDBACK_ACTION_MIN_MS = 60;
 // Single SD SPI frequency, no diagnostic probing or speed fallback.
 // Conservative starting speed for breadboard wiring; tune after real testing.
 constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable

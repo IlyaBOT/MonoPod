@@ -250,7 +250,7 @@ void Display::progress(int x,int y,int w,int percent){
   surface().fillRect(OX+x+2,OY+y+2,w-4,4,bg);
   if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,themed(10,fg));
 }
-void Display::syncScreen(bool wifi,bool transferring,const String& address){
+void Display::syncScreen(bool wifi,bool transferring,const String& address,const String& otaLine,bool otaUpdating){
   clear();
   // Minimal 160x128 monochrome-like lock screen. No status bar/navigation.
   const int cx=80;
@@ -277,9 +277,9 @@ void Display::syncScreen(bool wifi,bool transferring,const String& address){
   surface().setCursor(OX+45,OY+49);surface().print("SYNC");
   surface().setTextSize(1);
   const uint16_t color=fg,back=bg;
-  smallText(3,77,transferring?"DATA TRANSFER ACTIVE":(wifi?"Wi-Fi sync active":"USB sync active"),color,back);
+  smallText(3,77,otaUpdating?otaLine:(transferring?"DATA TRANSFER ACTIVE":(wifi?otaLine:"USB sync active")),color,back);
   if(wifi && !address.isEmpty())smallText(3,91,"IP: "+address,color,back);
-  smallText(3,101,"DO NOT REMOVE SD",color,back);
+  smallText(3,101,otaUpdating?"DO NOT POWER OFF":"DO NOT REMOVE SD",color,back);
   smallText(3,113,wifi?"KEEP Wi-Fi CONNECTED":"DO NOT UNPLUG USB",color,back);
 }
 void Display::clock(const String& dt){centerText(47,dt,true);}
@@ -326,7 +326,7 @@ void Display::nowPlaying(const String& title,const String& artist,const String& 
 void Display::nowPlayingTitleMarquee(const String& title,int scrollPx){
   windowText(4,38,152,title,true,scrollPx,fg,bg);
 }
-void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration){
+void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration,uint32_t scrubSeconds){
   // Update only the bottom region; never erase the header and metadata lines.
   surface().fillRect(OX,OY+96,160,32,bg);
   surface().drawRoundRect(OX+13,OY+96,134,10,5,themed(11,fg));
@@ -335,7 +335,7 @@ void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,ui
     int px=16+125*constrain(percent,0,100)/100;
     surface().fillTriangle(OX+px,OY+95,OX+px-4,OY+100,OX+px+4,OY+100,fg);
     surface().fillTriangle(OX+px,OY+107,OX+px-4,OY+102,OX+px+4,OY+102,fg);
-    if(knownDuration){uint32_t total=elapsed+remaining,at=(uint32_t)((uint64_t)total*scrub/100ULL);
+    if(knownDuration){uint32_t total=elapsed+remaining,at=scrubSeconds==UINT32_MAX?(uint32_t)((uint64_t)total*scrub/100ULL):min(scrubSeconds,total);
       smallText(6,112,timeLabel(at),fg,bg);
       String right="-"+timeLabel(total-at);smallText(154-textWidth(right,true),112,right,fg,bg);
     }

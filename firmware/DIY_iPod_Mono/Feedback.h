@@ -28,8 +28,6 @@ private:
   uint8_t secondPulseMs=0;
   uint32_t piezoStopAt=0;
   uint32_t secondPulseAt=0;
-  uint32_t lastScrollAt=0;
-  uint32_t lastActionAt=0;
   void startTone(uint16_t hz,uint8_t durationMs);
   void silencePiezo();
   void localEffect(FeedbackEvent event,uint32_t now);

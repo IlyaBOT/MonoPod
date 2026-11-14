@@ -26,12 +26,12 @@ def test_adc_invalid_voltage_is_not_reported_as_charging():
     assert "chargeDetected && fault==0" in h
     assert "ADC_STATUS=%s" in dbg
 
-def test_live_button_diagnostics_uses_same_adc_decoder():
+def test_adc_decoder_stays_active_but_debug_streaming_is_gone():
     inp=(R/"Input.cpp").read_text()
     dbg=(R/"DevConsole.cpp").read_text()
     ino=(R/"DIY_iPod_Mono.ino").read_text()
     assert "return decodeButtonMillivolts(buttonAdcMillivolts());" in inp
-    assert "input.buttonAdcMillivolts()" in dbg
-    assert 'strcmp(command,"$BTNS_ADC")' in dbg
-    assert 'strcmp(command,"$BTNS_ADC=0")' in dbg
-    assert "devConsole.physicalKey(k)" in ino
+    assert "input.buttonAdcMillivolts()" not in dbg
+    assert "$BTNS_ADC" not in dbg
+    assert "$BUTTON_ADC" not in dbg
+    assert "ui.event(k,input.lastEventFromWheel())" in ino
