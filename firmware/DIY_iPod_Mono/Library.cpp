@@ -5,6 +5,7 @@
 #include <cstring>
 #include <memory>
 #include <new>
+#include "Id3Parser.h"
 #if FEATURE_SD_FORMAT
 #define DISABLE_FS_H_WARNING
 #include <SdFat.h>
@@ -13,21 +14,6 @@ MediaLibrary media;
 static String clipTag(String s) {s.trim(); if(s.length()>80) s.remove(80);return s;}
 static String noExt(String n) {int slash=n.lastIndexOf('/');if(slash>=0)n=n.substring(slash+1);int dot=n.lastIndexOf('.');if(dot>0)n.remove(dot);return n;}
 static bool strLess(String a,String b) {a.toLowerCase(); b.toLowerCase();return a.compareTo(b)<0;}
-static uint32_t bigEndian4(const uint8_t *b) {return ((uint32_t)b[0]<<24)|((uint32_t)b[1]<<16)|((uint32_t)b[2]<<8)|b[3];}
-static String id3Text(File &f,uint32_t len) {
-  if(!len || len>1024) return String();
-  const uint8_t enc=f.read();len--;
-  // ID3 text encoding 0 = Latin1, 3 = UTF-8; UTF-16 intentionally falls back to filenames.
-  if(enc!=0 && enc!=3) return String();
-  String out;out.reserve(min((uint32_t)80,len));
-  for(uint32_t i=0;i<len && out.length()<80;i++) {
-    int c=f.read();if(c<=0)break;
-    if(enc==0 && c>=0x80) { // Latin1 -> UTF-8
-      out += (char)(0xC0 | (c >> 6));out += (char)(0x80 | (c & 0x3F));
-    } else out+=(char)c;
-  }
-  return clipTag(out);
-}
 // MP3 duration: exact when Xing/Info frame count is available; otherwise CBR estimate.
 // Accurate remaining time needs TLEN/Xing. Unknown files display --:-- instead.
 static uint32_t probeMp3Duration(const String& path){
@@ -161,28 +147,13 @@ void MediaLibrary::scanFolder(const String &path,uint8_t depth) {
 void MediaLibrary::metadata(Track &t) {
   String ext=t.path;ext.toLowerCase();if(!ext.endsWith(".mp3"))return;
   File f=SD.open(t.path.c_str());if(!f)return;
-  uint8_t head[10];if(f.read(head,10)!=10 || memcmp(head,"ID3",3)!=0){f.close();return;}
-  int version=head[3];if(version!=3 && version!=4){f.close();return;}
-  uint32_t total=((head[6]&127)<<21)|((head[7]&127)<<14)|((head[8]&127)<<7)|(head[9]&127);
-  total=min(total,(uint32_t)65536);
-  uint32_t pos=10,end=10+total;
-  while(pos+10<=end) {
-    uint8_t fh[10];if(f.read(fh,10)!=10)break;
-    if(fh[0]==0)break;
-    uint32_t n= version==4 ? ((fh[4]&127)<<21)|((fh[5]&127)<<14)|((fh[6]&127)<<7)|(fh[7]&127) : bigEndian4(fh+4);
-    pos+=10;if(!n || pos+n>end || n>65536)break;
-    String frame=String((char)fh[0])+String((char)fh[1])+String((char)fh[2])+String((char)fh[3]);
-    if(frame=="TIT2" || frame=="TPE1" || frame=="TALB" || frame=="TCON" || frame=="TLEN") {
-      String value=id3Text(f,n);
-      if(value.length()) {
-        if(frame=="TIT2") t.title=value;
-        if(frame=="TPE1") t.artist=value;
-        if(frame=="TALB") t.album=value;
-        if(frame=="TCON") t.genre=value;
-        if(frame=="TLEN") {unsigned long ms=strtoul(value.c_str(),nullptr,10); if(ms>0 && ms<86400000UL)t.durationSeconds=(ms+500)/1000;}
-      }
-    }
-    pos+=n;f.seek(pos);
+  Id3Parser::Tags tags;
+  if(Id3Parser::parse(f,tags)){
+    if(tags.title[0])t.title=tags.title;
+    if(tags.artist[0])t.artist=tags.artist;
+    if(tags.album[0])t.album=tags.album;
+    if(tags.genre[0])t.genre=tags.genre;
+    if(tags.durationSeconds)t.durationSeconds=tags.durationSeconds;
   }
   f.close();
 }

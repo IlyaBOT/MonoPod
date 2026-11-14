@@ -30,7 +30,7 @@ private:
   bool active=false,scanRunning=false,connectRunning=false,dirty=false;
   bool suspended=false,pendingSave=false,wasConnected=false;
   uint8_t cachedBars=0;
-  uint32_t lastScan=0,connectionStart=0,nextRetryAt=0,lastRssiSample=0;
+  uint32_t lastScan=0,connectionStart=0,lastRssiSample=0;
   String message="";
   String target,candidatePassword,savedSSID,savedPassword;
   void startScan();

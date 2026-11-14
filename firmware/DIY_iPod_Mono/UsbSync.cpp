@@ -19,7 +19,7 @@ void UsbSyncService::finish(){if(buffered&&!SyncFiles::write(buffer,buffered)){f
 void UsbSyncService::command(const String& cmd){
  if(cmd=="MPOD1 HELLO"){reply(String("READY 4 SD=")+(media.sdOK()?"1":"0"));return;}
  if(cmd=="MPOD1 X INFO"||cmd=="MPOD1 X STORAGE"){reply("OK "+SyncFiles::info());return;}
- if(cmd=="MPOD1 INFO"){char a[24],b[24];snprintf(a,sizeof(a),"%llu",(unsigned long long)media.totalBytes());snprintf(b,sizeof(b),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));reply(String("OK INFO SD=")+(media.sdOK()?"1":"0")+" TRACKS="+String((unsigned)media.size())+" TOTAL_BYTES="+a+" FREE_BYTES="+b+" GUID="+IpodIdentity::guid()+" FW=0.10.0 PROTOCOL=4");return;}
+ if(cmd=="MPOD1 INFO"){char a[24],b[24];snprintf(a,sizeof(a),"%llu",(unsigned long long)media.totalBytes());snprintf(b,sizeof(b),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));reply(String("OK INFO SD=")+(media.sdOK()?"1":"0")+" TRACKS="+String((unsigned)media.size())+" TOTAL_BYTES="+a+" FREE_BYTES="+b+" GUID="+IpodIdentity::guid()+" FW=0.10.2 PROTOCOL=4");return;}
  if(cmd=="MPOD1 SYNC START"){if(!media.sdOK()){reply("ERR NO_SD");return;}reply(syncMode.enter(SyncTransport::UsbCdc)?"OK SYNC_STARTED":"ERR SYNC_BUSY");return;}
  if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
  if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}

@@ -159,10 +159,14 @@ void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars
   wifiSignal(wifiBars);
   if(held)smallText(20,4,"H",fg,bg);
   else if(playing){surface().fillRect(OX+22,OY+5,3,10,fg);surface().fillRect(OX+28,OY+5,3,10,fg);}
-  const String fitted=fittedTitle(title,94);
-  const int w=textWidth(fitted,false);
+  // The 2004-style Now Playing title must never be ellipsized. The standard
+  // 16px font needs 105px, wider than the clear 94px status-bar area; use
+  // the 12px face (84px) without disturbing the Wi-Fi and battery indicators.
+  const bool compact=(title=="Now Playing" && textWidth(title,false)>94);
+  const String fitted=compact?title:fittedTitle(title,94);
+  const int w=textWidth(fitted,compact);
   const int x=(160-w)/2;
-  drawString(x,3,fitted,themed(8,fg),bg,false,0,134);
+  drawString(x,compact?4:3,fitted,themed(8,fg),bg,compact,0,134);
   batteryIcon();
   surface().drawFastHLine(OX,OY+19,160,themed(11,fg));
 }

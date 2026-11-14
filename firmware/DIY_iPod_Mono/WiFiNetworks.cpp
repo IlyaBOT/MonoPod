@@ -6,8 +6,7 @@
 #include <algorithm>
 WiFiNetworkManager wifiNetworks;
 namespace {
-constexpr uint32_t kConnectTimeoutMs=16000;
-constexpr uint32_t kRetryDelayMs=15000;
+constexpr uint32_t kConnectTimeoutMs=10000;
 constexpr uint32_t kRssiIntervalMs=12000;
 constexpr uint32_t kBlinkIntervalMs=650;
 }
@@ -44,7 +43,7 @@ void WiFiNetworkManager::beginConnection(const String& ssid,const String& pass,b
   if(scanRunning){WiFi.scanDelete();scanRunning=false;}
   target=ssid;candidatePassword=pass;pendingSave=saveWhenConnected;
   WiFi.mode(WIFI_STA);
-  // Own the bounded retry cadence here, not in a synchronous wait or driver loop.
+  // One bounded join attempt. No driver reconnect loop after 10 seconds.
   WiFi.setAutoReconnect(false);
   WiFi.begin(ssid.c_str(),pass.c_str());
   connectRunning=true;wasConnected=false;cachedBars=0;
@@ -81,13 +80,12 @@ void WiFiNetworkManager::suspendForSync(){
 void WiFiNetworkManager::resumeAfterSync(){
   suspended=false;
   message="Disconnected";dirty=true;
-  // Rejoin previously paired STA once AP-only Sync releases the radio.
-  if(!savedSSID.isEmpty())beginConnection(savedSSID,savedPassword,false);
+  // Do not auto-retry after AP Sync. Manual join or next boot only.
 }
 void WiFiNetworkManager::disconnect(){
   leave();
   savedSSID="";savedPassword="";target="";candidatePassword="";
-  connectRunning=false;wasConnected=false;cachedBars=0;pendingSave=false;nextRetryAt=0;
+  connectRunning=false;wasConnected=false;cachedBars=0;pendingSave=false;
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
   Preferences p;
@@ -126,18 +124,13 @@ void WiFiNetworkManager::tick(){
     if(wasConnected){
       wasConnected=false;cachedBars=0;
       message="Disconnected";dirty=true;
-      nextRetryAt=now+kRetryDelayMs;
+      // A dropped link stays offline until manually reconnected or rebooted.
     }
     if(connectRunning && (uint32_t)(now-connectionStart)>=kConnectTimeoutMs){
       WiFi.disconnect(false);
       connectRunning=false;pendingSave=false;candidatePassword="";
-      message="Connection failed";dirty=true;nextRetryAt=now+kRetryDelayMs;
-    }
-    // Do not retry when manually disconnected, in password entry or while scanning.
-    if(!connectRunning && !scanRunning && !savedSSID.isEmpty() &&
-       (int32_t)(now-nextRetryAt)>=0){
-      nextRetryAt=now+kRetryDelayMs;
-      beginConnection(savedSSID,savedPassword,false);
+      message="Connection failed";dirty=true;
+      MONOPOD_LOG.println("Wi-Fi: 10s timeout; auto-retries disabled until restart/manual connect");
     }
   }
   if(!active)return;
