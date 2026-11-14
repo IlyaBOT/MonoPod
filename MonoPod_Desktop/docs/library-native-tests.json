@@ -1,6 +1,0 @@
-{
-  "exit_code": 0,
-  "output": "PASS actual Library.cpp: recursive SD directories through depth 6, reject depth 7, MP3 Xing, WAV, empty/unknown and rescan/eject\n",
-  "source_sha256": "9dfbf54691abf7669bacec31deb8ae29301fc37fbc9922a9ed88a6c4b1288b54",
-  "scope": "Actual Library.cpp under host SD adapter. Not an ESP32 or electrical SD test."
-}

@@ -1,1 +1,48 @@
-firmware/README_PERFORMANCE_v0.10.7.5_RU.md
+# OS / editors
+.DS_Store
+Thumbs.db
+.vs/
+.idea/
+.vscode/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest/
+.venv/
+venv/
+
+# .NET builds and packages
+**/bin/
+**/obj/
+**/TestResults/
+desktop/work/
+desktop/publish/
+desktop/outputs/
+desktop/firmware-builds/
+*.trx
+
+# Arduino / native build artifacts
+*.elf
+*.map
+*.o
+*.d
+*.hex
+*.uf2
+firmware/build/
+firmware/work/
+
+# Hardware CAD generated work; KEEP tracked STEP/STL/Gerbers and sources
+hardware/**/work/
+hardware/**/.venv/
+hardware/**/fp-info-cache
+hardware/**/*.kicad_prl
+hardware/**/*-backups/
+hardware/**/*.lck
+
+# Logs and temporary archives
+*.log
+*.tmp
+*.bak

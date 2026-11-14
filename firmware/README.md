@@ -1,87 +1,39 @@
-# MonoPod v0.10.7.5 — Wi-Fi Sync Performance
+# MonoPod Firmware
 
-Изменения производительности: `README_PERFORMANCE_v0.10.7.5_RU.md`.
+**Версия: 0.10.7.5** · ESP32 / ESP32-S3 · Arduino C++
 
-## v0.10.7.5 — Arduino-ESP32 3.3.12 compile hotfix
+Прошивка отвечает за экран, колесо, кнопки, проигрывание музыки с microSD, настройки и синхронизацию с MonoPod Desktop.
 
-- Fixed Wi-Fi Sync `sessionAuthorized()` const qualifier: `WebServer::client()` is non-const in Arduino-ESP32 3.3.12.
-- No behavior changes to authentication, SD SPI (16 MHz default) or TFT SPI (20 MHz).
-- Build on real ESP32-S3 remains to be verified in Arduino IDE.
+## Как собрать
 
-## v0.10.7.4 — SPI tuning for the N16R8 prototype
+1. Установите **Arduino IDE 2.x** и поддержку плат **Arduino-ESP32 3.x**.
+2. Установите библиотеки **Adafruit GFX**, **Adafruit ST7735 and ST7789 Library**, **ESP8266Audio**. В коде также предусмотрены условные зависимости для некоторых аппаратных возможностей.
+3. Откройте [`DIY_iPod_Mono/DIY_iPod_Mono.ino`](DIY_iPod_Mono/DIY_iPod_Mono.ino).
+4. В Arduino IDE выберите **ESP32-S3** (для прототипа N16R8: Flash 16 MB, PSRAM 8 MB / OPI) или классическую ESP32, если собираете под старую плату.
+5. Проверьте параметры платы и подключение модулей по [`Config.h`](DIY_iPod_Mono/Config.h) **до прошивки**. Пины двух аппаратных профилей различаются.
+6. Скомпилируйте скетч. Для обновления по OTA требуется подходящая таблица разделов; пример — [`tools/partitions/`](tools/partitions/).
 
-- ST7735S: **20 MHz** default (user-tested), including the emergency low-battery display.
-- microSD: **16 MHz** default; automatic startup/remount fallback 16 → 8 → 4 MHz on mount/readback failures.
-- Optional **20 MHz SD**: set `MONOPOD_SPI_SD_TARGET_HZ` to `20000000UL` in `Config.h`, then fallback is 20 → 16 → 8 → 4 MHz.
-- Read-only sector spot checks during mounting; no destructive speed tests. Actual selected clock is logged to UART and `$SD`.
-- The two peripherals share SPI wires but use independent transaction speeds and CS lines. No `SPI.setFrequency()` global override.
-- The original ESP32-WROVER profile still defaults to SD 8 MHz / TFT 16 MHz.
-- **Hardware caveats:** stability of extended streaming/writing is NOT proven by the quick readback check. At low VDD (below 3.0 V) do not test faster SD/write/OTA.
-- Initial field validation: read a large FLAC while scrolling text, transfer 100+ MiB through Wi-Fi Sync, verify CRC on PC, and reboot/remount several times. If any CRC or SD error occurs, set 8 MHz manually.
+Распиновка и значения резисторов определены в `Config.h`; не ориентируйтесь на картинки ранних прототипов.
 
-## v0.10.7.2 — HOLD Deep Sleep low-rail prototype
+## Функции
 
-- Critical 3V3 proxy on released GPIO9; show low-battery screen before full init.
-- Deep Sleep and HOLD LOCK→UNLOCK wake cycle on GPIO21.
-- See `README_POWER_GUARD_HOLD_v0.10.7.2_RU.md` for wiring and limitations.
+- Списки музыки и метаданные MP3/FLAC; кэш медиатеки MonoPodDB.
+- Аудиовыход I²S через PCM5102A; сенсорное колесо и резистивная клавиатура.
+- Синхронизация файлов по Wi-Fi и USB CDC; встроенные настройки и диагностика.
+- Часы, темы оформления и экспериментальное OTA-обновление.
+- Bluetooth Classic/A2DP — **только для оригинального ESP32**. На ESP32-S3 его нет.
 
-## v0.10.7.1 — Skip embedded FLAC cover art
+## Структура
 
-- Virtual FLAC stream replaces PICTURE metadata payload with empty PADDING headers, without changing files on microSD.
-- Avoids reading 9+ MiB images into the decoder; retains all audio/metadata and FLAC seek support.
-- Added a native regression test using a 9 MiB cover and random seek checks.
-- See `README_FLAC_PICTURE_SKIP_v0.10.7.1_RU.md`.
+- `DIY_iPod_Mono/` — рабочий Arduino-проект: `.ino`, `.cpp` и `.h`.
+- `tests/` — тесты для ПК; они не заменяют проверку на физическом устройстве.
+- `tools/` — конвертеры, утилиты и файлы конфигурации.
+- `docs/` — [краткая история изменений](docs/CHANGELOG.md) и технические пояснения.
 
-## v0.10.7.0 — MonoPodDB indexed media library
+## Важно для прототипа
 
-- Сохраняемый индекс `/MonoPod/MonoPodDB` с CRC32-контролем целостности самой БД и безопасной заменой через `.tmp/.bak`.
-- Быстрый повторный scan: сравнение размера и FAT mtime, CRC32-отпечаток заголовка/хвоста при недостоверной дате и точечная инвалидация после Sync.
-- Теги Title / Artist / Album / Album Artist / Year / Genre / Track Number, длительность, codec, bitrate, sample rate, размер, timestamp, sampled CRC32 и известный полный CRC32 загрузки.
-- Wi-Fi: `/api/library/info`, `/api/library/refresh`, `/api/library/db`. USB: `MPOD1 X DBINFO`, `DBREFRESH`, `DBREAD` (Sync Protocol v4 не изменён).
-- Даты FAT 1980/1981 считаются неизвестными и передаются как нулевые.
-- Эталонный Python-клиент с редактированием тегов MP3/FLAC и задача для интеграции в MonoPod Desktop.
+При просадке шины 3,3 В встроенная защита прошивки **не заменяет** исправный стабилизатор, аппаратную защиту аккумулятора и корректное питание. Режим HOLD/Deep Sleep и его ограничения описаны [здесь](docs/POWER_GUARD_HOLD_RU.md).
 
-Полное описание: `docs/README_MONOPODDB_v1_RU.md`. **В самом MonoPod Desktop UI ещё не интегрировано:** исходники Desktop не были приложены, см. задание для Codex.
+USB CDC и USB Mass Storage — разные режимы. В текущем проекте MSC экспериментален и не является обычным режимом синхронизации с Desktop.
 
-# MonoPod v0.10.6.8 — ESP32 / ESP32-S3
-
-**Новое в v0.10.6.8:** адаптивный FLAC ring buffer до 2 МиБ в PSRAM (доступно для ESP32-S3 N16R8), с резервом >= 50% свободной PSRAM; старт по 12 КиБ без ожидания заполнения. Предыдущие изменения: см. `README_FLAC_AUDIO_CORE_v0.10.6.8.md` — потоковый FLAC, метаданные и seek, аудиозадача Core 0, расширенный I2S DMA.
-
-Прошивка DIY iPod-подобного плеера. Основная проверенная конфигурация: ESP32-S3 DevKitC N16R8, Touch Wheel 6 сенсоров (GPIO 1,2,5,6,7,8), ST7735S, PCM5102A, microSD, кнопки на ADC GPIO9.
-
-## Сборка
-
-Откройте `DIY_iPod_Mono/DIY_iPod_Mono.ino` в Arduino IDE. Требуется Arduino-ESP32 3.x, Adafruit GFX, Adafruit ST7735 и ESP8266Audio. Профиль платы выбирается компиляционным параметром `MONOPOD_BOARD` в `Config.h`. Bluetooth Classic недоступен на ESP32-S3, но доступен для старого ESP32 при соответствующей сборке.
-
-Схема кнопок ESP32-S3: GPIO9 -> **внешний резистор 20 кОм к 3.3 В**, клавиши через 0 / 5.1 / 10 / 20 / 39.9 кОм к GND. `pinMode(INPUT)`, внутренняя подтяжка не включается. GPIO21 HOLD сохраняет отдельную внешнюю 10 кОм подтяжку.
-
-## Изменения v0.10.6.8
-
-- BAV3 `badapple.bav` переконвертирован отдельно на 15 FPS (160×128, GRAY6) с сохранением MP3 побайтно. Файл не включён в архив прошивки; копировать на карту в `/MonoPod/badapple.bav`. Поставляемый ресемплер: `tools/resample_bav3.cpp`.
-- Плавная угловая интерполяция Touch Wheel (`WheelDetents.h`), без отсечения маленьких шагов по 0.08 рад. Детент = 0.92 рад, фильтр = 0.55; один сектор на медленном движении ≈ один пункт. Прошивка продолжает автоматически калибровать Touch при старте и восстанавливать явно ошибочный BASE.
-- Акселерация только для *физического* колеса: после трёх последовательных детентов в одном направлении с интервалами меньше 130 мс. Список: 1 или 3 пункта; громкость: 1 или 5%; перемотка: 1 или 30 секунд. На поворотах медленнее порога ускорения нет.
-- Клики на каждый детент без ограничения в 45 мс; Piezo 3 мс, цифровой тик в наушниках 2 мс; способ вывода выбирается в настройках Clicker.
-- Громкость всегда строго 0–100% (signed int, clamp); кривая усиления `x^1.5` вместо прежней `x^2`: низкие уровни стали заметно громче, 0% остаётся тишиной.
-- Перемотка оперирует секундами, а не целыми процентами длительности; экран показывает точную секунду предпросмотра, запись нового положения — с задержкой 350 мс после поворота. Ограничение: приблизительная byte-position перемотка MP3/WAV при известной длительности; для MP3 VBR это **не sample-accurate**, а при неизвестной длительности перемотка недоступна.
-- Удалены UART-команды `$TOUCH*`, `$BTNS_ADC*`, `$BUTTON_ADC`, ручная калибровка и диагностическое потоковое чтение. Остальная dev-консоль работает (`$HELP`, `$STATUS`, `$SCROLL`, `$CLICKER_STATUS`, `$BATTERY`, `$WIFI_STATUS`, `$SD`).
-- Номер прошивки синхронизирован в UART-баннере, `About`, `/info` MPOD1, имени корневой папки ZIP.
-
-## Тесты
-
-`pytest -q tests` — 45 passed, 1 skipped на данной сборке тестов. `g++ -std=c++17 tests/wheel_detents_native_test.cpp -o wheel_test && ./wheel_test` — 4 нативных теста прокрутки. Контроллер ESP32-S3 в этом окружении не компилировался и не испытывался на железе.
-
-## Исторические справки
-
-Описания прошлых версий находятся в `docs/legacy/`; их старые команды диагностики и значения подтяжек **больше не актуальны**.
-
-
-## Совместимость с MonoPod Desktop 1.2.0
-
-Перенесены настройки CLOCK/NTP с выбором сервера и проверки совместимости OTA. Подробности: [OTA_DESKTOP_PORT_RU.md](docs/OTA_DESKTOP_PORT_RU.md). Изменения FLAC/PSRAM и аудиозадачи сохранены.
-
-## v0.10.6.9 — Adaptive BTN_ADC
-
-Для ESP32-S3 с внешней подтяжкой GPIO9 через 20 кОм добавлена компенсация
-просадки питания резистивной клавиатуры: уровни кнопок нормализуются по
-напряжению GPIO9 при отпущенных кнопках. Подробности и ограничения:
-`README_BUTTON_ADC_POWER_COMPENSATION_v0.10.6.9_RU.md`.
+Документация описывает исходники, но **не утверждает, что версия 0.10.7.5 проверена на реальном ESP32-S3**. Перед обновлением устройства сделайте резервную копию microSD.

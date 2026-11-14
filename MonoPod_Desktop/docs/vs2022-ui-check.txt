@@ -1,5 +1,0 @@
-Visual Studio 2022 17.14.36127.28
-Opened via native Open project or solution dialog: I:\DIY_iPod_Mono\MonoPod_Desktop\MonoPod.Desktop.sln
-Solution Explorer: MonoPod.Core, MonoPod.Desktop, MonoPod.Desktop.Tests loaded.
-Debug startup target: MonoPod.Desktop.
-Verified using Windows UI Automation; no device connection or flashing performed.
