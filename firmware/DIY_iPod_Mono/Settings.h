@@ -8,6 +8,7 @@ public:
   void markDirty();
   void loop();
   void saveNow();
+  void resetDefaults();
 private:
   Preferences pref;
   bool dirty=false;

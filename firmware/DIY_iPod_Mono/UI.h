@@ -16,9 +16,15 @@ private:
   std::vector<Item> items;
   std::vector<size_t> songIndices;
   int selected=0,scroll=0;
+  enum class NowOverlay : uint8_t {Progress, Volume, Seek};
+  NowOverlay nowOverlay=NowOverlay::Progress;
+  uint32_t overlayUpdatedAt=0,lastWheelTurnAt=0;
+  uint32_t lastNowTime=UINT32_MAX;
+  int lastNowTrack=-1;
+  int seekPreview=-1,lastSeekCommitted=-1;
   bool dirty=true,blank=false,brightnessEditing=false;
   uint32_t lastTouch=0,lastRender=0,sleepDeadline=0;
-  uint8_t lastWiFiIndicator=255;
+  uint8_t lastWiFiIndicator=255,lastBatteryBand=255;
   // Network password keyboard. MENU toggles case; SELECT types; NEXT joins;
   // PREVIOUS deletes; Play/Pause cancels, Scroll moves selection.
   String wifiSSID,wifiPassword;
@@ -38,6 +44,7 @@ private:
   void build();int listItemCount() const;void navigate(Page next);void back();void open();void paint();
   void adjust(int delta);bool listPage()const;String title()const;
   void chooseTrack(size_t idx,const std::vector<size_t>& q);
+  void updateNowPlayingOverlay();
   void passwordEvent(Key key);void paintKeyboard();
 #if FEATURE_BLUETOOTH
   void bluetoothEvent(Key key);void paintBluetoothDialog();

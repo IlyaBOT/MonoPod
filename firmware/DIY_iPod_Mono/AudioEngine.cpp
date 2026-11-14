@@ -55,7 +55,7 @@ void AudioEngine::stop() {
   releaseDecoder();activeTrack=-1;pausedState=false;queuePos=-1;queue.clear();
 }
 bool AudioEngine::startFile(size_t index) {
-  releaseDecoder();pausedState=false;pausedMs=0;
+  releaseDecoder();pausedState=false;pausedMs=0;seekBaseSeconds=0;
   if(index>=media.size())return false;
   const Track &t=media.at(index);
   source=new AudioFileSourceSD(t.path.c_str());
@@ -90,10 +90,37 @@ void AudioEngine::pauseToggle(){
 uint32_t AudioEngine::elapsedSeconds() const {
   if(!active())return 0;
   uint32_t end=pausedState?pauseStarted:millis();
-  return (end-playStarted-pausedMs)/1000;
+  return seekBaseSeconds+(end-playStarted-pausedMs)/1000;
+}
+uint32_t AudioEngine::durationSeconds() const {
+  if(activeTrack<0 || (size_t)activeTrack>=media.size())return 0;
+  return media.at((size_t)activeTrack).durationSeconds;
+}
+uint32_t AudioEngine::remainingSeconds() const {
+  uint32_t duration=durationSeconds();
+  uint32_t elapsed=elapsedSeconds();
+  return duration>elapsed?duration-elapsed:0;
+}
+bool AudioEngine::seekPercent(uint8_t pct){
+  if(!active() || !source || !decoder)return false;
+  pct=constrain((int)pct,0,99); // keep seek away from EOF
+  String path=media.at((size_t)activeTrack).path;path.toLowerCase();
+  // Seeking arbitrary compressed frames requires frame sync; MPEG is experimental here.
+  if(!path.endsWith(".mp3") && !path.endsWith(".wav"))return false;
+  uint32_t length=source->getSize();if(length<128)return false;
+  uint32_t pos=(uint32_t)(((uint64_t)length*pct)/100ULL);
+  // Retain AudioEngine queue; restart decoder then seek its file source.
+  int index=activeTrack;
+  if(!startFile((size_t)index))return false;
+  bool ok=source->seek((int32_t)pos,SEEK_SET);
+  if(!ok){startFile((size_t)index);return false;}
+  uint32_t duration=durationSeconds();seekBaseSeconds=duration?(uint32_t)(((uint64_t)duration*pct)/100ULL):0;
+  playStarted=millis();pausedMs=0;pausedState=false;
+  return true;
 }
 uint8_t AudioEngine::approximateProgress() const {
   if(!source || !source->getSize())return 0;
+  if(durationSeconds())return (uint8_t)min(100UL,100UL*elapsedSeconds()/durationSeconds());
   return (uint8_t)min(100UL,(100UL*source->getPos())/source->getSize());
 }
 void AudioEngine::next(bool userInitiated){

@@ -3,7 +3,7 @@
 SettingsStore settings;
 void SettingsStore::begin() {
   pref.begin("monopod",false);
-  data.volume=constrain((int)pref.getUChar("vol",30),0,(int)Config::MAX_VOLUME);
+  data.volume=constrain((int)pref.getUChar("vol",30),0,100);
   data.shuffle=pref.getBool("shuffle",false);
   data.repeat=(RepeatMode)constrain((int)pref.getUChar("repeat",0),0,2);
   data.backlightSeconds=pref.getUChar("bklight",10);
@@ -24,4 +24,9 @@ void SettingsStore::saveNow() {
   pref.putUChar("clickroute",(uint8_t)data.clicker);
   pref.putUChar("palette",data.contrast);pref.putBool("fontAA",data.fontSmoothing);
   dirty=false;
+}
+
+void SettingsStore::resetDefaults(){
+  data=SettingsState{};
+  markDirty();saveNow();
 }

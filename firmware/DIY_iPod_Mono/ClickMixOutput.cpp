@@ -34,14 +34,13 @@ void ClickMixOutput::cancelClick(){
 }
 int16_t ClickMixOutput::currentClick() const {
   if(!remaining_ || !duration_)return 0;
-  // Triangle-like click envelope: small, short, and free of large DC offsets.
-  uint32_t elapsed=duration_-remaining_;
-  int32_t envelope=(int32_t)((remaining_*8000ULL)/duration_);
-  int32_t wave=(phase_ & 0x80000000UL)?envelope:-envelope;
-  // 1ms ramp-in avoids the abrupt full-scale initial edge.
-  const uint32_t attack=(uint32_t)std::max(1,(int)(sampleRate_/1000));
-  if(elapsed<attack) wave=(int32_t)((int64_t)wave*elapsed/attack);
-  return (int16_t)wave;
+  // Short, deterministic broadband tick with a decaying envelope (no pitched tone).
+  // A tiny unipolar pulse at 3.3 kHz sounded like a beep; this does not.
+  const uint32_t elapsed=duration_-remaining_;
+  uint32_t noise=(phase_ ^ (phase_>>13) ^ (elapsed*0x9E3779B9UL));
+  noise^=noise<<13;noise^=noise>>17;noise^=noise<<5;
+  const int32_t amp=(int32_t)(remaining_*2600ULL/duration_);
+  return (int16_t)((int32_t)((noise>>16)&0xffff)-32768)*amp/32768;
 }
 void ClickMixOutput::consumeAccepted(){
   if(remaining_){--remaining_;phase_+=increment_;}
@@ -61,7 +60,15 @@ bool ClickMixOutput::ConsumeSample(int16_t sample[2]) {
   return true;
 }
 void ClickMixOutput::serviceIdle(uint16_t maxFrames){
-  if(!remaining_)return;
+  if(!remaining_){
+    if(started_ && target_){
+      // Drain stale DMA samples then shut down idle I2S; a click must not loop.
+      int16_t zero[2]={0,0};
+      for(int i=0;i<256;i++)if(!target_->ConsumeSample(zero))break;
+      target_->stop();started_=false;
+    }
+    return;
+  }
   if(!begin())return;
   for(uint16_t i=0;i<maxFrames && remaining_;i++){
     int16_t silence[2]={0,0};

@@ -105,7 +105,7 @@ void FeedbackController::loop(){
 void FeedbackController::localEffect(FeedbackEvent event,uint32_t now){
 #if FEATURE_PIEZO
   silencePiezo();
-  if(event==FeedbackEvent::Scroll)startTone(Config::PIEZO_SCROLL_HZ,7);
+  if(event==FeedbackEvent::Scroll)startTone(2100,2);
   else if(event==FeedbackEvent::Menu)startTone(2400,12);
   else if(event==FeedbackEvent::Select)startTone(Config::PIEZO_ACTION_HZ,17);
   else {
@@ -128,8 +128,9 @@ void FeedbackController::localEffect(FeedbackEvent event,uint32_t now){
 }
 void FeedbackController::fire(FeedbackEvent event){
   if(syncMode.active() || suppressed)return;
-  if(selected==ClickerMode::Off)return;
-  ++fired;
+  // The 2004 Click Wheel clicks only on scroll detents.
+  // Physical MENU / SELECT / transport switches already provide tactile feedback.
+  if(event!=FeedbackEvent::Scroll || selected==ClickerMode::Off)return;
   uint32_t now=millis();
   if(event==FeedbackEvent::Scroll){
     if(lastScrollAt && now-lastScrollAt<Config::FEEDBACK_SCROLL_MIN_MS)return;
@@ -138,15 +139,11 @@ void FeedbackController::fire(FeedbackEvent event){
     if(lastActionAt && now-lastActionAt<Config::FEEDBACK_ACTION_MIN_MS)return;
     lastActionAt=now;
   }
+  ++fired;
   if(selected==ClickerMode::Speaker || selected==ClickerMode::Both) localEffect(event,now);
   if(selected==ClickerMode::Headphones || selected==ClickerMode::Both){
 #if FEATURE_AUDIO
-    uint16_t hz=(event==FeedbackEvent::Scroll)?3300:
-                (event==FeedbackEvent::Menu)?2500:
-                (event==FeedbackEvent::Select)?2850:3150;
-    uint8_t ms=(event==FeedbackEvent::Scroll)?9:
-               (event==FeedbackEvent::Menu)?13:18;
-    player.headphoneClick(hz,ms);
+    player.headphoneClick(2100,3); // short decaying noise tick, not a beep
 #endif
   }
 }

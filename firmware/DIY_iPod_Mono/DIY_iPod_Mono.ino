@@ -30,7 +30,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.8.9.2 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.9.0 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -52,6 +52,9 @@ void setup(){
   else {MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
     display.reloadTheme(); // load optional bitmap theme from microSD
   }
+  display.bootLogo(); // pixel art or /MonoPod/boot.rgb565 theme asset
+  backlight.wake();
+  for(int i=0;i<85;i++){backlight.loop();delay(10);} // visible fade-in over boot logo
   input.begin();
   feedback.begin();
 #if FEATURE_AUDIO

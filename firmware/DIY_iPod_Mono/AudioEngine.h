@@ -22,6 +22,11 @@ public:
   bool paused() const {return pausedState;}
   int current() const {return activeTrack;}
   uint32_t elapsedSeconds() const;
+  uint32_t durationSeconds() const;
+  uint32_t remainingSeconds() const;
+  uint32_t ordinal() const {return queuePos>=0?(uint32_t)queuePos+1:0;}
+  uint32_t queueSize() const {return (uint32_t)queue.size();}
+  bool seekPercent(uint8_t percent); // WAV direct; MP3 requires decoder restart and frame resync
   uint8_t approximateProgress() const;
 #if FEATURE_BLUETOOTH
   bool bluetooth() const {return bluetoothOn;}
@@ -41,7 +46,7 @@ private:
 #if FEATURE_BLUETOOTH
   bool bluetoothOn=false;
 #endif
-  uint32_t playStarted=0,pauseStarted=0,pausedMs=0;
+  uint32_t playStarted=0,pauseStarted=0,pausedMs=0,seekBaseSeconds=0;
   String error;
   bool startFile(size_t index);
   void releaseDecoder();

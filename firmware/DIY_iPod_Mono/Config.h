@@ -132,12 +132,13 @@ constexpr uint32_t SPI_SD_HZ = 4000000;
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.
-constexpr bool TFT_BL_ACTIVE_LOW = true;
+constexpr bool TFT_BL_ACTIVE_LOW = false; // direct GPIO15 LED/BL, active-high; set true for P-MOS inverter
 constexpr uint32_t TFT_BL_PWM_HZ = 16000;
 constexpr uint8_t TFT_BL_PWM_BITS = 10;
 constexpr uint16_t TFT_BL_FADE_ON_MS = 250;
+constexpr uint32_t BATTERY_SAMPLE_INTERVAL_MS = 60000UL;
 constexpr uint16_t TFT_BL_FADE_OFF_MS = 400;
-constexpr uint8_t MAX_VOLUME = 90; // 90/100 maximum by design, initial is 30
+constexpr uint8_t MAX_VOLUME = 100; // clamp 0..100, no wraparound
 // Index capacity, NOT a limit on microSD file count. Target: >=1024 tracks.
 // 2048 is the configurable scan ceiling; PSRAM is recommended for real use.
 constexpr size_t MAX_TRACKS = 2048;
@@ -198,9 +199,14 @@ constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 #endif
 
 #ifndef FEATURE_SD_FORMAT
-#define FEATURE_SD_FORMAT 0 // opt-in! requires SdFat v2, test with expendable card first
+#define FEATURE_SD_FORMAT (!WOKWI_SIMULATION) // SdFat v2 required; destructive operation requires two confirmations
 #endif
 
+
+// 0=S3 builds video feature, 1=omit it entirely on flash-constrained ESP32.
+#ifndef EXCLUDE_BAD_APPLE_EASTEREGG
+#define EXCLUDE_BAD_APPLE_EASTEREGG (MONOPOD_BOARD == MONOPOD_BOARD_ESP32)
+#endif
 
 // MonoPod USB Sync v1: native ESP32-S3 USB CDC (GPIO19 D-, GPIO20 D+).
 // USB sync is NOT Apple's iAP and does not implement iTunes pairing.

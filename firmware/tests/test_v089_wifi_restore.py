@@ -32,7 +32,7 @@ def test_wifi_icon_is_three_bars_and_only_region_repainted():
     for folder in ('DIY_iPod_Mono','Wokwi_ILI9341'):
         display=get(folder,'Display.cpp'); ui=get(folder,'UI.cpp')
         assert 'void Display::wifiSignal(uint8_t bars)' in display
-        assert 'tft.fillRect(OX+117,OY+0,17,19,bg);' in display
+        assert 'surface().fillRect(OX+2,OY,17,19,bg);' in display
         assert 'wifiSignal(wifiBars);' in display
         assert 'smallText(117,3,"W"' not in display
         assert 'display.wifiSignal(next==5?3:(next==4?0:next));' in ui

@@ -18,6 +18,8 @@ public:
   bool reloadTheme();
   bool themeLoaded() const;
   void clear();
+  void startFrame(); // draw offscreen when PSRAM/RAM is available
+  void endFrame(); // one full-screen SPI transfer: no visible erase/flicker
   void header(const String& title,bool held,bool playing,uint8_t wifiBars);
   void wifiSignal(uint8_t bars); // refresh only the icon region; 0 hides it
   void footer(const String& message=""); // Explicit info only; no generic item counter
@@ -25,19 +27,29 @@ public:
   void text(int x,int y,const String& value,uint16_t front,uint16_t back,uint8_t maxChars=0);
   void smallText(int x,int y,const String& value,uint16_t front,uint16_t back,uint8_t maxChars=0);
   void centerText(int y,const String& value,bool small=false,bool inverted=false);
-  void fillRect(int x,int y,int w,int h,uint16_t color){tft.fillRect(x+OX,y+OY,w,h,color);}
+  void fillRect(int x,int y,int w,int h,uint16_t color){surface().fillRect(x+OX,y+OY,w,h,color);}
   void progress(int x,int y,int w,int percent);
   void clock(const String& dt);
   void syncScreen(bool wifi, bool transferring);
-  void nowPlaying(const String& title,const String& artist,bool paused,int progress,uint32_t seconds,uint8_t volume);
+  void nowPlaying(const String& title,const String& artist,const String& album,bool paused,uint32_t trackNumber,uint32_t trackCount);
+  void nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration);
+  uint8_t batteryBand() const;
+  void batteryIcon();
+  void bootLogo();
+  bool streamMonoFrame(const uint8_t* packed, uint16_t white=0xffff, uint16_t black=0x0000);
+  bool streamGray2Frame(const uint8_t* packed,const uint16_t colors[4]);
   uint16_t background()const{return bg;}
   uint16_t foreground()const{return fg;}
   uint16_t selectedBackground()const{return hi;}
   uint16_t muted()const{return low;}
   int textWidth(const String& s,bool small=false)const;
+  String fittedTitle(const String& title,int maxWidth)const;
   static constexpr uint8_t ROW_COUNT=5;
 private:
   MonoDisplayDriver tft;
+  GFXcanvas16* buffer=nullptr;
+  bool inFrame=false;
+  Adafruit_GFX& surface(){return inFrame && buffer?static_cast<Adafruit_GFX&>(*buffer):static_cast<Adafruit_GFX&>(tft);}
   static constexpr int OX=WOKWI_SIMULATION?40:0;
   static constexpr int OY=WOKWI_SIMULATION?96:0;
   uint16_t bg=0xCE59,fg=0x2104,hi=0x2945,low=0x8C71;

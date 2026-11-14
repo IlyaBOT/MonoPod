@@ -3,7 +3,7 @@
 #include "Config.h"
 enum class Key : uint8_t { None, Up, Down, Menu, Select, SelectLong, Previous, Next, PlayPause, RemotePlay, RemotePause, HoldChanged };
 enum class Page : uint8_t { Home, Music, Playlists, Artists, Albums, Genres, Songs,
-   Folders, Category, NowPlaying, Settings, Backlight, Clicker, FontSmoothing, Extras, Clock, SleepTimer, About, WiFi, WiFiNetworks, WiFiPassword,
+   Folders, Category, NowPlaying, Settings, Backlight, BacklightTimer, ResetAllSettings, Clicker, FontSmoothing, Extras, Clock, SleepTimer, About, BadApple, WiFi, WiFiNetworks, WiFiPassword,
 #if FEATURE_BLUETOOTH
    Bluetooth, BluetoothPaired, BluetoothScan, BluetoothPairConfirm, BluetoothPin, BluetoothDelete,
 #endif
@@ -13,6 +13,7 @@ enum class RepeatMode : uint8_t { Off=0, One=1, All=2 };
 enum class ClickerMode : uint8_t { Off=0, Speaker=1, Headphones=2, Both=3 };
 struct Track {
   String path, title, artist, album, genre, folder;
+  uint32_t durationSeconds=0; // 0=unknown; ID3 TLEN or WAV duration
 };
 struct SettingsState {
   uint8_t volume = 30;

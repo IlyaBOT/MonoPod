@@ -8,7 +8,7 @@ def test_s3_gpio15_and_no_conflicts():
         assert 'constexpr int8_t PIN_TFT_BL = 15;' in cfg
         assert 'constexpr int8_t PIN_TFT_BL = -1;' in cfg
         assert 'TFT_BL_PWM_HZ = 16000' in cfg
-        assert 'TFT_BL_ACTIVE_LOW = true' in cfg
+        assert 'TFT_BL_ACTIVE_LOW = false' in cfg
         assert 'S3 GPIO15 backlight PWM conflicts with developer encoder' in cfg
         assert 'constexpr uint8_t PIN_PIEZO = 42;' in cfg
 
@@ -19,7 +19,7 @@ def test_ui_has_brightness_and_idle_fade():
         assert 'backlight.wake();' in ui
         assert 'backlight.sleep();' in ui
         assert 'backlight.setBrightness(settings.data.backlightBrightness);' in ui
-        assert 'void PlayerUI::loop(){\n  if(syncMode.active()){' in ui
+        assert 'void PlayerUI::loop(){' in ui and 'if(syncMode.active()){' in ui
         assert 'blank=true;backlight.sleep();' in ui
         assert 'backlight.loop();' in ui
         assert 'settings.data.backlightBrightness' in ui

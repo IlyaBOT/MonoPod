@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstring>
 #if FEATURE_SD_FORMAT
+#define DISABLE_FS_H_WARNING
 #include <SdFat.h>
 #endif
 MediaLibrary media;
@@ -24,6 +25,48 @@ static String id3Text(File &f,uint32_t len) {
     } else out+=(char)c;
   }
   return clipTag(out);
+}
+// MP3 duration: exact when Xing/Info frame count is available; otherwise CBR estimate.
+// Accurate remaining time needs TLEN/Xing. Unknown files display --:-- instead.
+static uint32_t probeMp3Duration(const String& path){
+  File f=SD.open(path.c_str());if(!f)return 0;
+  uint32_t start=0;
+  uint8_t id3[10];
+  if(f.read(id3,10)==10 && memcmp(id3,"ID3",3)==0){
+    start=10UL+((uint32_t)(id3[6]&127)<<21)+((uint32_t)(id3[7]&127)<<14)+((uint32_t)(id3[8]&127)<<7)+(id3[9]&127);
+  }
+  if(start>=f.size()){f.close();return 0;}
+  f.seek(start);
+  uint8_t b[4096];int n=f.read(b,sizeof(b));
+  uint32_t secs=0;
+  for(int i=0;i+4<n;i++){
+    if(b[i]!=0xff || (b[i+1]&0xe0)!=0xe0)continue;
+    int version=(b[i+1]>>3)&3,layer=(b[i+1]>>1)&3;
+    int bitrateIndex=(b[i+2]>>4)&15,sampleIndex=(b[i+2]>>2)&3;
+    if(version==1 || layer!=1 || bitrateIndex==0 || bitrateIndex==15 || sampleIndex==3)continue;
+    static const uint16_t rates1[]={0,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0};
+    static const uint16_t rates2[]={0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,0};
+    const int rate= (version==3?rates1[bitrateIndex]:rates2[bitrateIndex]);
+    const int base[3]={44100,48000,32000};
+    const int sampleRate=base[sampleIndex]>>(version==3?0:(version==2?1:2));
+    const int samplesPerFrame=(version==3?1152:576);
+    if(!rate||!sampleRate)continue;
+    // MPEG layer III Xing/Info frame count, including optional CRC and side information.
+    const int mono=((b[i+3]>>6)&3)==3;
+    const int side=(version==3?(mono?17:32):(mono?9:17));
+    const int off=i+4+((b[i+1]&1)?0:2)+side;
+    if(off+12<n && (memcmp(b+off,"Xing",4)==0 || memcmp(b+off,"Info",4)==0)){
+      const uint32_t flags=bigEndian4(b+off+4);
+      if(flags&1){const uint32_t frames=bigEndian4(b+off+8);
+        if(frames)secs=(uint32_t)(((uint64_t)frames*samplesPerFrame+sampleRate/2)/sampleRate);
+      }
+    }
+    if(!secs){uint32_t bytes=f.size()-(start+(uint32_t)i);
+      secs=(uint32_t)(((uint64_t)bytes*8+500UL*rate)/(1000UL*rate));
+    }
+    break;
+  }
+  f.close();return secs;
 }
 bool MediaLibrary::isAudio(const String &name) {
   String n=name; n.toLowerCase();
@@ -89,7 +132,18 @@ void MediaLibrary::scanFolder(const String &path,uint8_t depth) {
       t.album=album.length()?album:"Unknown Album";
       String artist=parent(t.folder);sl=artist.lastIndexOf('/');if(sl>=0)artist=artist.substring(sl+1);
       t.artist=artist.length()?artist:"Unknown Artist";t.genre="Unknown";
-      metadata(t);tracks.push_back(t);
+      metadata(t);
+      if(t.durationSeconds==0 && (name.endsWith(".mp3") || name.endsWith(".MP3")))t.durationSeconds=probeMp3Duration(name);
+      // Read canonical PCM WAV header (RIFF/WAVE, fmt/data). Do not estimate MP3 VBR duration.
+      if(name.endsWith(".wav") || name.endsWith(".WAV")){
+        File wf=SD.open(name.c_str()); uint8_t wh[44];
+        if(wf && wf.read(wh,sizeof(wh))==sizeof(wh) && memcmp(wh,"RIFF",4)==0 && memcmp(wh+8,"WAVE",4)==0 && memcmp(wh+12,"fmt ",4)==0){
+          uint32_t bytesPerSecond=(uint32_t)wh[28]|((uint32_t)wh[29]<<8)|((uint32_t)wh[30]<<16)|((uint32_t)wh[31]<<24);
+          if(bytesPerSecond && memcmp(wh+36,"data",4)==0){uint32_t dataBytes=(uint32_t)wh[40]|((uint32_t)wh[41]<<8)|((uint32_t)wh[42]<<16)|((uint32_t)wh[43]<<24);t.durationSeconds=(dataBytes+bytesPerSecond/2)/bytesPerSecond;}
+        }
+        if(wf)wf.close();
+      }
+      tracks.push_back(t);
     }
     entry=dir.openNextFile();
   }
@@ -109,13 +163,14 @@ void MediaLibrary::metadata(Track &t) {
     uint32_t n= version==4 ? ((fh[4]&127)<<21)|((fh[5]&127)<<14)|((fh[6]&127)<<7)|(fh[7]&127) : bigEndian4(fh+4);
     pos+=10;if(!n || pos+n>end || n>65536)break;
     String frame=String((char)fh[0])+String((char)fh[1])+String((char)fh[2])+String((char)fh[3]);
-    if(frame=="TIT2" || frame=="TPE1" || frame=="TALB" || frame=="TCON") {
+    if(frame=="TIT2" || frame=="TPE1" || frame=="TALB" || frame=="TCON" || frame=="TLEN") {
       String value=id3Text(f,n);
       if(value.length()) {
         if(frame=="TIT2") t.title=value;
         if(frame=="TPE1") t.artist=value;
         if(frame=="TALB") t.album=value;
         if(frame=="TCON") t.genre=value;
+        if(frame=="TLEN") {unsigned long ms=strtoul(value.c_str(),nullptr,10); if(ms>0 && ms<86400000UL)t.durationSeconds=(ms+500)/1000;}
       }
     }
     pos+=n;f.seek(pos);
@@ -188,30 +243,44 @@ void MediaLibrary::eject(){
 }
 bool MediaLibrary::formatCard(){
 #if FEATURE_SD_FORMAT
-  // Opt-in quick format. SD library must be UNMOUNTED before opening SdFat.
-  // Test with a disposable card and reliable external USB power first.
+  // Explicit, double-confirmed DESTRUCTIVE operation initiated only from the UI.
+  // The S3 SD.h interface supports FAT; choose FAT16/32 for compatibility with
+  // the playback and USB sync filesystem. Do not create an unmountable exFAT card.
   eject();
-  digitalWrite(Config::PIN_TFT_CS,HIGH);
-  SdCardFactory factory;
-  SdCard* card=factory.newCard(SdSpiConfig(Config::PIN_SD_CS,SHARED_SPI,SD_SCK_MHZ(10)));
-  if(!card || card->errorCode() || !card->sectorCount()) {
-    error="SD formatter: card init failed";return false;
-  }
-  uint8_t sectorBuffer[512] __attribute__((aligned(4)))={};
-  uint32_t sectors=card->sectorCount();
-  bool ok=false;
-  if(sectors>67108864UL){
-    ExFatFormatter formatter;
-    ok=formatter.format(card,sectorBuffer,&MONOPOD_LOG);
-  }else{
+  pinMode(Config::PIN_TFT_CS, OUTPUT); digitalWrite(Config::PIN_TFT_CS,HIGH);
+  pinMode(Config::PIN_SD_CS, OUTPUT); digitalWrite(Config::PIN_SD_CS,HIGH);
+  {
+    SdCardFactory factory;
+    SdCard* card=factory.newCard(SdSpiConfig(Config::PIN_SD_CS,SHARED_SPI,
+                                             SD_SCK_MHZ(4),&SPI));
+    if(!card || card->errorCode() || !card->sectorCount()){
+      error="Formatter: SD card init failed";return false;
+    }
+    uint8_t sectorBuffer[512] __attribute__((aligned(4)))={};
+    // SdFat FatFormatter chooses FAT16/FAT32 based on sector count.
+    // FAT32 on SDXC (>32 GiB) is intentional for the Arduino SDFS backend.
     FatFormatter formatter;
-    ok=formatter.format(card,sectorBuffer,&MONOPOD_LOG);
+    MONOPOD_LOG.println("SD FORMAT: destroying all existing files, creating FAT volume");
+    if(!formatter.format(card,sectorBuffer,&MONOPOD_LOG)){
+      error="Formatter: FAT creation failed";return false;
+    }
   }
-  if(!ok){error="SD formatter failed";return false;}
-  return begin();
+  // The formatting card object has now gone out of scope; mount normally.
+  if(!begin()){
+    error="FAT written, but SD mount failed";return false;
+  }
+  if(!SD.exists("/Music") && !SD.mkdir("/Music")){
+    error="Formatted, failed to create /Music";return false;
+  }
+  if(!SD.exists("/Playlists") && !SD.mkdir("/Playlists")){
+    error="Formatted, failed to create /Playlists";return false;
+  }
+  rescan();
+  MONOPOD_LOG.println("SD FORMAT: FAT volume ready, /Music and /Playlists created");
+  return true;
 #else
-  // Arduino-ESP32 SDFS exposes no formatting API. Never guess FatFs drive IDs.
-  error="Enable FEATURE_SD_FORMAT with SdFat v2";
+  error="SD formatting unavailable (SdFat v2 not compiled)";
   return false;
 #endif
 }
+

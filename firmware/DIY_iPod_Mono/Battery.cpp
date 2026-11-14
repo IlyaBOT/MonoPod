@@ -13,7 +13,7 @@ void BatteryMonitor::begin(){
 }
 void BatteryMonitor::loop(){
 #if FEATURE_BATTERY_ADC
-  if(millis()-sampledAt>=2000)sample();
+  if(millis()-sampledAt>=Config::BATTERY_SAMPLE_INTERVAL_MS)sample();
 #endif
 }
 void BatteryMonitor::sample(){

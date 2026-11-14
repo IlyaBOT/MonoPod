@@ -1,3 +1,11 @@
+# MonoPod v0.9.0 — Now Playing / GPU-style offscreen TFT / boot assets / battery
+
+See `CHANGELOG_v0.9.0.md`. Video player uses your own MP4 converted with `tools/convert_badapple.py`. Missing user video is not bundled.
+
+# MonoPod v0.9.0
+
+See `CHANGELOG_v0.8.9.3.md` and `docs/Classic4G_UI_Formatting_Clicker_v0.8.9.3_RU.md` for changes. **Install Greiman SdFat v2** for formatting; test only with backed-up spare cards.
+
 > **v0.8.9.1 hotfix:** Arduino build integration: include WiFiNetworks.h in the physical sketch and implement hasSavedNetwork() in both board/simulator headers. No NVS wipe required.
 
 # MonoPod v0.8.9 — ESP32-S3 Wi-Fi auto-reconnect, signal indicator, UART improvements
@@ -20,6 +28,8 @@ See `CHANGELOG_v0.8.9.md` and `docs/MonoPod_v0.8.9_WiFi_and_UART_Diagnostics_RU.
 ## TFT backlight (NEW in 0.8.6)
 
 On ESP32-S3, `Config::PIN_TFT_BL = GPIO15` controls PWM at 16 kHz / 10 bits, with a 250 ms fade-in and 400 ms fade-out. Use an appropriate P-channel high-side MOSFET (active-low gate, `TFT_BL_ACTIVE_LOW=true`), **not** a direct unknown LED current through GPIO. `Settings > Backlight` now offers 5–100% brightness and timeout; settings persist to NVS. Backlight remains on during Sync and goes dark smoothly while music continues. See `docs/MonoPod_Backlight_PWM_v0.8.6_RU.md` for wiring/safety.
+
+**Prototype active-high:** ESP32-S3 GPIO15 now uses `TFT_BL_ACTIVE_LOW=false` for direct GPIO drive. This is a hardware overload risk at 30 mA; use a MOSFET for a reliable build.
 
 **Classic ESP32/WROVER:** PWM GPIO unassigned (`PIN_TFT_BL=-1`) until its wiring is confirmed; S3 is the primary prototype target. Existing Rev A power system remains TP4056.
 
