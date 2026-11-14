@@ -49,11 +49,11 @@ private:
   uint8_t badBaselineSamples=0;
   // Updated only after a stable touch. Sampling for UART never moves the cursor.
   bool wheelTouch=false, touchPresent=false, touchValid=false, touchOn=true;
-  uint32_t touchCandidateSince=0, touchLastSample=0;
+  uint32_t touchCandidateSince=0, touchLastSample=0, touchMissingSince=0;
   uint8_t peakChannel=0;
   float lastAngle=0,angleDelta=0,touchSum=0,touchVector=0;
   float touchX=0,touchY=0;
-  uint8_t touchSensitivityPct=10, touchTotalPct=2, touchDominancePct=50;
+  uint8_t touchSensitivityPct=3, touchTotalPct=2, touchDominancePct=45;
   uint8_t touchPadPct[6]={}; // 0: use global sensitivity
   uint32_t touchMinDelta=5;
   Key readButtons();

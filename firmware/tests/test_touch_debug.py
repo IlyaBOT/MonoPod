@@ -11,8 +11,8 @@ def test_touch_runtime_api_and_commands():
         assert token in input_cpp and token in input_h
 
 def test_no_single_sample_scroll():
-    assert "(uint32_t)(now-touchCandidateSince)<90" in input_cpp
-    assert "fabsf(d)<0.12f" in input_cpp
+    assert "(uint32_t)(now-touchCandidateSince)<35" in input_cpp
+    assert "fabsf(d)<0.08f" in input_cpp
     assert "b!=Key::None || keyStable!=Key::None" in input_cpp
 
 def test_disabled_touch_keeps_diagnostics():
@@ -25,3 +25,10 @@ def test_both_board_profiles_preserved():
     assert "MONOPOD_BOARD_ESP32_S3" in config
     assert "MONOPOD_BOARD_ESP32" in config
     assert "constexpr uint8_t WHEEL_PINS[6] = {1,2,5,6,7,8}" in config
+
+
+def test_bridged_touch_dropout_and_s3_threshold():
+    assert "touchMissingSince" in input_cpp
+    assert "(now-touchMissingSince)>130" in input_cpp
+    assert "touchSensitivityPct=3" in input_h
+    assert "touchTotalPct=2" in input_h

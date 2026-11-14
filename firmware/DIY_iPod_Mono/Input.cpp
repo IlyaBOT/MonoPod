@@ -33,7 +33,7 @@ uint16_t InputManager::buttonAdcMillivolts() {
 Key InputManager::decodeButtonMillivolts(uint16_t mV) const {
 #if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
   {
-    // External 10k GPIO9 pull-up. Reject inter-key gaps and idle voltage.
+    // External 20k GPIO9 pull-up. Reject inter-key gaps and idle voltage.
     const Key keys[5] = {Key::Menu, Key::Previous, Key::Next, Key::PlayPause, Key::Select};
     for(uint8_t i=0;i<5;i++){
       if(mV>=Config::BUTTON_ADC_WINDOWS_MV[i][0] &&
@@ -55,6 +55,7 @@ Key InputManager::readButtons() {
 void InputManager::touchResetTracking() {
   wheelTouch=false;
   touchCandidateSince=0;
+  touchMissingSince=0;
   angleDelta=0;
   touchPresent=false;
 }
@@ -176,12 +177,21 @@ Key InputManager::readWheel() {
   if((uint32_t)(now-lastWheel)<30)return Key::None;
   lastWheel=now;
   touchSample();
-  if(!touchPresent){touchResetTracking();return Key::None;}
+  // A finger may cross a narrow gap or an electrode with a weaker response.
+  // A short loss of DETECT must not turn one physical swipe into several new swipes.
+  if(!touchPresent){
+    if(touchMissingSince==0)touchMissingSince=now;
+    if((uint32_t)(now-touchMissingSince)>130)touchResetTracking();
+    return Key::None;
+  }
+  const bool wasMissing=touchMissingSince!=0;
+  const uint32_t missingMs=wasMissing?(uint32_t)(now-touchMissingSince):0;
+  touchMissingSince=0;
   const float angle=atan2f(touchY,touchX);
   if(!wheelTouch){
-    // One noisy sample can no longer move the cursor.
+    // With 30 ms polling, 90 ms could consume multiple sectors of a fast swipe.
     if(touchCandidateSince==0)touchCandidateSince=now;
-    if((uint32_t)(now-touchCandidateSince)<90)return Key::None;
+    if((uint32_t)(now-touchCandidateSince)<35)return Key::None;
     wheelTouch=true;
     lastAngle=angle;
     angleDelta=0;
@@ -191,8 +201,10 @@ Key InputManager::readWheel() {
   while(d>3.14159265f)d-=6.283185307f;
   while(d< -3.14159265f)d+=6.283185307f;
   lastAngle=angle;
-  // Tiny angle jitter or discontinuous position jumps are ignored.
-  if(fabsf(d)<0.12f || fabsf(d)>1.1f)return Key::None;
+  // Re-anchor after crossing a dead zone rather than interpreting a large
+  // uncertain displacement as a sudden reverse rotation.
+  if(wasMissing && (missingMs>75 || fabsf(d)>1.5f))return Key::None;
+  if(fabsf(d)<0.08f || fabsf(d)>1.6f)return Key::None;
   angleDelta+=d;
   if(angleDelta>=0.40f){angleDelta-=0.40f;return Key::Down;}
   if(angleDelta<=-0.40f){angleDelta+=0.40f;return Key::Up;}

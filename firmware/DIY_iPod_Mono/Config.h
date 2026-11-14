@@ -67,15 +67,16 @@ constexpr uint8_t PIN_SD_CS = 14;
 constexpr uint8_t PIN_I2S_BCLK = 16;
 constexpr uint8_t PIN_I2S_LRC = 17;
 constexpr uint8_t PIN_I2S_DATA = 18;
-constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, external 10k pull-up to 3V3
+constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, external 20k pull-up to 3V3
 // Five normally-open buttons connect GPIO9 to GND through separate resistors:
 // MENU=0, PREV=5.1k, NEXT=10k, PLAY=20k, SELECT=39.9k.
-// Required: one physical 10k resistor between GPIO9 and 3V3.
+// Required: one physical 20k resistor between GPIO9 and 3V3.
 constexpr bool BUTTON_ADC_INTERNAL_PULLUP = false;
-// Nominal voltage with external 10k pull-up: 0 / 1115 / 1650 / 2200 / 2640 mV.
+// Measured GPIO9 levels with external 20k pull-up (mV): MENU=0, PREV=654..657, NEXT=1064..1085, PLAY=1604..1702, SELECT=2194..2217.
+// Idle/transient 3148 mV is NOT a PLAY press.
 // Windows allow analog tolerances and preserve gaps between keys.
 constexpr uint16_t BUTTON_ADC_WINDOWS_MV[5][2] = {
-  { 0, 160 }, { 900, 1300 }, { 1450, 1850 }, { 1980, 2400 }, { 2460, 2900 }
+  { 0, 120 }, { 530, 800 }, { 940, 1220 }, { 1480, 1840 }, { 2040, 2410 }
 };
 constexpr uint8_t PIN_BATTERY_ADC = 4; // ADC1, 100k/100k divider
 constexpr uint8_t PIN_HOLD = 21; // external 10k pull-up
@@ -129,7 +130,7 @@ constexpr uint16_t FEEDBACK_ACTION_MIN_MS = 60;
 constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable
 // ST7735S was at 16MHz. 20/26.67MHz are optional OVERCLOCK values,
 // not guaranteed by ST7735S datasheet. Keep stable default first.
-constexpr uint32_t SPI_TFT_HZ = 16000000; // experimentally test 20000000 later
+constexpr uint32_t SPI_TFT_HZ = 20000000; // experimentally test 20000000 later
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.
