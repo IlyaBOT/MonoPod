@@ -695,7 +695,7 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.10.6";break;
+        case 3:value="0.10.6.1";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }
@@ -906,7 +906,7 @@ void PlayerUI::loop(){
     }
   }
   // Update only the Wi-Fi glyph while idle; do not clear/redraw the menu.
-  if(!blank && !dirty && page!=Page::NowPlaying && !player.active() && !input.held()){
+  if(!blank && !dirty && page!=Page::NowPlaying && (!player.active() || input.held())){
     const uint8_t next=wifiNetworks.indicator();
     if(next!=lastWiFiIndicator){
       lastWiFiIndicator=next;

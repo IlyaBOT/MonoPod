@@ -69,11 +69,16 @@ constexpr uint8_t PIN_I2S_LRC = 17;
 constexpr uint8_t PIN_I2S_DATA = 18;
 constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, internal pull-up + resistor ladder
 // ADC button ladder on S3 uses weak internal pull-up to 3V3; no 10k external pull-up.
-// Button resistor branches: MENU=0, PREV=2k2, NEXT=5k1, PLAY=10k, SELECT=22k.
+// Actual S3 board: MENU=0, PREV=5k1, NEXT=10k, PLAY=20k, SELECT=39k9.
 // The internal pull-up is not precision rated: verify measured ADC levels on the real board.
 constexpr bool BUTTON_ADC_INTERNAL_PULLUP = true;
-// mV thresholds nominally for ~45k internal pull-up. Tune using actual GPIO9 measurements.
-constexpr int BUTTON_ADC_BOUNDS_MV[5] = {75, 245, 470, 795, 1550};
+// Measured GPIO9 values may differ from calculations: weak internal pull-up is variable.
+// Expected at VDD=3.3V and Rpullup=45k: 0 / 336 / 600 / 1015 / 1551mV.
+// Inclusive non-overlapping windows: MENU / PREV / NEXT / PLAY / SELECT.
+// A gap between windows is intentional: unstable voltages must NOT trigger keys.
+constexpr uint16_t BUTTON_ADC_WINDOWS_MV[5][2] = {
+  { 0, 120 }, { 180, 480 }, { 490, 830 }, { 845, 1330 }, { 1360, 2100 }
+};
 constexpr uint8_t PIN_BATTERY_ADC = 4; // ADC1, 100k/100k divider
 constexpr uint8_t PIN_HOLD = 21; // external 10k pull-up
 constexpr uint8_t WHEEL_PINS[6] = {1,2,5,6,7,8}; // all actual S3 touch channels
@@ -114,6 +119,9 @@ constexpr uint8_t PIN_PIEZO = 2;
 constexpr uint8_t PIN_HAPTIC_SDA = 32;
 constexpr uint8_t PIN_HAPTIC_SCL = 33;
 #endif
+// Debounce / release guard apply to both ESP32 and ESP32-S3.
+constexpr uint16_t BUTTON_ADC_DEBOUNCE_MS = 60;
+constexpr uint16_t BUTTON_ADC_RELEASE_GUARD_MS = 100;
 constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
 constexpr uint16_t PIEZO_ACTION_HZ = 2700;
 constexpr uint16_t FEEDBACK_SCROLL_MIN_MS = 45;
@@ -136,13 +144,21 @@ constexpr bool TFT_BL_BRIGHTNESS_CONTROL = false;
 constexpr uint32_t TFT_BL_PWM_HZ = 16000;
 constexpr uint8_t TFT_BL_PWM_BITS = 10;
 constexpr uint16_t TFT_BL_FADE_ON_MS = 250;
-// Voltage calibration parameters (replace after measured full-cell ADC sample).
+// Calibration from prototype measurement: Vbat=4.23 V when GPIO4=2.10 V.
+// Applied to analogReadMilliVolts() output, not raw 12-bit ADC counts.
 // Effective conversion: Vbat = ADC_mV * BATTERY_ADC_RATIO / 1000 + BATTERY_ADC_OFFSET_V.
-// The default 2.0 is the ideal 100k/100k divider; do not adjust without data.
-constexpr float BATTERY_ADC_RATIO = 2.0f;
+constexpr float BATTERY_ADC_RATIO = 4.23f / 2.10f;
 constexpr float BATTERY_ADC_OFFSET_V = 0.0f;
+constexpr float BATTERY_FULL_VOLTAGE = 4.23f;
+// Voltage-only charge indication (NOT proof of current flowing into the cell).
+// Starts STRICTLY above 2.15 V at GPIO4, clears below 2.13 V (20 mV hysteresis).
+// Use a TP4056 CHRG/STAT signal for reliable charging detection on future PCB.
+constexpr uint16_t BATTERY_CHARGE_ADC_ON_MV = 2150;
+constexpr uint16_t BATTERY_CHARGE_ADC_OFF_MV = 2130;
 constexpr uint32_t BATTERY_SAMPLE_INTERVAL_MS = 60000UL;
 constexpr uint16_t TFT_BL_FADE_OFF_MS = 400;
+// Minimum visible splash duration; SD library scan and STA connection overlap it.
+constexpr uint32_t BOOT_LOGO_MIN_MS = 1850UL;
 constexpr uint8_t MAX_VOLUME = 100; // clamp 0..100, no wraparound
 // Index capacity, NOT a limit on microSD file count. Target: >=1024 tracks.
 // 2048 is the configurable scan ceiling; PSRAM is recommended for real use.

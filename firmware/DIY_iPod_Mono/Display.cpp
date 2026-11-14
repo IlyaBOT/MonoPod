@@ -164,18 +164,19 @@ String Display::fittedTitle(const String& title, int width,bool small) const {
 }
 void Display::header(const String& title,bool held,bool playbackActive,uint8_t wifiBars,bool nowPlaying,bool playbackPaused){
   surface().fillRect(OX,OY,160,20,bg);
-  // Show current playback status in *every* menu; while idle use Wi-Fi indicator.
-  // HOLD overrides the playback glyph; never show PAUSE for an inactive player.
-  if(held || playbackActive || nowPlaying){
-    surface().fillRect(OX+2,OY,30,19,bg);
-    if(held)smallText(20,5,"H",fg,bg);
-    else if(playbackActive && playbackPaused){
+  // On HOLD keep the Wi-Fi symbol in its original slot and show H beside it.
+  // Now Playing intentionally suppresses Wi-Fi, as on the classic iPod UI.
+  if(held){
+    if(!nowPlaying)wifiSignal(wifiBars);
+    smallText(20,5,"H",fg,bg);
+  }else if(playbackActive){
+    if(playbackPaused){
       surface().fillRect(OX+7,OY+4,3,11,themed(7,fg));
       surface().fillRect(OX+14,OY+4,3,11,themed(7,fg));
-    }else if(playbackActive){
+    }else{
       surface().fillTriangle(OX+7,OY+4,OX+7,OY+15,OX+17,OY+9,themed(7,fg));
     }
-  }else{
+  }else if(!nowPlaying){
     wifiSignal(wifiBars);
   }
   headerTitleMarquee(title,0);
@@ -286,6 +287,7 @@ static String timeLabel(uint32_t seconds){
   return String(seconds/60)+":"+(seconds%60<10?"0":"")+String(seconds%60);
 }
 uint8_t Display::batteryBand()const {
+  if(battery.charging())return 5; // separate band: charging indicator overrides charge level
   int pct=battery.level();
   if(pct<0)return 255;
   if(pct>=75)return 4;
@@ -300,7 +302,12 @@ void Display::batteryIcon(){
   surface().drawRect(OX+bx,OY+by,19,9,themed(9,fg));
   surface().fillRect(OX+bx+19,OY+by+3,2,3,themed(9,fg));
   int b=batteryBand();
-  if(b==255){
+  if(b==5){ // charging: filled battery with contrasting lightning bolt
+    surface().fillRect(OX+bx+2,OY+by+2,15,5,themed(9,fg));
+    surface().drawLine(OX+bx+10,OY+by+2,OX+bx+8,OY+by+4,bg);
+    surface().drawLine(OX+bx+8,OY+by+4,OX+bx+12,OY+by+4,bg);
+    surface().drawLine(OX+bx+12,OY+by+4,OX+bx+10,OY+by+6,bg);
+  }else if(b==255){
     surface().fillRect(OX+bx+8,OY+by+2,2,3,themed(9,fg));
     surface().drawPixel(OX+bx+8,OY+by+6,themed(9,fg));
   }else if(b){
@@ -352,13 +359,20 @@ void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,ui
 void Display::bootLogo(){
   tft.fillRect(OX,OY,160,128,0x0000);
   File f=SD.open("/MonoPod/boot.rgb565",FILE_READ);
-  if(f && f.size()==160UL*128UL*2UL){
+  if(f && (f.size()==160UL*128UL*2UL || f.size()==128UL*128UL*2UL)){
+    const int logoWidth=f.size()==128UL*128UL*2UL?128:160;
+    const int x=OX+(160-logoWidth)/2;
     uint16_t line[160];
+    bool complete=true;
     for(int y=0;y<128;y++){
-      if(f.read((uint8_t*)line,sizeof(line))!=sizeof(line))break;
-      tft.drawRGBBitmap(OX,OY+y,line,160,1);
+      if(f.read((uint8_t*)line,(size_t)logoWidth*2)!=(int)(logoWidth*2)){
+        complete=false;break;
+      }
+      tft.drawRGBBitmap(x,OY+y,line,logoWidth,1);
     }
-    f.close();return;
+    f.close();
+    if(complete)return;
+    tft.fillRect(OX,OY,160,128,0x0000); // partial asset: fall back to builtin
   }
   if(f)f.close();
   // Old iPod-style white silhouette on black; a theme RGB565 image overrides it.

@@ -14,11 +14,12 @@ MediaLibrary media;
 static String clipTag(String s) {s.trim(); if(s.length()>80) s.remove(80);return s;}
 static String noExt(String n) {int slash=n.lastIndexOf('/');if(slash>=0)n=n.substring(slash+1);int dot=n.lastIndexOf('.');if(dot>0)n.remove(dot);return n;}
 static bool strLess(String a,String b) {a.toLowerCase(); b.toLowerCase();return a.compareTo(b)<0;}
+// Xing/Info frame fields use network (big-endian) byte order.
 static uint32_t bigEndian4(const uint8_t* p) {
-    return (uint32_t(p[0]) << 24) |
-           (uint32_t(p[1]) << 16) |
-           (uint32_t(p[2]) << 8)  |
-            uint32_t(p[3]);
+  return (uint32_t(p[0]) << 24) |
+         (uint32_t(p[1]) << 16) |
+         (uint32_t(p[2]) << 8)  |
+          uint32_t(p[3]);
 }
 // MP3 duration: exact when Xing/Info frame count is available; otherwise CBR estimate.
 // Accurate remaining time needs TLEN/Xing. Unknown files display --:-- instead.
@@ -74,7 +75,7 @@ bool MediaLibrary::isAudio(const String &name) {
   return n.endsWith(".mp3") || n.endsWith(".wav") || n.endsWith(".flac") || n.endsWith(".aac");
 }
 String MediaLibrary::parent(const String &p) {int at=p.lastIndexOf('/');return at>0 ? p.substring(0,at) : String("/");}
-bool MediaLibrary::begin() {
+bool MediaLibrary::begin(bool scanOnMount) {
   if(mounted)eject();
   // SD must enter SPI mode BEFORE the TFT communicates on their shared bus.
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
@@ -89,7 +90,7 @@ bool MediaLibrary::begin() {
     MONOPOD_LOG.printf("SD: OK type=%u size=%llu B SPI=%lu Hz\n",
       (unsigned)SD.cardType(),(unsigned long long)SD.cardSize(),
       (unsigned long)activeSpiHz);
-    rescan();
+    if(scanOnMount)rescan();
     return true;
   }
   SD.end();

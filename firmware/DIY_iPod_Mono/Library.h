@@ -4,7 +4,7 @@
 #include <vector>
 class MediaLibrary {
 public:
-  bool begin();
+  bool begin(bool scanOnMount=true);
   void rescan();
   void eject();
   bool remount(){return begin();}

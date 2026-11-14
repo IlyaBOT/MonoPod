@@ -34,7 +34,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC reserved for MPOD1 v4
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.10.6 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.10.6.1 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32)
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -43,6 +43,7 @@ void setup(){
   MONOPOD_LOG.printf("Board profile=%s | Bluetooth Classic=%s\n",
     MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3 N16R8":"ESP32-WROVER",FEATURE_BLUETOOTH?"enabled":"compiled out");
 #endif
+  MONOPOD_LOG.println("Build: Boot-HOLD-ADC-BTNS fixes");
   settings.begin();
   backlight.begin(settings.data.backlightBrightness);
   battery.begin();
@@ -50,36 +51,62 @@ void setup(){
   // Each SPI peripheral MUST have its own CS; both high when idle.
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
-  MONOPOD_LOG.println("Boot: SD mount and library scan");
-  const bool sdMounted=media.begin(); // IMPORTANT: initialize SD SPI mode BEFORE first TFT transaction
-  const bool recoveryNeeded=sdMounted && (SD.exists("/.monopod-transfer.target") || SD.exists("/Music/.monopod-target.txt") || SD.exists("/Music/.monopod-wifi.target"));
-  SyncFiles::recover();
-  if(recoveryNeeded)media.rescan(); // restored files must be present in the initial player index
+  MONOPOD_LOG.println("Boot: SD mount (without media scan)");
+  // SD enters SPI mode before the first TFT transaction; keep this order.
+  const bool sdMounted=media.begin(false);
+  MONOPOD_LOG.println("Boot: TFT and splash");
+  display.begin();
+  if(!sdMounted)MONOPOD_LOG.println("SD: "+media.lastError());
+  else display.reloadTheme(); // theme and custom bootlogo need an already mounted card
+  display.bootLogo(); // built-in square or /MonoPod/boot.rgb565
+  const uint32_t bootLogoShownAt=millis();
+  backlight.wake();
+  // Start Wi-Fi immediately: lwIP connects concurrently with the SD scan.
+  // SNTP remains asynchronous and is started as soon as a STA IP is available.
+  clockService.begin();
+  wifiNetworks.begin();
+  clockService.loop();
+  // Let the short LEDC fade finish before the main-thread SD scan blocks loop().
+  // Wi-Fi STA is already joining asynchronously while this runs.
+  const uint32_t fadeStarted=millis();
+  while((uint32_t)(millis()-fadeStarted)<Config::TFT_BL_FADE_ON_MS+10u){
+    backlight.loop();
+    wifiNetworks.tick();clockService.loop();
+    delay(10);
+  }
+  MONOPOD_LOG.println("Boot: library scan behind visible splash / STA join asynchronous");
+  if(sdMounted){
+    const bool recoveryNeeded=SD.exists("/.monopod-transfer.target") ||
+      SD.exists("/Music/.monopod-target.txt") || SD.exists("/Music/.monopod-wifi.target");
+    SyncFiles::recover();
+    media.rescan(); // scan AFTER recovery, behind the splash (not twice)
+    MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
+    if(recoveryNeeded)MONOPOD_LOG.println("Boot: recovered interrupted SD transfer");
+  }
+  wifiNetworks.tick();
+  clockService.loop();
 #if defined(ARDUINO_ARCH_ESP32)
   MONOPOD_LOG.printf("Boot: index complete; loop stack low-water=%u B\n",(unsigned)uxTaskGetStackHighWaterMark(nullptr));
 #endif
-  MONOPOD_LOG.println("Boot: TFT");
-  display.begin();
-  if(!sdMounted)MONOPOD_LOG.println("SD: "+media.lastError());
-  else {MONOPOD_LOG.printf("SD: %u tracks\n",(unsigned)media.size());
-    display.reloadTheme(); // load optional bitmap theme from microSD
+  // Extra 1s compared with the former 850ms delay; scanning is included.
+  while((uint32_t)(millis()-bootLogoShownAt)<Config::BOOT_LOGO_MIN_MS){
+    backlight.loop();
+    wifiNetworks.tick();clockService.loop();
+    delay(10);
   }
-  display.bootLogo(); // pixel art or /MonoPod/boot.rgb565 theme asset
-  backlight.wake();
-  for(int i=0;i<85;i++){backlight.loop();delay(10);} // visible fade-in over boot logo
   input.begin();
   feedback.begin();
 #if FEATURE_AUDIO
   MONOPOD_LOG.println("Boot: audio");
   if(!player.begin())MONOPOD_LOG.println("Audio: init failed");
 #endif
-  clockService.begin();
   IpodIdentity::begin();
   MONOPOD_LOG.printf("MonoPod device GUID=%s (%s)\n",IpodIdentity::guid(),IpodIdentity::fromEfuse()?"eFuse MAC":"NVS fallback");
   usbSync.begin();
   randomSeed(esp_random());
   MONOPOD_LOG.println("Boot: Wi-Fi and UI");
-  wifiNetworks.begin(); // restore last successful Wi-Fi connection from NVS at boot
+  // Wi-Fi was already started under the boot logo; no second connection attempt.
+  wifiNetworks.tick();clockService.loop();
   ui.begin();
   if(!media.sdOK())ui.notify("No microSD card");
   devConsole.begin();
@@ -99,7 +126,7 @@ void loop(){
   // No compile-time define or reboot required.
   if(!devConsole.hardwareDisabled()){
     Key k=input.poll();
-    if(k!=Key::None)ui.event(k);
+    if(k!=Key::None){devConsole.physicalKey(k);ui.event(k);}
   }
   Key virtualKey=devConsole.pollKey();
   if(virtualKey!=Key::None)ui.event(virtualKey);

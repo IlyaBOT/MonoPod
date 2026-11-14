@@ -23,9 +23,9 @@ def test_legacy_hardware_removed():
 
 def test_now_playing_status_icon():
     display=(P/'Display.cpp').read_text();ui=(P/'UI.cpp').read_text()
-    assert 'if(held || playbackActive || nowPlaying)' in display
+    assert 'if(held){' in display and 'if(!nowPlaying)wifiSignal(wifiBars);' in display
     assert 'fillTriangle(OX+7' in display
-    assert 'else if(playbackActive && playbackPaused)' in display
+    assert 'if(playbackPaused)' in display
     assert 'page==Page::NowPlaying?0:bars' in ui
     assert 'smallText(20,5,"H"' in display
 

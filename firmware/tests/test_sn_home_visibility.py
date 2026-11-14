@@ -29,9 +29,9 @@ def test_now_playing_home_entry_only_when_actively_playing():
     assert 'if(selected>=listItemCount())selected=max(0,listItemCount()-1);' in ui
 
 
-def test_version_and_adc_ladder_not_changed():
+def test_version_and_actual_adc_ladder():
     ui = (ROOT / "UI.cpp").read_text()
     conf = (ROOT / "Config.h").read_text()
-    assert 'case 3:value="0.10.6";' in ui
-    assert 'NEXT=5k1' in conf
-    assert 'constexpr int BUTTON_ADC_BOUNDS_MV[5] = {75, 245, 470, 795, 1550};' in conf
+    assert 'case 3:value="0.10.6.1";' in ui
+    assert 'PREV=5k1, NEXT=10k, PLAY=20k, SELECT=39k9' in conf
+    assert 'BUTTON_ADC_WINDOWS_MV[5][2]' in conf
