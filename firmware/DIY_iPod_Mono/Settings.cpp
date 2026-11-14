@@ -7,6 +7,8 @@ void SettingsStore::begin() {
   data.shuffle=pref.getBool("shuffle",false);
   data.repeat=(RepeatMode)constrain((int)pref.getUChar("repeat",0),0,2);
   data.backlightSeconds=pref.getUChar("bklight",10);
+  if(data.backlightSeconds!=5 && data.backlightSeconds!=10 && data.backlightSeconds!=15 &&
+     data.backlightSeconds!=30 && data.backlightSeconds!=60) data.backlightSeconds=10;
   data.backlightBrightness=constrain((int)pref.getUChar("blpct",75),5,100);
   // v0.4 new key: do NOT read legacy clickmode (it encoded hardware Piezo/Haptic).
   data.clicker=(ClickerMode)constrain((int)pref.getUChar("clickroute",(uint8_t)ClickerMode::Speaker),0,3);

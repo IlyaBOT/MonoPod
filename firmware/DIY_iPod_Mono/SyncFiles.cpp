@@ -3,6 +3,7 @@
 #include "Theme.h"
 #include "Display.h"
 #include "Settings.h"
+#include "ClockService.h"
 #include <WiFi.h>
 namespace SyncFiles {
 String error;
@@ -11,7 +12,7 @@ const char* PART="/.monopod-transfer.part";
 const char* BACKUP="/.monopod-transfer.bak";
 const char* JOURNAL="/.monopod-transfer.target";
 File output;String target;uint32_t expected=0,checksum=0,received=0,runningCRC=~0u,lastWrite=0;
-bool active=false,isTheme=false,unknownLength=false;
+bool active=false,isTheme=false;
 bool fail(const char* text){error=text;return false;}
 bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes";}
 String number(uint64_t n){char buf[24];snprintf(buf,sizeof(buf),"%llu",(unsigned long long)n);return String(buf);}
@@ -47,7 +48,7 @@ String info(){
  formats+=",\".aac\"";
 #endif
  formats+="]";
- return "{\"firmware\":\"0.10.2\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"audio_formats\":"+formats+",\"capabilities\":[\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\"]}";
+ return "{\"firmware\":\"0.10.5\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\"]}";
 }
 String stat(const String& path,SyncTransport who){String p;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return "";File f=SD.open(p.c_str());if(!f){fail("NOT_FOUND");return "";}String result=entry(f,p);f.close();return result;}
 String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who){
@@ -65,20 +66,13 @@ bool rename(const String& path,const String& dest,SyncTransport who){String p,q;
 void recover(){
  if(!media.sdOK()||active)return;
 
- const char* oldJournals[]={"/Music/.monopod-target.txt","/Music/.monopod-wifi.target"};
- const char* oldBackups[]={"/Music/.monopod-previous.bak","/Music/.monopod-wifi.bak"};
- for(int i=0;i<2;i++)if(SD.exists(oldJournals[i])){File j=SD.open(oldJournals[i]);String name=j?j.readStringUntil('\n'):String();if(j)j.close();name.trim();String dest="/Music/"+name,checked;
-  if(name.indexOf('/')<0&&canonical(dest,checked)){if(SD.exists(oldBackups[i])){if(SD.exists(dest.c_str()))SD.remove(oldBackups[i]);else SD.rename(oldBackups[i],dest.c_str());}if(!SD.exists(oldBackups[i]))SD.remove(oldJournals[i]);}
- }
- if(SD.exists("/MonoPod/theme.bak")&&!SD.exists("/MonoPod/theme.mpt"))SD.rename("/MonoPod/theme.bak","/MonoPod/theme.mpt");
- SD.remove("/Music/.monopod-upload.part");SD.remove("/Music/.monopod-wifi.part");
  if(SD.exists(JOURNAL)){File j=SD.open(JOURNAL);String p=j?j.readStringUntil('\n'):String();if(j)j.close();p.trim();String checked;if(!canonical(p,checked,p=="/MonoPod/theme.mpt"))return;
   if(SD.exists(BACKUP)){if(SD.exists(p.c_str())){if(!SD.remove(BACKUP))return;}else if(!SD.rename(BACKUP,p.c_str()))return;}
   if(!SD.exists(BACKUP))SD.remove(JOURNAL);
  }
  SD.remove(PART);
 }
-bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who,bool legacy){
+bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who){
  if(!gate(who))return false;if(active)return fail("TRANSFER_ACTIVE");String p;if(!canonical(path,p,theme))return false;
  if(theme && p!="/MonoPod/theme.mpt")return fail("INVALID_THEME_PATH");if(p=="/"||size>1073741824UL|| (theme&&size>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
  recover();if(SD.exists(BACKUP)||SD.exists(JOURNAL))return fail("RECOVERY_PENDING");
@@ -88,10 +82,9 @@ bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme
  if(theme && !SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
  if(!SD.exists(parent.c_str()))return fail("PARENT_NOT_FOUND");
  SD.remove(PART);output=SD.open(PART,FILE_WRITE);if(!output)return fail("OPEN_FAILED");
- target=p;expected=size;checksum=crc;received=0;runningCRC=~0u;active=true;isTheme=theme;unknownLength=legacy;lastWrite=millis();return true;
+ target=p;expected=size;checksum=crc;received=0;runningCRC=~0u;active=true;isTheme=theme;lastWrite=millis();return true;
 }
-bool write(const uint8_t* data,size_t n){if(!active)return fail("NO_TRANSFER");if(n>1073741824UL-received||(!unknownLength && n>expected-received)|| (isTheme && received+n>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
- if(unknownLength && media.totalBytes()-media.usedBytes()<n+4096)return fail("NO_SPACE");
+bool write(const uint8_t* data,size_t n){if(!active)return fail("NO_TRANSFER");if(n>1073741824UL-received||(n>expected-received)|| (isTheme && received+n>ThemeManager::MAX_BYTES+44))return fail("INVALID_SIZE");
  if(output.write(data,n)!=n)return fail("SD_WRITE");runningCRC=crcStep(runningCRC,data,n);received+=n;lastWrite=millis();return true;}
 void abort(){if(output)output.close();if(active)SD.remove(PART);active=false;target="";}
 bool busy(){return active;}
@@ -99,7 +92,7 @@ void tick(){if(active && (uint32_t)(millis()-lastWrite)>15000){abort();error="TI
 bool commit(){
  if(!active)return fail("NO_TRANSFER");output.flush();output.close();
  File verified=SD.open(PART,FILE_READ);bool validSize=verified && verified.size()==received;if(verified)verified.close();if(!validSize){abort();return fail("SD_SIZE_MISMATCH");}
- if(!unknownLength && (received!=expected || ~runningCRC!=checksum)){abort();return fail("SIZE_OR_CRC_MISMATCH");}
+ if(received!=expected || ~runningCRC!=checksum){abort();return fail("SIZE_OR_CRC_MISMATCH");}
  if(isTheme&&!ThemeManager::validate(PART)){abort();return fail("INVALID_THEME_OR_CRC");}
  String dest=target;bool old=SD.exists(dest.c_str()),installTheme=isTheme;
  File j=SD.open(JOURNAL,FILE_WRITE);if(!j){abort();return fail("JOURNAL_WRITE");}j.println(dest);j.flush();j.close();

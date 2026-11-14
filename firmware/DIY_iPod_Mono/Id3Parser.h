@@ -17,6 +17,7 @@ constexpr uint32_t kMaxTextFrame=4096; // heap, never allocated on the task stac
 struct Tags {
   char title[kValueSize]={},artist[kValueSize]={},album[kValueSize]={},genre[kValueSize]={};
   uint32_t durationSeconds=0;
+  uint16_t year=0;
 };
 inline uint32_t be32(const uint8_t *p){return ((uint32_t)p[0]<<24)|((uint32_t)p[1]<<16)|((uint32_t)p[2]<<8)|p[3];}
 inline uint32_t syncsafe(const uint8_t *p){return ((uint32_t)(p[0]&127)<<21)|((uint32_t)(p[1]&127)<<14)|((uint32_t)(p[2]&127)<<7)|(p[3]&127);}
@@ -145,11 +146,14 @@ template<class Reader> bool parse(Reader& f,Tags& tags){
           else if(!memcmp(fh,"TAL",3))name="TALB";
           else if(!memcmp(fh,"TCO",3))name="TCON";
           else if(!memcmp(fh,"TLE",3))name="TLEN";
+          else if(!memcmp(fh,"TYE",3))name="TYER";
         }else if(!memcmp(fh,"TIT2",4))name="TIT2";
         else if(!memcmp(fh,"TPE1",4))name="TPE1";
         else if(!memcmp(fh,"TALB",4))name="TALB";
         else if(!memcmp(fh,"TCON",4))name="TCON";
         else if(!memcmp(fh,"TLEN",4))name="TLEN";
+        else if(!memcmp(fh,"TDRC",4))name="TDRC";
+        else if(!memcmp(fh,"TYER",4))name="TYER";
         bool unsupported=false,unsync=(h[5]&0x80)!=0;
         uint32_t payloadOffset=0;
         if(ver==3)unsupported=(fh[9]&0xe0)!=0; // compression, encryption, grouping
@@ -179,6 +183,15 @@ template<class Reader> bool parse(Reader& f,Tags& tags){
               else if(!strcmp(name,"TPE1"))copyIfMissing(tags.artist,value);
               else if(!strcmp(name,"TALB"))copyIfMissing(tags.album,value);
               else if(!strcmp(name,"TCON"))copyIfMissing(tags.genre,value);
+              else if(!strcmp(name,"TDRC") || !strcmp(name,"TYER")){
+                if(strlen(value)>=4 && value[0]>='0' && value[0]<='9' &&
+                   value[1]>='0' && value[1]<='9' && value[2]>='0' && value[2]<='9' &&
+                   value[3]>='0' && value[3]<='9'){
+                  const unsigned y=(unsigned)(value[0]-'0')*1000+(unsigned)(value[1]-'0')*100+
+                    (unsigned)(value[2]-'0')*10+(unsigned)(value[3]-'0');
+                  if(y>=1800 && y<=2100)tags.year=(uint16_t)y;
+                }
+              }
               else if(!strcmp(name,"TLEN")){
                 char* tail=nullptr;unsigned long ms=strtoul(value,&tail,10);
                 if(tail!=value && (!*tail || *tail==' ') && ms>=1000 && ms<86400000UL)
@@ -201,6 +214,9 @@ template<class Reader> bool parse(Reader& f,Tags& tags){
       latin1Plain(v1+3,30,value,sizeof(value));copyIfMissing(tags.title,value);
       latin1Plain(v1+33,30,value,sizeof(value));copyIfMissing(tags.artist,value);
       latin1Plain(v1+63,30,value,sizeof(value));copyIfMissing(tags.album,value);
+      if(!tags.year && v1[93]>='0' && v1[93]<='9' && v1[94]>='0' && v1[94]<='9' &&
+         v1[95]>='0' && v1[95]<='9' && v1[96]>='0' && v1[96]<='9')
+        tags.year=(v1[93]-'0')*1000+(v1[94]-'0')*100+(v1[95]-'0')*10+(v1[96]-'0');
       found=true;
     }
   }

@@ -5,6 +5,7 @@
 #include "Settings.h"
 #include "IpodIdentity.h"
 #include "WiFiSync.h"
+#include "ClockService.h"
 #include <errno.h>
 UsbSyncService usbSync;
 #if FEATURE_USB_SYNC
@@ -19,10 +20,21 @@ void UsbSyncService::finish(){if(buffered&&!SyncFiles::write(buffer,buffered)){f
 void UsbSyncService::command(const String& cmd){
  if(cmd=="MPOD1 HELLO"){reply(String("READY 4 SD=")+(media.sdOK()?"1":"0"));return;}
  if(cmd=="MPOD1 X INFO"||cmd=="MPOD1 X STORAGE"){reply("OK "+SyncFiles::info());return;}
- if(cmd=="MPOD1 INFO"){char a[24],b[24];snprintf(a,sizeof(a),"%llu",(unsigned long long)media.totalBytes());snprintf(b,sizeof(b),"%llu",(unsigned long long)(media.totalBytes()-media.usedBytes()));reply(String("OK INFO SD=")+(media.sdOK()?"1":"0")+" TRACKS="+String((unsigned)media.size())+" TOTAL_BYTES="+a+" FREE_BYTES="+b+" GUID="+IpodIdentity::guid()+" FW=0.10.2 PROTOCOL=4");return;}
  if(cmd=="MPOD1 SYNC START"){if(!media.sdOK()){reply("ERR NO_SD");return;}reply(syncMode.enter(SyncTransport::UsbCdc)?"OK SYNC_STARTED":"ERR SYNC_BUSY");return;}
  if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
  if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
+ if(cmd.startsWith("MPOD1 X CLOCK ")){
+  int p=14;String epochText=token(cmd,p),tzText=token(cmd,p),ntpText=token(cmd,p);
+  uint32_t epoch=0,enabled=0;
+  if(!uintArg(epochText,epoch)||epoch<1600000000UL||tzText.length()>126 ||
+     !uintArg(ntpText,enabled)||enabled>1){reply("ERR CLOCK_ARGUMENTS");return;}
+  String tz=SyncFiles::fromHex(tzText);
+  if(!clockService.setTimezone(tz)||!clockService.setNtpEnabled(enabled==1)){
+    reply("ERR CLOCK_TIMEZONE");return;
+  }
+  clockService.setUnix((time_t)epoch);
+  reply("OK CLOCK_SET");return;
+ }
  if(cmd=="MPOD1 SCAN"){if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}media.rescan();reply("OK SCANNED "+String((unsigned)media.size()));return;}
  if(cmd.startsWith("MPOD1 X ")){
   int i=8;String op=token(cmd,i),path=SyncFiles::fromHex(token(cmd,i));
@@ -40,14 +52,6 @@ void UsbSyncService::command(const String& cmd){
    size=n;received=0;buffered=0;sending=true;lastByteAt=millis();chunkRemaining=min((uint32_t)sizeof(buffer),size);if(!size){finish();return;}reply("NEXT "+String(chunkRemaining));return;
   }
   reply("ERR UNKNOWN_COMMAND");return;
- }
- // Legacy v1-v3 commands remain byte-compatible and target /Music only.
- if(cmd.startsWith("MPOD1 DELETE ")){String name=cmd.substring(13),path="/Music/"+name;if(name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}reply(SyncFiles::remove(path,false,SyncTransport::UsbCdc)?"OK DELETED":"ERR "+SyncFiles::error);return;}
- bool replace=cmd.startsWith("MPOD1 REPLACE ");if(replace||cmd.startsWith("MPOD1 PUT ")){
-  int i=replace?14:10;uint32_t n=0,crc=0;String len=token(cmd,i),crcText=token(cmd,i),name=cmd.substring(i);
-  if(!uintArg(len,n)||!n||crcText.length()!=8||!uintArg(crcText,crc,16)||name.indexOf('/')>=0||!MediaLibrary::isAudio(name)){reply("ERR INVALID_FILE");return;}
-  if(!SD.exists("/Music"))SD.mkdir("/Music");if(!SyncFiles::begin("/Music/"+name,n,crc,replace,false,SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
-  size=n;received=0;buffered=0;sending=true;chunkRemaining=min((uint32_t)sizeof(buffer),size);lastByteAt=millis();reply("NEXT "+String(chunkRemaining));return;
  }
  reply("ERR UNKNOWN_COMMAND");
 }

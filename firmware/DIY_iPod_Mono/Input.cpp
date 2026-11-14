@@ -3,22 +3,11 @@
 #include <math.h>
 InputManager input;
 void InputManager::begin() {
-#if WOKWI_SIMULATION
-  for(uint8_t pin : {Config::PIN_KEY_MENU,Config::PIN_KEY_PREVIOUS,
-                     Config::PIN_KEY_NEXT,Config::PIN_KEY_PLAY,Config::PIN_KEY_SELECT})
-    pinMode(pin,INPUT_PULLUP);
-  hold=false; // virtual schematic has no HOLD switch
-#else
   pinMode(Config::PIN_BUTTON_ADC,INPUT);
   analogReadResolution(12);
   analogSetPinAttenuation(Config::PIN_BUTTON_ADC,ADC_11db);
   pinMode(Config::PIN_HOLD, INPUT); // external 10k pull-up is mandatory
   hold=(digitalRead(Config::PIN_HOLD)==LOW);
-#endif
-#if FEATURE_DEV_ENCODER
-  pinMode(Config::ENCODER_A,INPUT);pinMode(Config::ENCODER_B,INPUT);
-  encoderPrevious=(digitalRead(Config::ENCODER_A)<<1)|digitalRead(Config::ENCODER_B);
-#endif
 #if FEATURE_TOUCH_WHEEL
   // Never touch wheel while starting; average 32 baseline readings per electrode.
   uint64_t accum[6]={};
@@ -34,21 +23,9 @@ void InputManager::resetState(){
   changed=pressed=lastRepeat=millis();
   selectLongSent=false;
   wheelTouch=false;angleDelta=0;
-#if !WOKWI_SIMULATION
   hold=(digitalRead(Config::PIN_HOLD)==LOW);
-#else
-  hold=false;
-#endif
 }
 Key InputManager::readButtons() {
-#if WOKWI_SIMULATION
-  if(!digitalRead(Config::PIN_KEY_MENU))return Key::Menu;
-  if(!digitalRead(Config::PIN_KEY_PREVIOUS))return Key::Previous;
-  if(!digitalRead(Config::PIN_KEY_NEXT))return Key::Next;
-  if(!digitalRead(Config::PIN_KEY_PLAY))return Key::PlayPause;
-  if(!digitalRead(Config::PIN_KEY_SELECT))return Key::Select;
-  return Key::None;
-#else
   const int mV=analogReadMilliVolts(Config::PIN_BUTTON_ADC);
   // Single key supported, measured windows for 10k pullup / 0/2k2/4k7/10k/22k resistors.
   if(mV<200)return Key::Menu;
@@ -57,20 +34,8 @@ Key InputManager::readButtons() {
   if(mV>1440 && mV<1840)return Key::PlayPause;
   if(mV>2010 && mV<2580)return Key::Select;
   return Key::None;
-#endif
 }
 Key InputManager::readWheel() {
-#if FEATURE_DEV_ENCODER
-  const uint8_t current=(digitalRead(Config::ENCODER_A)<<1)|digitalRead(Config::ENCODER_B);
-  if(current!=encoderPrevious){
-    const uint8_t step=(encoderPrevious<<2)|current;
-    if(step==0b0001||step==0b0111||step==0b1110||step==0b1000) encoderQuarter++;
-    if(step==0b0010||step==0b0100||step==0b1101||step==0b1011) encoderQuarter--;
-    encoderPrevious=current;
-    if(encoderQuarter>=4){encoderQuarter=0;return Key::Down;}
-    if(encoderQuarter<=-4){encoderQuarter=0;return Key::Up;}
-  }
-#endif
 #if FEATURE_TOUCH_WHEEL
   if(millis()-lastWheel<30)return Key::None;
   lastWheel=millis();
@@ -106,11 +71,7 @@ Key InputManager::readWheel() {
   return Key::None;
 }
 Key InputManager::poll() {
-#if WOKWI_SIMULATION
-  bool nowHold=false;
-#else
   bool nowHold=digitalRead(Config::PIN_HOLD)==LOW;
-#endif
   if(hold!=nowHold){hold=nowHold;keyLast=keyStable=Key::None;selectLongSent=false;wheelTouch=false;return Key::HoldChanged;}
   if(hold)return Key::None;
   const Key b=readButtons();

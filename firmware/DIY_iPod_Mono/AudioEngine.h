@@ -12,6 +12,8 @@ public:
   void setVolume(uint8_t v);
   void headphoneClick(uint16_t freq,uint8_t durationMs);
   void stopHeadphoneClick();
+  // Exclusive external MP3 playback during Bad Apple (main decoder stopped).
+  AudioOutput* externalAudioSink() const {return sink;}
   bool play(size_t libraryIndex,const std::vector<size_t>& context);
   void stop();
   void pauseToggle();

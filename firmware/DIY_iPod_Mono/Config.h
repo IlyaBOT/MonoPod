@@ -46,13 +46,8 @@
 #define FEATURE_PIEZO (CLICKER_HARDWARE == CLICKER_HW_PIEZO)
 #define FEATURE_HAPTIC_DRV2605 (CLICKER_HARDWARE == CLICKER_HW_HAPTIC)
 
-// WOKWI_SIMULATION=1: ILI9341/individual GPIO keys, no touch, no I2S.
-// Arduino IDE physical hardware is the default (ST7735/ADC ladder).
-#ifndef WOKWI_SIMULATION
-#define WOKWI_SIMULATION 0
-#endif
 #ifndef FEATURE_AUDIO
-#define FEATURE_AUDIO (!WOKWI_SIMULATION)
+#define FEATURE_AUDIO 1
 #endif
 
 namespace Config {
@@ -81,12 +76,6 @@ constexpr uint8_t PIN_PIEZO = 42;
 // GPIO40/41 are also JTAG pins; only use with no external JTAG.
 constexpr uint8_t PIN_HAPTIC_SDA = 40;
 constexpr uint8_t PIN_HAPTIC_SCL = 41;
-constexpr uint8_t PIN_KEY_MENU = 4; // Wokwi emulates independent keys
-constexpr uint8_t PIN_KEY_PREVIOUS = 13;
-constexpr uint8_t PIN_KEY_NEXT = 14;
-constexpr uint8_t PIN_KEY_PLAY = 27;
-constexpr uint8_t PIN_KEY_SELECT = 32;
-constexpr uint8_t ENCODER_A = 15, ENCODER_B = 40; // disabled in Rev A (developer-only)
 #else
 // Original ESP32-WROVER prototype wiring (unchanged).
 constexpr uint8_t PIN_SPI_SCK  = 18;
@@ -113,14 +102,8 @@ constexpr uint8_t WHEEL_PINS[6] = {4,13,14,27,33,32};
 constexpr uint8_t WHEEL_COUNT = 6;
 #endif
 constexpr uint8_t PIN_PIEZO = 2;
-constexpr uint8_t PIN_KEY_MENU = 4;
-constexpr uint8_t PIN_KEY_PREVIOUS = 13;
-constexpr uint8_t PIN_KEY_NEXT = 14;
-constexpr uint8_t PIN_KEY_PLAY = 27;
-constexpr uint8_t PIN_KEY_SELECT = 32;
 constexpr uint8_t PIN_HAPTIC_SDA = 32;
 constexpr uint8_t PIN_HAPTIC_SCL = 33;
-constexpr uint8_t ENCODER_A = 36, ENCODER_B = 39;
 #endif
 constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
 constexpr uint16_t PIEZO_ACTION_HZ = 2700;
@@ -128,14 +111,27 @@ constexpr uint16_t FEEDBACK_SCROLL_MIN_MS = 45;
 constexpr uint16_t FEEDBACK_ACTION_MIN_MS = 60;
 // Single SD SPI frequency, no diagnostic probing or speed fallback.
 // Conservative starting speed for breadboard wiring; tune after real testing.
-constexpr uint32_t SPI_SD_HZ = 4000000;
+constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable
+// ST7735S was at 16MHz. 20/26.67MHz are optional OVERCLOCK values,
+// not guaranteed by ST7735S datasheet. Keep stable default first.
+constexpr uint32_t SPI_TFT_HZ = 16000000; // experimentally test 20000000 later
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.
 constexpr bool TFT_BL_ACTIVE_LOW = false; // direct GPIO15 LED/BL, active-high; set true for P-MOS inverter
+// false: force 100% ON as a steady GPIO level, PWM only during fade.
+// true: respect the user brightness setting and keep LEDC PWM enabled.
+// NOTE: steady HIGH cannot fix an overcurrent/voltage sag caused by directly
+// driving the TFT LED/backlight from the ESP32 GPIO. Use a transistor driver.
+constexpr bool TFT_BL_BRIGHTNESS_CONTROL = false;
 constexpr uint32_t TFT_BL_PWM_HZ = 16000;
 constexpr uint8_t TFT_BL_PWM_BITS = 10;
 constexpr uint16_t TFT_BL_FADE_ON_MS = 250;
+// Voltage calibration parameters (replace after measured full-cell ADC sample).
+// Effective conversion: Vbat = ADC_mV * BATTERY_ADC_RATIO / 1000 + BATTERY_ADC_OFFSET_V.
+// The default 2.0 is the ideal 100k/100k divider; do not adjust without data.
+constexpr float BATTERY_ADC_RATIO = 2.0f;
+constexpr float BATTERY_ADC_OFFSET_V = 0.0f;
 constexpr uint32_t BATTERY_SAMPLE_INTERVAL_MS = 60000UL;
 constexpr uint16_t TFT_BL_FADE_OFF_MS = 400;
 constexpr uint8_t MAX_VOLUME = 100; // clamp 0..100, no wraparound
@@ -151,31 +147,15 @@ constexpr char BT_TARGET_NAME[] = ""; // only built for original ESP32
 constexpr uint16_t SCREEN_W = 160, SCREEN_H = 128;
 constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 }
-// Battery voltage through a 100k/100k divider at PIN_BATTERY_ADC (ADC1).
-// Wokwi has no physical battery: it shows a documented demo charge level.
+// Real prototype ADC, six capacitive wheel electrodes and Wi-Fi Sync.
 #ifndef FEATURE_BATTERY_ADC
-#define FEATURE_BATTERY_ADC (!WOKWI_SIMULATION)
-#endif
-#ifndef WOKWI_BATTERY_DEMO_PERCENT
-#define WOKWI_BATTERY_DEMO_PERCENT 75
+#define FEATURE_BATTERY_ADC 1
 #endif
 #ifndef FEATURE_TOUCH_WHEEL
-#define FEATURE_TOUCH_WHEEL (!WOKWI_SIMULATION)
-#endif
-#ifndef FEATURE_DEV_ENCODER
-#define FEATURE_DEV_ENCODER 0
-#endif
-#if FEATURE_BATTERY_ADC && FEATURE_DEV_ENCODER && MONOPOD_BOARD == MONOPOD_BOARD_ESP32
-#error "Battery ADC GPIO36 conflicts with developer encoder GPIO36 on classic ESP32"
-#endif
-#if FEATURE_DEV_ENCODER && MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
-#error "S3 GPIO15 backlight PWM conflicts with developer encoder GPIO15; disable unused encoder"
-#endif
-#if FEATURE_DEV_ENCODER && FEATURE_HAPTIC_DRV2605 && MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
-#error "ESP32-S3 developer encoder GPIO40 conflicts with DRV2605 I2C SDA"
+#define FEATURE_TOUCH_WHEEL 1
 #endif
 #ifndef FEATURE_WIFI_SYNC
-#define FEATURE_WIFI_SYNC (!WOKWI_SIMULATION)
+#define FEATURE_WIFI_SYNC 1
 #endif
 // Bluetooth Classic A2DP source/AVRCP is only present on original ESP32.
 // On S3, force the feature out at preprocessing time: no includes, class,
@@ -199,7 +179,7 @@ constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 #endif
 
 #ifndef FEATURE_SD_FORMAT
-#define FEATURE_SD_FORMAT (!WOKWI_SIMULATION) // SdFat v2 required; destructive operation requires two confirmations
+#define FEATURE_SD_FORMAT 1 // SdFat v2 required; destructive operation requires two confirmations
 #endif
 
 
@@ -208,10 +188,10 @@ constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 #define EXCLUDE_BAD_APPLE_EASTEREGG (MONOPOD_BOARD == MONOPOD_BOARD_ESP32)
 #endif
 
-// MonoPod USB Sync v1: native ESP32-S3 USB CDC (GPIO19 D-, GPIO20 D+).
+// MonoPod USB Sync MPOD1 v4: native ESP32-S3 USB CDC (GPIO19 D-, GPIO20 D+).
 // USB sync is NOT Apple's iAP and does not implement iTunes pairing.
 #ifndef FEATURE_USB_SYNC
-#define FEATURE_USB_SYNC (MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3 && !WOKWI_SIMULATION)
+#define FEATURE_USB_SYNC (MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3)
 #endif
 #if FEATURE_USB_SYNC && MONOPOD_BOARD != MONOPOD_BOARD_ESP32_S3
 #error "Native USB Sync currently requires ESP32-S3"

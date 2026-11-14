@@ -94,7 +94,7 @@ void MediaLibrary::rescan() {
   tracks.clear();if(!mounted)return;
   // Large contiguous Track storage prefers PSRAM via the ESP32 heap allocator.
   // Allocate once, avoiding transient vector-growth copies during long scans.
-#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+#if defined(ARDUINO_ARCH_ESP32)
   if(psramFound() && tracks.capacity()<Config::MAX_TRACKS)
     tracks.reserve(Config::MAX_TRACKS);
 #endif
@@ -104,7 +104,7 @@ void MediaLibrary::rescan() {
   if(tracks.size()>=Config::MAX_TRACKS) error="Library limit reached";
   // The index owns String metadata; actual RAM use depends on filename/ID3 lengths.
   // Report heap state so 1024+ track builds can be validated on real hardware.
-#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+#if defined(ARDUINO_ARCH_ESP32)
   MONOPOD_LOG.printf("Library: %u/%u tracks, heap free=%u B, PSRAM free=%u B\n",
     (unsigned)tracks.size(),(unsigned)Config::MAX_TRACKS,
     (unsigned)ESP.getFreeHeap(),(unsigned)ESP.getFreePsram());
@@ -123,10 +123,8 @@ void MediaLibrary::scanFolder(const String &path,uint8_t depth) {
       if(!name.startsWith("/System Volume") && !name.startsWith("/iPod_Control"))scanFolder(name,depth+1);
     } else if(isAudio(name)) {
       Track t;t.path=name;t.title=noExt(name);t.folder=parent(name);
-      String album=t.folder;int sl=album.lastIndexOf('/');if(sl>=0)album=album.substring(sl+1);
-      t.album=album.length()?album:"Unknown Album";
-      String artist=parent(t.folder);sl=artist.lastIndexOf('/');if(sl>=0)artist=artist.substring(sl+1);
-      t.artist=artist.length()?artist:"Unknown Artist";t.genre="Unknown";
+      t.album="Unknown Album";
+      t.artist="Unknown Artist";t.genre="Unknown Genre";
       metadata(t);
       if(t.durationSeconds==0 && (name.endsWith(".mp3") || name.endsWith(".MP3")))t.durationSeconds=probeMp3Duration(name);
       // Read canonical PCM WAV header (RIFF/WAVE, fmt/data). Do not estimate MP3 VBR duration.
@@ -153,6 +151,7 @@ void MediaLibrary::metadata(Track &t) {
     if(tags.artist[0])t.artist=tags.artist;
     if(tags.album[0])t.album=tags.album;
     if(tags.genre[0])t.genre=tags.genre;
+    if(tags.year)t.year=tags.year;
     if(tags.durationSeconds)t.durationSeconds=tags.durationSeconds;
   }
   f.close();

@@ -1,21 +1,19 @@
 #include "Display.h"
+#include "BavPixel.h"
 #include "MonoFont.h"
 #include "BootLogoBitmap.h"
 #include "Settings.h"
 #include "Battery.h"
 #include "Theme.h"
+#include "MarqueeMotion.h"
 #include <pgmspace.h>
 #include <SD.h>
 Display display;
 Display::Display():tft(Config::PIN_TFT_CS,Config::PIN_TFT_DC,Config::PIN_TFT_RST){}
 void Display::begin(){
-#if WOKWI_SIMULATION
-  tft.begin();tft.setRotation(0);tft.fillScreen(0);
-#else
-  tft.initR(INITR_BLACKTAB);tft.setRotation(Config::TFT_ROTATION);tft.setSPISpeed(16000000);
-#endif
+  tft.initR(INITR_BLACKTAB);tft.setRotation(Config::TFT_ROTATION);tft.setSPISpeed(Config::SPI_TFT_HZ);
   palette(settings.data.contrast);clear();
-#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3 && !WOKWI_SIMULATION
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
   buffer=new GFXcanvas16(160,128);
   if(!buffer || !buffer->getBuffer()){
     if(buffer){delete buffer;buffer=nullptr;}
@@ -72,14 +70,14 @@ static uint16_t blend565(uint16_t a,uint16_t b,uint8_t opacity){
   uint16_t bl=(((a&31)*inv+(b&31)*opacity+7)/15);
   return (r<<11)|(g<<5)|bl;
 }
-void Display::drawGlyph(int x,int y,uint32_t cp,uint16_t front,uint16_t back,bool small){
+void Display::drawGlyph(int x,int y,uint32_t cp,uint16_t front,uint16_t back,bool small,int clipLeft,int clipRight){
   ThemeManager::Glyph cg;
   if(theme.active() && (theme.glyph(cp,small,cg)||theme.glyph('?',small,cg))){
     const int height=small?12:16;
     for(int yy=0;yy<height;yy++){
       const int dy=y+yy;if(dy<0||dy>=128)continue;
       for(int xx=0;xx<cg.advance;xx++){
-        const int dx=x+xx;if(dx<0||dx>=160)continue;
+        const int dx=x+xx;if(dx<clipLeft||dx>=clipRight||dx<0||dx>=160)continue;
         uint8_t alpha= xx<cg.width?theme.alpha(cg,small,xx,yy):0;
         if(!settings.data.fontSmoothing)alpha=(alpha>=8)?15:0;
         surface().writePixel(OX+dx,OY+dy,alpha==15?front:alpha==0?back:blend565(back,front,alpha));
@@ -93,7 +91,7 @@ void Display::drawGlyph(int x,int y,uint32_t cp,uint16_t front,uint16_t back,boo
     const int dy=y+yy;if(dy<0||dy>=128)continue;
     for(int xx=0;xx<g.advance;xx++){
       const int dx=x+xx;
-      if(dx<0||dx>=160)continue;
+      if(dx<clipLeft||dx>=clipRight||dx<0||dx>=160)continue;
       uint8_t alpha=MonoFont::alpha(g,small,xx,yy);
       if(!settings.data.fontSmoothing)alpha=(alpha>=8)?15:0;
       surface().writePixel(OX+dx,OY+dy,
@@ -137,10 +135,10 @@ void Display::wifiSignal(uint8_t bars){
     surface().fillRect(OX+3+5*i,OY+15-height,3,height,themed(9,fg));
   }
 }
-String Display::fittedTitle(const String& title, int width) const {
-  if(textWidth(title,false)<=width)return title;
+String Display::fittedTitle(const String& title, int width,bool small) const {
+  if(textWidth(title,small)<=width)return title;
   const String dots="...";
-  const int dotsWidth=textWidth(dots,false);
+  const int dotsWidth=textWidth(dots,small);
   String result;
   // Iterate by UTF-8 codepoint, never cut a multibyte glyph in half.
   size_t i=0;uint32_t cp=0;
@@ -148,25 +146,24 @@ String Display::fittedTitle(const String& title, int width) const {
     size_t before=i;
     if(!utf8next(title,i,cp))break;
     const String prefix=title.substring(0,i);
-    if(textWidth(prefix,false)+dotsWidth>width){i=before;break;}
+    if(textWidth(prefix,small)+dotsWidth>width){i=before;break;}
     result=prefix;
   }
   return result+dots;
 }
-void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars){
+void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars,bool nowPlaying){
   surface().fillRect(OX,OY,160,20,bg);
-  // Outer icons: network/lock at left, battery at right.  Title centered on x=80.
-  wifiSignal(wifiBars);
-  if(held)smallText(20,4,"H",fg,bg);
-  else if(playing){surface().fillRect(OX+22,OY+5,3,10,fg);surface().fillRect(OX+28,OY+5,3,10,fg);}
-  // The 2004-style Now Playing title must never be ellipsized. The standard
-  // 16px font needs 105px, wider than the clear 94px status-bar area; use
-  // the 12px face (84px) without disturbing the Wi-Fi and battery indicators.
-  const bool compact=(title=="Now Playing" && textWidth(title,false)>94);
-  const String fitted=compact?title:fittedTitle(title,94);
-  const int w=textWidth(fitted,compact);
-  const int x=(160-w)/2;
-  drawString(x,compact?4:3,fitted,themed(8,fg),bg,compact,0,134);
+  // Now Playing reserves the left indicator for actual playback state.
+  if(nowPlaying){
+    surface().fillRect(OX+2,OY,30,19,bg);
+    if(held)smallText(20,5,"H",fg,bg);
+    else if(playing)surface().fillTriangle(OX+7,OY+4,OX+7,OY+15,OX+17,OY+9,themed(7,fg));
+    else {surface().fillRect(OX+7,OY+4,3,11,fg);surface().fillRect(OX+14,OY+4,3,11,fg);}
+  }else{
+    wifiSignal(wifiBars);
+    if(held)smallText(20,5,"H",fg,bg);
+  }
+  headerTitleMarquee(title,0);
   batteryIcon();
   surface().drawFastHLine(OX,OY+19,160,themed(11,fg));
 }
@@ -176,15 +173,59 @@ void Display::footer(const String& s){
   surface().fillRect(OX,OY+115,160,13,bg);
   smallText(5,115,s,fg,bg);
 }
-void Display::listRow(uint8_t row,const String& s,bool selected,bool submenu){
+// A pixel-clipped marquee: no glyph can overlap a neighboring row or icon.
+// Repeated text begins arriving from the right before the previous copy exits.
+void Display::windowText(int left,int y,int width,const String& value,bool small,int offset,uint16_t front,uint16_t back){
+  if(width<=0 || left<0 || left+width>160)return;
+  const int h=small?12:16;
+  surface().fillRect(OX+left,OY+y,width,h,back);
+  const int wordWidth=textWidth(value,small);
+  if(wordWidth<=0)return;
+  if(wordWidth<=width){
+    surface().startWrite();
+    int x=left+(width-wordWidth)/2;
+    size_t i=0;uint32_t cp;
+    while(utf8next(value,i,cp)){
+      drawGlyph(x,y,cp,front,back,small,left,left+width);x+=glyphAdvance(cp,small);
+    }
+    surface().endWrite();
+    return;
+  }
+  const int period=wordWidth+MarqueeMotion::kGapPixels;
+  int pos=MarqueeMotion::phase((uint32_t)offset,wordWidth);
+  if(pos<0)pos+=period;
+  // Skip off-window glyphs without allocating clipped temporary strings.
+  surface().startWrite();
+  for(int copy=0;copy<2;copy++){
+    int x=left-pos+copy*period;
+    size_t i=0;uint32_t cp;
+    while(utf8next(value,i,cp)){
+      const int advance=glyphAdvance(cp,small);
+      if(x<left+width && x+advance>left)
+        drawGlyph(x,y,cp,front,back,small,left,left+width);
+      x+=advance;
+      if(x>=left+width)break;
+    }
+  }
+  surface().endWrite();
+}
+void Display::headerTitleMarquee(const String& label,int scrollPx){
+  constexpr int left=34,width=100;
+  const bool small=textWidth(label,false)>width;
+  // Clear the title rectangle only. The left control icon and battery persist.
+  surface().fillRect(OX+left,OY+2,width,17,bg);
+  windowText(left,small?4:3,width,label,small,scrollPx,themed(8,fg),bg);
+}
+void Display::listRow(uint8_t row,const String& s,bool selected,bool submenu,int scrollPx){
   if(row>=ROW_COUNT)return;
   int y=21+row*18;
   uint16_t back=selected?hi:bg,front=selected?themed(4,bg):fg;
   surface().fillRect(OX+2,OY+y,156,18,back);
   const int maxWidth=submenu?137:149;
-  String rendered=s;
-  if(textWidth(rendered)>maxWidth)rendered=fittedTitle(rendered,maxWidth);
-  text(6,y+1,rendered,front,back);
+  if(selected && textWidth(s)>maxWidth)
+    windowText(6,y+1,maxWidth,s,false,scrollPx,front,back);
+  else
+    text(6,y+1,textWidth(s)>maxWidth?fittedTitle(s,maxWidth):s,front,back);
   if(submenu){surface().fillTriangle(OX+150,OY+y+6,OX+155,OY+y+9,OX+150,OY+y+12,themed(selected?6:5,front));}
 }
 void Display::progress(int x,int y,int w,int percent){
@@ -254,9 +295,14 @@ void Display::batteryIcon(){
 void Display::nowPlaying(const String& title,const String& artist,const String& album,bool paused,uint32_t trackNumber,uint32_t trackCount){
   surface().fillRect(OX,OY+20,160,108,bg);
   smallText(7,21,String(trackNumber)+" of "+String(trackCount),fg,bg);
-  const String a=fittedTitle(title,152),b=fittedTitle(artist,152),c=fittedTitle(album,152);
-  centerText(38,a,false);centerText(56,b,false);centerText(74,c,false);
+  // A dedicated 12px metadata face preserves the original iPod layout.
+  nowPlayingTitleMarquee(title,0);
+  centerText(56,fittedTitle(artist,152,true),true);
+  centerText(74,fittedTitle(album,152,true),true);
   (void)paused;
+}
+void Display::nowPlayingTitleMarquee(const String& title,int scrollPx){
+  windowText(4,38,152,title,true,scrollPx,fg,bg);
 }
 void Display::nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration){
   // Update only the bottom region; never erase the header and metadata lines.
@@ -326,6 +372,32 @@ bool Display::streamGray2Frame(const uint8_t* bits,const uint16_t colors[4]){
       const uint8_t v=(bits[i>>2]>>(6-2*(i&3)))&3;
       row[x]=colors[v];
     }
+    tft.writePixels(row,160);
+  }
+  tft.endWrite();return true;
+}
+
+// One SPI transaction per complete frame, line conversion without a 40KB stack array.
+bool Display::streamGray6Frame(const uint8_t* bits){
+  if(!bits)return false;
+  uint16_t row[160];
+  tft.startWrite();tft.setAddrWindow(OX,OY,160,128);
+  for(int y=0;y<128;y++){
+    for(int x=0;x<160;x++){
+      const uint32_t pixel=(uint32_t)y*160u+(uint32_t)x;
+      row[x]=BavPixel::gray6To565(BavPixel::gray6(bits,pixel));
+    }
+    tft.writePixels(row,160);
+  }
+  tft.endWrite();return true;
+}
+bool Display::streamRgb565Frame(const uint8_t* bits){
+  if(!bits)return false;
+  uint16_t row[160];
+  tft.startWrite();tft.setAddrWindow(OX,OY,160,128);
+  for(int y=0;y<128;y++){
+    const uint8_t* src=bits+(uint32_t)y*160u*2u;
+    for(int x=0;x<160;x++)row[x]=BavPixel::rgb565(src,(size_t)x);
     tft.writePixels(row,160);
   }
   tft.endWrite();return true;

@@ -18,9 +18,5 @@ private:
   float lastAngle=0,angleDelta=0;
   Key readButtons();
   Key readWheel();
-#if FEATURE_DEV_ENCODER
-  uint8_t encoderPrevious=0;
-  int8_t encoderQuarter=0;
-#endif
 };
 extern InputManager input;

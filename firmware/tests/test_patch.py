@@ -3,13 +3,13 @@ ROOT = Path(__file__).resolve().parents[1] / 'DIY_iPod_Mono'
 
 def test_header_now_playing_is_full():
     display = (ROOT/'Display.cpp').read_text()
-    assert 'compact=(title=="Now Playing"' in display
-    assert 'const String fitted=compact?title:fittedTitle(title,94);' in display
+    assert 'headerTitleMarquee(title,0)' in display
+    assert 'windowText(left,small?4:3,width,label,small,scrollPx' in display
     font = (ROOT/'MonoFont.h').read_text()
     import re
     m = re.search(r'static const Glyph small\[\] PROGMEM = \{(.*?)\};', font, re.S)
     advances = {int(c):int(a) for c,a in re.findall(r'\{(\d+),(\d+),\d+,\d+\}',m.group(1))}
-    assert sum(advances[ord(c)] for c in 'Now Playing') <= 94
+    assert sum(advances[ord(c)] for c in 'Now Playing') <= 100
 
 def test_wifi_one_attempt_only():
     s = (ROOT/'WiFiNetworks.cpp').read_text()
@@ -28,9 +28,9 @@ def test_id3_uses_new_decoder():
     assert 'kMaxTextFrame=4096' in p
     assert 'new(std::nothrow)' in p
 
-def test_fw_version_unchanged_protocol():
-    for fname in ('DIY_iPod_Mono.ino','UI.cpp','SyncFiles.cpp','UsbSync.cpp'):
-        assert '0.10.2' in (ROOT/fname).read_text()
+def test_fw_version_updated_protocol_unchanged():
+    for fname in ('DIY_iPod_Mono.ino','UI.cpp','SyncFiles.cpp'):
+        assert '0.10.5' in (ROOT/fname).read_text()
     assert '"protocol":4' in (ROOT/'SyncFiles.cpp').read_text().replace('\\','')
 
 
@@ -40,3 +40,30 @@ def test_id3_scans_large_artwork_without_allocating_it():
     assert 'kMaxFrameHeaders=8192' in p
     assert 'len-payloadOffset<=kMaxTextFrame' in p
     assert 'f.seek(content+payloadOffset)' in p
+
+def test_marquee_pixel_scrolling_and_clipping():
+    display = (ROOT/'Display.cpp').read_text()
+    ui = (ROOT/'UI.cpp').read_text()
+    assert 'void Display::windowText(' in display
+    assert 'dx<clipLeft||dx>=clipRight' in display
+    assert 'windowText(4,38,152,title,true' in display
+    assert 'surface().startWrite();' in display
+    assert 'MarqueeMotion::pixelOffset' in ui
+    assert 'MarqueeMotion::phase' in display
+    assert 'display.listRow((uint8_t)row,label,true,submenu,(int)frame)' in ui
+
+def test_offscreen_backlight_stays_off():
+    ui = (ROOT/'UI.cpp').read_text()
+    assert 'now-lastHiddenRefresh>=600000UL' in ui
+    assert 'lastHiddenTrack=track;' in ui
+    block = ui.split('if(blank && !syncMode.active()){')[1].split('// Marquee is updated')[0]
+    assert 'backlight.wake()' not in block
+
+def test_click_and_default_metadata():
+    feedback = (ROOT/'Feedback.cpp').read_text()
+    library = (ROOT/'Library.cpp').read_text()
+    assert 'startTone(Config::PIEZO_SCROLL_HZ,1)' in feedback
+    assert 'headphoneClick(Config::PIEZO_SCROLL_HZ,2)' in feedback
+    for v in ('Unknown Artist','Unknown Album','Unknown Genre'):
+        assert v in library
+    assert 'if(tags.year)t.year=tags.year;' in library

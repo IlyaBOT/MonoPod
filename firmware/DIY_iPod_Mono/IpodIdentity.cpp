@@ -1,6 +1,6 @@
 #include "IpodIdentity.h"
 #include <inttypes.h>
-#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+#if defined(ARDUINO_ARCH_ESP32)
 #include <Preferences.h>
 #include <esp_mac.h>
 #include <esp_system.h>
@@ -14,7 +14,7 @@ void IpodIdentity::begin() {
   if(initialized)return;
   initialized=true;
   uint64_t id=0;
-#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+#if defined(ARDUINO_ARCH_ESP32)
   uint8_t mac[6]{};
   if(esp_efuse_mac_get_default(mac)==ESP_OK){
     bool empty=true;for(uint8_t b:mac)if(b){empty=false;break;}
@@ -39,7 +39,7 @@ void IpodIdentity::begin() {
 #else
   id=0x4D50000000000001ULL; // deterministic simulation marker
 #endif
-#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+#if defined(ARDUINO_ARCH_ESP32)
   if(!id){ // NVS unavailable: still create an ID, but it may change after reboot.
     id=0x4D50000000000000ULL |
        (((uint64_t(esp_random())<<32)|esp_random())&0x0000FFFFFFFFFFFFULL);

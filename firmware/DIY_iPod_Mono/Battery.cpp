@@ -7,8 +7,6 @@ void BatteryMonitor::begin(){
   analogReadResolution(12);
   analogSetPinAttenuation(Config::PIN_BATTERY_ADC, ADC_11db);
   sample();
-#elif WOKWI_SIMULATION
-  percent=constrain(WOKWI_BATTERY_DEMO_PERCENT,0,100); // UI-only demo: no battery simulation
 #endif
 }
 void BatteryMonitor::loop(){
@@ -29,7 +27,7 @@ void BatteryMonitor::sample(){
     delayMicroseconds(120);
   }
   // ADC input = Vbat * 100k/(100k+100k).  Real resistor tolerances need calibration.
-  volts=(total/12.0f)*2.0f/1000.0f;
+  volts=(total/12.0f)*Config::BATTERY_ADC_RATIO/1000.0f + Config::BATTERY_ADC_OFFSET_V;
   if(volts<2.90f || volts>4.30f){percent=-1;return;}
   // Rough rested Li-ion voltage-to-SoC curve. Under load/charging, percentage drifts.
   static const float V[]={3.00f,3.30f,3.50f,3.60f,3.70f,3.75f,3.80f,3.85f,3.92f,4.00f,4.10f,4.20f};

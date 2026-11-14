@@ -95,5 +95,14 @@ int main(){
     FakeFile f(makeId3(4,frames));Id3Parser::Tags t;
     assert(Id3Parser::parse(f,t));assert(eq(t.artist,"Skillet"));
   }
-  puts("ID3 parser tests: 10/10 PASS");
+  {
+    Bytes frames;frame(frames,"TIT2",text({'R','4','v','3',' ','B','0','y'},0),3);
+    frame(frames,"TPE1",text({'S','3','R','L'},0),3);
+    frame(frames,"TALB",text({'R','4','v','3',' ','B','0','y'},0),3);
+    frame(frames,"TDRC",text({'2','0','1','5'},0),3);
+    FakeFile f(makeId3(3,frames));Id3Parser::Tags t;
+    assert(Id3Parser::parse(f,t));assert(t.year==2015);
+    assert(eq(t.title,"R4v3 B0y") && eq(t.artist,"S3RL") && eq(t.album,"R4v3 B0y"));
+  }
+  puts("ID3 parser tests: 11/11 PASS");
 }

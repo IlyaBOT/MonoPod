@@ -1,0 +1,26 @@
+// INTEGRATION EXAMPLE, not an edited MonoPod Desktop source file.
+// Open the actual native ESP32-S3 USB CDC port (GPIO19/20).
+using System.IO.Ports;
+using System.Text;
+
+var port = new SerialPort(portName)
+{
+    BaudRate = 115200, // CDC line coding only. Link is USB Full Speed, NOT UART.
+    DataBits = 8,
+    Parity = Parity.None,
+    StopBits = StopBits.One,
+    Handshake = Handshake.None,
+    DtrEnable = true, // .NET default=false; important for CDC operator bool!
+    RtsEnable = false,
+    ReadTimeout = 10000,
+    WriteTimeout = 20000,
+    NewLine = "\n",
+    Encoding = Encoding.UTF8
+};
+port.Open();
+// Wire protocol v4: write UTF-8 ASCII control line "MPOD1 HELLO\n",
+// consume "MPOD1 READY 4 SD=1\n", then "MPOD1 X INFO\n".
+// MPOD1 SYNC START before uploads. X PUT has length/CRC32 then server NEXT N.
+// Write EXACTLY N raw binary bytes on each NEXT N. Do NOT use WriteLine for data.
+// Await MPOD1 OK SAVED; MPOD1 SCAN then MPOD1 SYNC END.
+// Do not log or interleave any commands with the binary phase.

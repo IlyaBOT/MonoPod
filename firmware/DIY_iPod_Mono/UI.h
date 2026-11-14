@@ -7,6 +7,8 @@ public:
   void redraw(){dirty=true;}
   void notify(const String& text);
 private:
+  String shownClock="";
+  uint32_t lastClockHeader=0;
   struct Item {String title;int id;bool submenu;};
   struct History {Page page;int selection;int scroll;Category category;String filter;};
   Page page=Page::Home;
@@ -21,8 +23,15 @@ private:
   uint32_t overlayUpdatedAt=0,lastWheelTurnAt=0;
   uint32_t lastNowTime=UINT32_MAX;
   int lastNowTrack=-1;
+  int lastHiddenTrack=-1;
   int seekPreview=-1,lastSeekCommitted=-1;
   bool dirty=true,blank=false,brightnessEditing=false;
+  uint32_t selectedSince=0,lastMarqueeFrame=UINT32_MAX,lastHiddenRefresh=0;
+  uint32_t nowTitleSince=0,lastTitleFrame=UINT32_MAX;
+  int marqueeSelection=-1;
+  String marqueeTitle;
+  int marqueeOffset(uint32_t since,uint32_t now)const;
+  String selectedText()const;
   uint32_t lastTouch=0,lastRender=0,sleepDeadline=0;
   uint8_t lastWiFiIndicator=255,lastBatteryBand=255;
   // Network password keyboard. MENU toggles case; SELECT types; NEXT joins;

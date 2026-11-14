@@ -24,11 +24,12 @@ void WiFiSyncService::upload(){
   if(uploadActive){uploadError="Only one multipart file is allowed";SyncFiles::abort();return;}
   uploadActive=true;uploadOk=false;uploadError="";
   if(!SyncFiles::gate(SyncTransport::WiFi)){uploadError=SyncFiles::error;return;}
-  bool legacy=server.uri()!="/api/fs/upload",theme=server.uri()=="/api/theme"||server.arg("theme")=="1";
-  String path=theme?"/MonoPod/theme.mpt":legacy?"/Music/"+u.filename:server.arg("path");uint32_t size=0,crc=0;
-  if(!legacy && (!number(server.arg("size"),size)||server.arg("crc").length()!=8||!number(server.arg("crc"),crc,16))){uploadError="INVALID_ARGUMENTS";return;}
-  if(legacy&&!theme){if(u.filename.indexOf('/')>=0||u.filename.indexOf('\\')>=0||!MediaLibrary::isAudio(u.filename)){uploadError="INVALID_FILE";return;}if(!SD.exists("/Music"))SD.mkdir("/Music");}
-  if(!SyncFiles::begin(path,size,crc,legacy||server.arg("replace")=="1",theme,SyncTransport::WiFi,legacy))uploadError=SyncFiles::error;
+  bool theme=server.uri()=="/api/theme";
+  String path=theme?"/MonoPod/theme.mpt":server.arg("path");uint32_t size=0,crc=0;
+  if(!number(server.arg("size"),size)||server.arg("crc").length()!=8||!number(server.arg("crc"),crc,16)){
+    uploadError="INVALID_ARGUMENTS";return;
+  }
+  if(!SyncFiles::begin(path,size,crc,server.arg("replace")=="1",theme,SyncTransport::WiFi))uploadError=SyncFiles::error;
  }else if(u.status==UPLOAD_FILE_WRITE){
   if(uploadError.length())return;if(!SyncFiles::write(u.buf,u.currentSize)){uploadError=SyncFiles::error;SyncFiles::abort();}
  }else if(u.status==UPLOAD_FILE_END){uploadOk=uploadError.isEmpty()&&SyncFiles::busy();}
@@ -37,10 +38,9 @@ void WiFiSyncService::upload(){
 void WiFiSyncService::finished(){
  bool ok=uploadOk&&uploadError.isEmpty();if(ok&&!SyncFiles::commit()){uploadError=SyncFiles::error;ok=false;}
  if(!ok)SyncFiles::abort();uploadActive=false;uploadOk=false;
- if(ok){if(server.uri()=="/upload")media.rescan();server.send(200,"application/json","{\"ok\":true}");ui.redraw();}else server.send(422,"text/plain",uploadError.length()?uploadError:"NO_UPLOAD");
+ if(ok){server.send(200,"application/json","{\"ok\":true}");ui.redraw();}else server.send(422,"text/plain",uploadError.length()?uploadError:"NO_UPLOAD");
 }
 void WiFiSyncService::routes(){
- server.on("/",HTTP_GET,[this](){server.send(200,"text/html; charset=utf-8","<!doctype html><title>MonoPod Sync</title><h2>MonoPod Wi-Fi Sync</h2><p>Local HTTP. Use MonoPod Desktop for the file manager.</p><form action='/upload' method='post' enctype='multipart/form-data'><input type='file' name='track' accept='.mp3,.wav,.flac,.aac'><button>Upload music</button></form>");});
  server.on("/api/info",HTTP_GET,[this](){server.send(200,"application/json",SyncFiles::info());});
  server.on("/api/storage",HTTP_GET,[this](){if(allowed())server.send(200,"application/json",SyncFiles::info());});
  server.on("/api/fs/list",HTTP_GET,[this](){if(!allowed())return;uint32_t offset=0,limit=32;if((server.hasArg("offset")&&!number(server.arg("offset"),offset))||(server.hasArg("limit")&&!number(server.arg("limit"),limit))||limit>32||!limit){server.send(400,"text/plain","INVALID_ARGUMENTS");return;}String json=SyncFiles::list(server.arg("path"),offset,limit,SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
@@ -59,13 +59,30 @@ void WiFiSyncService::routes(){
  server.on("/api/fs/rename",HTTP_POST,[this](){if(allowed())result(SyncFiles::rename(server.arg("path"),server.arg("destination"),SyncTransport::WiFi));});
  server.on("/api/fs/file",HTTP_DELETE,[this](){if(allowed())result(SyncFiles::remove(server.arg("path"),server.arg("directory")=="1",SyncTransport::WiFi));});
  server.on("/api/fs/upload",HTTP_POST,[this](){finished();},[this](){upload();});
- server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
  server.on("/api/theme",HTTP_POST,[this](){finished();},[this](){upload();});
  server.on("/api/smoothing",HTTP_POST,[this](){if(!allowed())return;if(!server.hasArg("enabled")){server.send(400,"text/plain","Missing enabled");return;}settings.data.fontSmoothing=server.arg("enabled")=="1";settings.markDirty();result(true);});
  server.on("/api/theme/reset",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}if(SD.exists("/MonoPod/theme.mpt")&&!SD.remove("/MonoPod/theme.mpt")){server.send(500,"text/plain","DELETE_FAILED");return;}theme.unload();display.palette(settings.data.contrast);result(true);});
  server.on("/api/scan",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}media.rescan();result(true);});
  server.on("/api/sync/end",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}server.send(200,"application/json","{\"ok\":true}");stopRequested=true;});
- server.on("/time",HTTP_GET,[this](){if(!allowed())return;time_t epoch=(time_t)strtoll(server.arg("unix").c_str(),nullptr,10);if(epoch<1600000000||epoch>4102444800LL){server.send(400,"text/plain","Invalid time");return;}clockService.setUnix(epoch);result(true);});
+ server.on("/api/clock",HTTP_POST,[this](){
+   if(!allowed())return;
+   if(!server.hasArg("unix") || !server.hasArg("timezone") || !server.hasArg("ntp")){
+     server.send(400,"text/plain","Missing unix, timezone or ntp");return;
+   }
+   const String raw=server.arg("unix");
+   if(raw.isEmpty() || raw.length()>11){server.send(400,"text/plain","Invalid unix");return;}
+   for(size_t i=0;i<raw.length();i++)if(!isdigit((unsigned char)raw[i])){
+     server.send(400,"text/plain","Invalid unix");return;
+   }
+   const time_t epoch=(time_t)strtoll(raw.c_str(),nullptr,10);
+   const String option=server.arg("ntp");
+   if(epoch<1600000000 || epoch>4102444800LL || (option!="0" && option!="1") ||
+      !clockService.setTimezone(server.arg("timezone")) ||
+      !clockService.setNtpEnabled(option=="1")){
+     server.send(400,"text/plain","Invalid clock settings");return;
+   }
+   clockService.setUnix(epoch);result(true);
+  });
  server.onNotFound([this](){server.send(404,"text/plain","Not found");});
 }
 void WiFiSyncService::begin(){

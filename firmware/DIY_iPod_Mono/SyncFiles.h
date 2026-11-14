@@ -16,7 +16,7 @@ bool mkdir(const String& path,SyncTransport who);
 bool remove(const String& path,bool directory,SyncTransport who);
 bool rename(const String& path,const String& dest,SyncTransport who);
 void recover();
-bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who,bool legacy=false);
+bool begin(const String& path,uint32_t size,uint32_t crc,bool replace,bool theme,SyncTransport who);
 bool write(const uint8_t* data,size_t count);
 bool commit();
 void abort();

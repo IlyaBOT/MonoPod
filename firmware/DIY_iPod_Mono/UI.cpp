@@ -14,6 +14,7 @@
 #include "Input.h"
 #include "DevConsole.h"
 #include "Feedback.h"
+#include "MarqueeMotion.h"
 #if !EXCLUDE_BAD_APPLE_EASTEREGG
 #include "BadApple.h"
 #endif
@@ -22,12 +23,12 @@
 #include "IpodIdentity.h"
 #include <time.h>
 PlayerUI ui;
-void PlayerUI::begin(){page=Page::Home;lastWiFiIndicator=255;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
+void PlayerUI::begin(){page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
 void PlayerUI::notify(const String& msg){blank=false;lastTouch=millis();backlight.wake();showMessage(msg);}
 void PlayerUI::navigate(Page next){
   history.push_back({page,selected,scroll,activeCategory,filter});
   if(page==Page::WiFiNetworks && next!=Page::WiFiNetworks)wifiNetworks.leave();
-  page=next;selected=0;scroll=0;brightnessEditing=false;nowOverlay=NowOverlay::Progress;seekPreview=-1;lastNowTime=UINT32_MAX;lastNowTrack=-1;
+  page=next;selected=0;scroll=0;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;brightnessEditing=false;nowOverlay=NowOverlay::Progress;seekPreview=-1;lastNowTime=UINT32_MAX;lastNowTrack=-1;
   if(page==Page::WiFiNetworks)wifiNetworks.enter();
 #if FEATURE_BLUETOOTH
   if(page==Page::Bluetooth){BluetoothAudioOutput::ensureStarted();}
@@ -125,13 +126,14 @@ void PlayerUI::build(){
     break;
   }
   case Page::Backlight:
-    add(String("Brightness: ")+String(settings.data.backlightBrightness)+"%"+(brightnessEditing?" *":""),0,false);
+    add(Config::TFT_BL_BRIGHTNESS_CONTROL
+        ? String("Brightness: ")+String(settings.data.backlightBrightness)+"%"+(brightnessEditing?" *":"")
+        : String("Brightness: Fixed 100%"),0,false);
     break;
   case Page::BacklightTimer:{
-    // Screenshot-matched UI: Off, 1/2/3/5 seconds, Always On.
-    const uint8_t values[]={0,1,2,3,5,255};
-    const char* labels[]={"Off","1 Second","2 Seconds","3 Seconds","5 Seconds","Always On"};
-    for(uint8_t i=0;i<6;i++)add(labels[i],values[i],false);
+    const uint8_t values[]={5,10,15,30,60};
+    const char* labels[]={"5 Seconds","10 Seconds","15 Seconds","30 Seconds","60 Seconds"};
+    for(uint8_t i=0;i<5;i++)add(labels[i],values[i],false);
     break;
   }
   case Page::ResetAllSettings:
@@ -278,6 +280,7 @@ void PlayerUI::open(){
   if(page==Page::SleepTimer){int minutes=items[selected].id;
     sleepDeadline=minutes?millis()+(uint32_t)minutes*60000UL:0;back();return;}
   if(page==Page::Backlight){
+    if(!Config::TFT_BL_BRIGHTNESS_CONTROL){showMessage("Brightness fixed 100%");return;}
     brightnessEditing=true;build();dirty=true;return;
   }
   if(page==Page::BacklightTimer){
@@ -285,8 +288,7 @@ void PlayerUI::open(){
       settings.data.backlightSeconds=(uint8_t)items[selected].id;
       settings.markDirty();
       // Settings take effect immediately; no reboot required.
-      if(settings.data.backlightSeconds==255){blank=false;backlight.wake();}
-      else if(settings.data.backlightSeconds==0){blank=false;backlight.sleep();}
+      blank=false;backlight.wake();
       back();
     }
     return;
@@ -415,7 +417,7 @@ void PlayerUI::adjust(int delta){
   const int count=listItemCount();
   if(!listPage()||count==0)return;
   int before=selected;selected=constrain(selected+delta,0,count-1);
-  if(selected!=before)
+  if(selected!=before){selectedSince=millis();lastMarqueeFrame=UINT32_MAX;marqueeSelection=selected;}
   if(selected<scroll)scroll=selected;
   if(selected>=scroll+Display::ROW_COUNT)scroll=selected-Display::ROW_COUNT+1;
   dirty=true;
@@ -532,8 +534,7 @@ void PlayerUI::event(Key key){
     return;
   }
   lastTouch=millis();
-  // Timer=Off means no automatic illumination. A manual Backlight item can still wake it.
-  if(settings.data.backlightSeconds!=0)backlight.wake();
+  backlight.wake();
   if(blank){blank=false;backlight.wake();return;} // TFT RAM retained; do not clear it when waking
   if(key==Key::Up || key==Key::Down)feedback.fire(FeedbackEvent::Scroll);
   if(page==Page::Backlight && brightnessEditing){
@@ -648,7 +649,10 @@ void PlayerUI::paint(){
   display.clear();
   lastWiFiIndicator=wifiNetworks.indicator();lastBatteryBand=display.batteryBand();
   const uint8_t bars=lastWiFiIndicator==5?3:(lastWiFiIndicator==4?0:lastWiFiIndicator);
-  display.header(title(),input.held() && !devConsole.hardwareDisabled(),player.active()&&!player.paused(),bars);
+  String headerText=title();
+  if(page==Page::NowPlaying && clockService.valid())headerText=clockService.shortTime();
+  display.header(headerText,input.held() && !devConsole.hardwareDisabled(),player.active()&&!player.paused(),page==Page::NowPlaying?0:bars,page==Page::NowPlaying);
+  display.headerTitleMarquee(headerText,marqueeOffset(nowTitleSince,millis()));
   if(page==Page::WiFiPassword){paintKeyboard();}
 #if FEATURE_BLUETOOTH
   else if(page==Page::BluetoothPin || page==Page::BluetoothPairConfirm || page==Page::BluetoothDelete){paintBluetoothDialog();}
@@ -676,7 +680,7 @@ void PlayerUI::paint(){
     for(int i=0;i<Display::ROW_COUNT;i++){
       int index=scroll+i;if(index>=listItemCount())break;
       if(page==Page::Songs || page==Page::Category){
-        display.listRow(i,media.at(songIndices[index]).title,index==selected,false);
+        display.listRow(i,media.at(songIndices[index]).title,index==selected,false,index==selected?marqueeOffset(selectedSince,millis()):0);
         continue;
       }
       if(page==Page::About){
@@ -688,7 +692,7 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.10.2";break;
+        case 3:value="0.10.5";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }
@@ -703,7 +707,7 @@ void PlayerUI::paint(){
         continue;
       }
       const Item &item=items[index];
-      display.listRow(i,item.title,index==selected,item.submenu);
+      display.listRow(i,item.title,index==selected,item.submenu,index==selected?marqueeOffset(selectedSince,millis()):0);
       if(page==Page::WiFiNetworks){
         const auto &a=wifiNetworks.networks()[item.id];
         int strength=a.rssi>=-55?3:a.rssi>=-70?2:a.rssi>=-85?1:0;
@@ -744,7 +748,12 @@ void PlayerUI::paint(){
     if(player.active()){
       const Track& t=media.at(player.current());
       display.nowPlaying(t.title,t.artist,t.album,player.paused(),(uint32_t)player.current()+1,media.size());
-      lastNowTrack=player.current();updateNowPlayingOverlay();
+      lastNowTrack=player.current();
+      display.nowPlayingTitleMarquee(t.title,marqueeOffset(nowTitleSince,millis()));
+      display.nowPlayingControls(nowOverlay==NowOverlay::Volume?1:nowOverlay==NowOverlay::Seek?2:0,
+        player.approximateProgress(),settings.data.volume,seekPreview>=0?seekPreview:0,
+        player.elapsedSeconds(),player.remainingSeconds(),player.durationSeconds()!=0);
+      lastNowTime=player.elapsedSeconds();
     }else display.centerText(51,"No music playing",true);
     // Bottom rows are reserved for progress/time or volume; no footer.
   }else if(page==Page::Clock){display.clock(clockService.dateTime());display.footer("Set via Wi-Fi Sync");}
@@ -753,6 +762,14 @@ void PlayerUI::paint(){
     display.smallText(6,97,toast,display.background(),display.selectedBackground());
   }
   display.endFrame();dirty=false;lastRender=millis();
+}
+int PlayerUI::marqueeOffset(uint32_t since,uint32_t now)const{
+  return (int)MarqueeMotion::pixelOffset(since,now);
+}
+String PlayerUI::selectedText()const{
+  if(selected<0 || selected>=listItemCount())return String();
+  if(page==Page::Songs || page==Page::Category)return media.at(songIndices[selected]).title;
+  return items[selected].title;
 }
 void PlayerUI::loop(){
 #if !EXCLUDE_BAD_APPLE_EASTEREGG
@@ -818,15 +835,61 @@ void PlayerUI::loop(){
 #endif
   if(sleepDeadline && (int32_t)(millis()-sleepDeadline)>=0){sleepDeadline=0;player.stop();dirty=true;}
   if(toastDeadline && (int32_t)(millis()-toastDeadline)>=0){toastDeadline=0;dirty=true;}
-  if(!blank && settings.data.backlightSeconds!=0 && settings.data.backlightSeconds!=255 &&
+  if(!blank &&
     millis()-lastTouch>(uint32_t)settings.data.backlightSeconds*1000UL){
-    blank=true;backlight.sleep();
-#if WOKWI_SIMULATION
-    display.fillRect(0,0,160,128,0); // simulator has no hardware backlight
-#endif
+    blank=true;lastHiddenRefresh=millis();backlight.sleep();
+  }
+  // Keep the framebuffer current behind an unlit backlight; never call wake().
+  // Change of track has priority; otherwise do one refresh every 10 minutes.
+  if(blank && !syncMode.active()){
+    const uint32_t now=millis();
+    const int track=player.active()?(int)player.current():-1;
+    bool changedTrack=track!=lastHiddenTrack;
+    lastHiddenTrack=track;
+    if(changedTrack){nowTitleSince=now;lastTitleFrame=UINT32_MAX;}
+    if(changedTrack || now-lastHiddenRefresh>=600000UL){
+      paint();lastHiddenRefresh=now;
+    }
+  }
+  if(!blank)lastHiddenTrack=player.active()?(int)player.current():-1;
+  // Marquee is updated only when backlight is on. Selected rows go back to
+  // their original text and ellipsis immediately when selection changes.
+  if(!blank && !dirty){
+    const uint32_t now=millis();
+    const String heading=title();
+    if(heading!=marqueeTitle){marqueeTitle=heading;nowTitleSince=now;lastTitleFrame=UINT32_MAX;}
+    bool compact=display.textWidth(heading,false)>100;
+    if(compact && display.textWidth(heading,true)>100){
+      uint32_t frame=MarqueeMotion::pixelOffset(nowTitleSince,now);
+      if(frame!=lastTitleFrame){display.headerTitleMarquee(heading,(int)frame);lastTitleFrame=frame;}
+    }
+    if(listPage() && page!=Page::About && page!=Page::WiFiNetworks){
+      String label=selectedText();
+      if(marqueeSelection!=selected){marqueeSelection=selected;selectedSince=now;lastMarqueeFrame=UINT32_MAX;}
+      if(display.textWidth(label,false)>(selected<(int)items.size() && page!=Page::Songs && page!=Page::Category && items[selected].submenu?137:149)){
+        uint32_t frame=MarqueeMotion::pixelOffset(selectedSince,now);
+        if(frame!=lastMarqueeFrame){
+          lastMarqueeFrame=frame;
+          // Draw just the selected row. Avoid full-screen SPI refresh at 12 FPS.
+          int row=selected-scroll;
+          if(row>=0 && row<Display::ROW_COUNT){
+            bool submenu=page!=Page::Songs && page!=Page::Category && selected<(int)items.size()?items[selected].submenu:false;
+            display.listRow((uint8_t)row,label,true,submenu,(int)frame);
+          }
+        }
+      }
+    }
+    if(page==Page::NowPlaying && player.active()){
+      if(player.current()!=lastNowTrack){nowTitleSince=now;lastTitleFrame=UINT32_MAX;}
+      const String& name=media.at(player.current()).title;
+      if(display.textWidth(name,true)>152){
+        uint32_t frame=MarqueeMotion::pixelOffset(nowTitleSince,now);
+        if(frame!=lastTitleFrame){display.nowPlayingTitleMarquee(name,(int)frame);lastTitleFrame=frame;}
+      }
+    }
   }
   // Update only the Wi-Fi glyph while idle; do not clear/redraw the menu.
-  if(!blank && !dirty){
+  if(!blank && !dirty && page!=Page::NowPlaying){
     const uint8_t next=wifiNetworks.indicator();
     if(next!=lastWiFiIndicator){
       lastWiFiIndicator=next;
@@ -837,7 +900,7 @@ void PlayerUI::loop(){
   if(!blank && !dirty && display.batteryBand()!=lastBatteryBand){
     lastBatteryBand=display.batteryBand();display.batteryIcon();
   }
-  if(page==Page::NowPlaying && !blank && !dirty && player.current()!=lastNowTrack){dirty=true;}
+  if(page==Page::NowPlaying && !blank && !dirty && player.current()!=lastNowTrack){nowTitleSince=millis();lastTitleFrame=UINT32_MAX;dirty=true;}
   if(page==Page::NowPlaying && player.active() && !blank && !dirty){
     const uint32_t now=millis();
     if(nowOverlay!=NowOverlay::Progress && now-overlayUpdatedAt>=5000UL){
@@ -851,6 +914,11 @@ void PlayerUI::loop(){
     }else if(nowOverlay==NowOverlay::Progress && player.elapsedSeconds()!=lastNowTime){
       updateNowPlayingOverlay();
     }
+  }
+  if(page==Page::NowPlaying && clockService.valid() && millis()-lastClockHeader>=1000UL){
+    lastClockHeader=millis();
+    const String next=clockService.shortTime();
+    if(next!=shownClock){shownClock=next;dirty=true;}
   }
   if(!blank && (dirty || (page==Page::Clock&&millis()-lastRender>5000UL)))paint();
   backlight.loop();

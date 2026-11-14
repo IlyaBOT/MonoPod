@@ -14,10 +14,11 @@ enum class ClickerMode : uint8_t { Off=0, Speaker=1, Headphones=2, Both=3 };
 struct Track {
   String path, title, artist, album, genre, folder;
   uint32_t durationSeconds=0; // 0=unknown; ID3 TLEN or WAV duration
+  uint16_t year=0; // 0=unknown; ID3 TDRC/TYER or ID3v1
 };
 struct SettingsState {
   uint8_t volume = 30;
-  uint8_t backlightSeconds = 10; // physical PWM off after inactivity; 0=always on
+  uint8_t backlightSeconds = 10; // valid values: 5, 10, 15, 30, 60 seconds
   uint8_t backlightBrightness = 75; // percentage, 5..100 (saved in NVS)
   bool shuffle = false;
   RepeatMode repeat = RepeatMode::Off;
