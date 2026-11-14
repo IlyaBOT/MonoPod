@@ -49,8 +49,10 @@ bool ClockService::setNtpServer(const String& value){
   if(!ClockConfigValidation::ntpServer(value.c_str()))return false;
   Preferences p;if(!p.begin("monopod-clock",false))return false;
   size_t saved=p.putString("ntp-server",value);p.end();if(!saved)return false;
-  const bool changed=ntpServer_!=value;ntpServer_=value;
-  if(changed)restartNtp();return true;
+  const bool changed=ntpServer_!=value;
+  // Stop SNTP before replacing the storage passed to configTzTime().
+  if(changed)restartNtp();
+  ntpServer_=value;return true;
 }
 void ClockService::loop(){
   // No blocking DNS / SNTP calls in the UI loop. LWIP services NTP on its own.

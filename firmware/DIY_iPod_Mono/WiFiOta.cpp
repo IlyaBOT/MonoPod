@@ -71,7 +71,7 @@ void WiFiOtaService::newSession(){
 }
 void WiFiOtaService::stopSession(){abort();pinCode="";}
 String WiFiOtaService::info()const{
-  return String("{\"protocol\":1,\"firmware\":\"0.10.6.6\",\"board\":\"")+boardName()+
+  return String("{\"protocol\":1,\"firmware\":\"0.10.6.8\",\"board\":\"")+boardName()+
     "\",\"device_id\":\""+IpodIdentity::guid()+
     "\",\"supported\":"+(supported()?"true":"false")+
     ",\"max_image_bytes\":"+String(maxImageBytes())+

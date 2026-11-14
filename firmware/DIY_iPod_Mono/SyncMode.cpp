@@ -9,6 +9,7 @@ bool SyncController::enter(SyncTransport wanted) {
   if(wanted==SyncTransport::None || !media.sdOK()) return false;
   if(current!=SyncTransport::None) return current==wanted;
   player.stop();             // decoder/I2S SD file handle must be released FIRST
+  player.suspendBackground(true); // no idle I2S writes while syncing
   feedback.quiet();          // no click/beep while synchronized
   current=wanted;            // lock normal UI BEFORE exposing storage/network
   ui.redraw();
@@ -18,6 +19,7 @@ bool SyncController::leave(SyncTransport expected) {
   if(SyncFiles::busy())return false;
   if(current!=expected || expected==SyncTransport::None) return false;
   current=SyncTransport::None;
+  player.suspendBackground(false);
   ui.redraw();
   return true;
 }

@@ -15,6 +15,8 @@ struct Track {
   String path, title, artist, album, genre, folder;
   uint32_t durationSeconds=0; // 0=unknown; ID3 TLEN or WAV duration
   uint16_t year=0; // 0=unknown; ID3 TDRC/TYER or ID3v1
+  uint32_t flacSampleRate=0; // FLAC STREAMINFO, needed for sample-accurate seek
+  uint64_t flacTotalSamples=0;
 };
 struct SettingsState {
   uint8_t volume = 30;

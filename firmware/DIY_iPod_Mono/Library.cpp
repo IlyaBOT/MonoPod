@@ -6,6 +6,7 @@
 #include <memory>
 #include <new>
 #include "Id3Parser.h"
+#include "FlacMetadata.h"
 #if FEATURE_SD_FORMAT
 #define DISABLE_FS_H_WARNING
 #include <SdFat.h>
@@ -150,7 +151,24 @@ void MediaLibrary::scanFolder(const String &path,uint8_t depth) {
   dir.close();
 }
 void MediaLibrary::metadata(Track &t) {
-  String ext=t.path;ext.toLowerCase();if(!ext.endsWith(".mp3"))return;
+  String ext=t.path;ext.toLowerCase();
+  if(ext.endsWith(".flac")){
+    File f=SD.open(t.path.c_str());if(!f)return;
+    FlacMetadata::Info flac;
+    const bool parsed=FlacMetadata::parse(f,flac);f.close();
+    if(parsed){
+      if(flac.title[0])t.title=flac.title;
+      if(flac.artist[0])t.artist=flac.artist;
+      if(flac.album[0])t.album=flac.album;
+      if(flac.genre[0])t.genre=flac.genre;
+      if(flac.year)t.year=flac.year;
+      t.durationSeconds=flac.durationSeconds;
+      t.flacSampleRate=flac.sampleRate;
+      t.flacTotalSamples=flac.totalSamples;
+    }
+    return;
+  }
+  if(!ext.endsWith(".mp3"))return;
   File f=SD.open(t.path.c_str());if(!f)return;
   Id3Parser::Tags tags;
   if(Id3Parser::parse(f,tags)){

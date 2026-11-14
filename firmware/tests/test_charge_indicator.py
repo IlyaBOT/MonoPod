@@ -12,6 +12,6 @@ def test_charging_state_and_render():
     assert "if(b==5){ // charging" in disp
 
 def test_all_version_surfaces_consistent():
-    assert 'MonoPod v0.10.6.6 /' in (ROOT/"DIY_iPod_Mono.ino").read_text()
-    assert 'case 3:value="0.10.6.6";' in (ROOT/"UI.cpp").read_text()
-    assert r'\"firmware\":\"0.10.6.6\"' in (ROOT/"SyncFiles.cpp").read_text()
+    assert 'MonoPod v0.10.6.8 /' in (ROOT/"DIY_iPod_Mono.ino").read_text()
+    assert 'case 3:value="0.10.6.8";' in (ROOT/"UI.cpp").read_text()
+    assert r'\"firmware\":\"0.10.6.8\"' in (ROOT/"SyncFiles.cpp").read_text()

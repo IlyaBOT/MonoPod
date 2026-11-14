@@ -723,7 +723,7 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.10.6.6";break;
+        case 3:value="0.10.6.8";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }
@@ -783,10 +783,11 @@ void PlayerUI::paint(){
     // Do not draw an item count or a generic bottom bar on normal list screens.
     // Keep the lower 14px quiet, as on the early monochrome iPod UI.
   }else if(page==Page::NowPlaying){
-    if(player.active()){
-      const Track& t=media.at(player.current());
-      display.nowPlaying(t.title,t.artist,t.album,player.paused(),(uint32_t)player.current()+1,media.size());
-      lastNowTrack=player.current();
+    const int currentTrack=player.current();
+    if(currentTrack>=0 && (size_t)currentTrack<media.size()){
+      const Track& t=media.at((size_t)currentTrack);
+      display.nowPlaying(t.title,t.artist,t.album,player.paused(),(uint32_t)currentTrack+1,media.size());
+      lastNowTrack=currentTrack;
       display.nowPlayingTitleMarquee(t.title,marqueeOffset(nowTitleSince,millis()));
       display.nowPlayingControls(nowOverlay==NowOverlay::Volume?1:nowOverlay==NowOverlay::Seek?2:0,
         player.approximateProgress(),settings.data.volume,seekPreview>=0?seekPreview:0,
@@ -927,7 +928,8 @@ void PlayerUI::loop(){
     }
     if(page==Page::NowPlaying && player.active()){
       if(player.current()!=lastNowTrack){nowTitleSince=now;lastTitleFrame=UINT32_MAX;}
-      const String& name=media.at(player.current()).title;
+      const int trackIndex=player.current();
+      const String name=trackIndex>=0 && (size_t)trackIndex<media.size()?media.at((size_t)trackIndex).title:String();
       if(display.textWidth(name,true)>152){
         uint32_t frame=MarqueeMotion::pixelOffset(nowTitleSince,now);
         if(frame!=lastTitleFrame){display.nowPlayingTitleMarquee(name,(int)frame);lastTitleFrame=frame;}

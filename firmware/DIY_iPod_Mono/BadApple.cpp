@@ -24,6 +24,7 @@ uint32_t BadApplePlayer::length(){return embedded?embeddedLength:(uint32_t)data.
 uint32_t BadApplePlayer::position(){return embedded?embeddedOffset:(uint32_t)data.position();}
 bool BadApplePlayer::begin(const char* path){
   end();lastError="";
+  player.suspendBackground(true); // main thread owns MP3 soundtrack during BAV
   data=SD.open(path,FILE_READ);
 #if BADAPPLE_HAS_EMBEDDED
   if(!data && BadAppleEmbeddedSize>0){
@@ -138,5 +139,6 @@ void BadApplePlayer::end(){
   if(data)data.close();embedded=nullptr;embeddedLength=embeddedOffset=0;
   if(pixels){free(pixels);pixels=nullptr;}
   frameBytes=0;videoEnd=0;running=false;
+  player.suspendBackground(false);
 }
 #endif

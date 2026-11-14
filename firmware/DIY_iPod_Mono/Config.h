@@ -128,7 +128,7 @@ constexpr uint16_t PIEZO_ACTION_HZ = 2700;
 constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable
 // ST7735S was at 16MHz. 20/26.67MHz are optional OVERCLOCK values,
 // not guaranteed by ST7735S datasheet. Keep stable default first.
-constexpr uint32_t SPI_TFT_HZ = 20000000; // experimentally test 20000000 later
+constexpr uint32_t SPI_TFT_HZ = 16000000; // experimentally test 20000000 later
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.

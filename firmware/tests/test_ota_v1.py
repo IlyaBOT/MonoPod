@@ -28,7 +28,7 @@ def test_ota_wired_only_to_wifi_sync():
     assert 'badPinAttempts>=5' in ota
     assert 'wifiOta.abort("CLIENT_ABORTED")' in wifi
     assert 'TRANSFER_TIMEOUT' in ota
-    assert '0.10.6.6' in (FW / 'DIY_iPod_Mono.ino').read_text()
+    assert '0.10.6.8' in (FW / 'DIY_iPod_Mono.ino').read_text()
 
 
 def test_desktop_reference_posts_stream_and_hash(tmp_path):

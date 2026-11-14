@@ -28,13 +28,23 @@
 #include "BluetoothOutput.h"
 #endif
 #include <SPI.h>
+#if FEATURE_AUDIO && MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+static TaskHandle_t monopodAudioTask=nullptr;
+static void audioCoreWorker(void*){
+  for(;;){
+    player.loop();
+    // At least one tick for Wi-Fi/system scheduling. DMA covers this gap.
+    vTaskDelay(pdMS_TO_TICKS(1) ? pdMS_TO_TICKS(1) : 1);
+  }
+}
+#endif
 void setup(){
   MONOPOD_LOG.begin(115200);
 #if FEATURE_USB_SYNC
   Serial.begin(115200); // native USB CDC reserved for MPOD1 v4
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.10.6.6 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.10.6.8 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32)
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -110,6 +120,11 @@ void setup(){
   ui.begin();
   if(!media.sdOK())ui.notify("No microSD card");
   devConsole.begin();
+#if FEATURE_AUDIO && MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+  const BaseType_t audioCreated=xTaskCreatePinnedToCore(audioCoreWorker,"MonoPodAudio",
+       16384,nullptr,3,&monopodAudioTask,0);
+  MONOPOD_LOG.printf("Audio: core 0 dedicated worker %s\n",audioCreated==pdPASS?"OK":"FAILED (loop fallback)");
+#endif
   MONOPOD_LOG.println("Ready. Use resistor-ladder keys or touch wheel.");
 }
 void loop(){
@@ -117,7 +132,13 @@ void loop(){
 #if !EXCLUDE_BAD_APPLE_EASTEREGG
      && !badApple.active()
 #endif
-  ) player.loop(); // MP3 soundtrack exclusively owns I2S during BAV2 playback
+  ) {
+#if FEATURE_AUDIO && MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+    if(!monopodAudioTask)player.loop(); // low-memory fallback
+#else
+    player.loop();
+#endif
+  } // No second task owns Bad Apple's soundtrack
 #if FEATURE_WIFI_SYNC
   wifiSync.loop();
 #endif

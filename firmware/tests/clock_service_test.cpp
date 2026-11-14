@@ -15,7 +15,9 @@ int main(){
     ClockNative::online=true;service.loop();
     check(ClockNative::starts==1&&ClockNative::server1=="pool.ntp.org"&&ClockNative::server2=="time.google.com");
     service.loop();check(ClockNative::starts==1);
+    ClockNative::onStop=[&](){check(service.ntpServer()=="pool.ntp.org");};
     check(service.setNtpServer("ntp.example.org")&&!ClockNative::sntp);
+    ClockNative::onStop={};
     service.loop();check(ClockNative::starts==2&&ClockNative::server1=="ntp.example.org"&&ClockNative::server2.empty());
     check(service.setNtpServer("ntp.example.org"));service.loop();check(ClockNative::starts==2);
     check(service.setTimezone("UTC-5:30")&&!ClockNative::sntp);
