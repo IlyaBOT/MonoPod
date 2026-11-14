@@ -1,5 +1,6 @@
 #include "Library.h"
 #include "Config.h"
+#include "SpiSpeedPolicy.h"
 #include <SPI.h>
 #include <algorithm>
 #include <cstring>
@@ -78,26 +79,55 @@ bool MediaLibrary::isAudio(const String &name) {
   return n.endsWith(".mp3") || n.endsWith(".wav") || n.endsWith(".flac") || n.endsWith(".aac");
 }
 String MediaLibrary::parent(const String &p) {int at=p.lastIndexOf('/');return at>0 ? p.substring(0,at) : String("/");}
+// Read-only consistency spot check. It cannot guarantee stability under
+// prolonged streaming, but catches many marginal breadboard/clock failures.
+// Never write test data to a user's microSD card.
+static bool verifySdClockReadOnly() {
+  const uint32_t sectors = SD.numSectors();
+  if (SD.cardType() == CARD_NONE || sectors == 0 || SD.sectorSize() != 512) return false;
+  // Static buffers avoid adding a full kilobyte to the Arduino loop task stack.
+  static uint8_t first[512];
+  static uint8_t second[512];
+  const uint32_t probes[] = {0, 1, 16, 128};
+  for (uint32_t block : probes) {
+    if (block >= sectors) continue;
+    if (!SD.readRAW(first, block) || !SD.readRAW(second, block) ||
+        memcmp(first, second, sizeof(first)) != 0) return false;
+  }
+  return true;
+}
+
 bool MediaLibrary::begin(bool scanOnMount) {
   if(mounted)eject();
   // SD must enter SPI mode BEFORE the TFT communicates on their shared bus.
   pinMode(Config::PIN_TFT_CS,OUTPUT);digitalWrite(Config::PIN_TFT_CS,HIGH);
   pinMode(Config::PIN_SD_CS,OUTPUT);digitalWrite(Config::PIN_SD_CS,HIGH);
   activeSpiHz=0;
-  // Hardware wiring confirmed; mount once at the configured SPI rate.
-  // Keep the SD-before-TFT initialization order on the shared bus.
-  mounted=SD.begin(Config::PIN_SD_CS,SPI,Config::SPI_SD_HZ);
-  if(mounted){
-    activeSpiHz=Config::SPI_SD_HZ;
-    error="";
-    MONOPOD_LOG.printf("SD: OK type=%u size=%llu B SPI=%lu Hz\n",
-      (unsigned)SD.cardType(),(unsigned long long)SD.cardSize(),
-      (unsigned long)activeSpiHz);
-    if(scanOnMount)rescan();
-    return true;
+  uint32_t rates[4] = {};
+  const size_t count = SpiSpeedPolicy::candidates(Config::SPI_SD_HZ, rates);
+  for (size_t i = 0; i < count; ++i) {
+    const uint32_t hz = rates[i];
+    MONOPOD_LOG.printf("SD: attempting SPI %lu Hz\n", (unsigned long)hz);
+    const bool mountOK = SD.begin(Config::PIN_SD_CS, SPI, hz);
+    const bool readOK = mountOK && verifySdClockReadOnly();
+    if (mountOK && readOK) {
+      mounted=true;
+      activeSpiHz=hz;
+      error="";
+      MONOPOD_LOG.printf("SD: OK type=%u size=%llu B SPI=%lu Hz\n",
+        (unsigned)SD.cardType(), (unsigned long long)SD.cardSize(),
+        (unsigned long)activeSpiHz);
+      if(scanOnMount)rescan();
+      return true;
+    }
+    MONOPOD_LOG.printf("SD: %lu Hz %s, retrying lower clock\n",
+      (unsigned long)hz, mountOK ? "readback failed" : "mount failed");
+    SD.end(); // essential: start the next attempt with a closed FS/driver
+    digitalWrite(Config::PIN_SD_CS,HIGH);
+    digitalWrite(Config::PIN_TFT_CS,HIGH);
   }
-  SD.end();
-  error="microSD mount failed (check CS GPIO, MISO, wiring and filesystem)";
+  mounted=false;
+  error="microSD mount/read check failed at all configured SPI speeds";
   return false;
 }
 void MediaLibrary::markDirty(const String& path,uint32_t fullCRC){

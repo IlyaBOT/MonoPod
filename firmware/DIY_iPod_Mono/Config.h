@@ -123,12 +123,30 @@ constexpr uint16_t BUTTON_ADC_DEBOUNCE_MS = 60;
 constexpr uint16_t BUTTON_ADC_RELEASE_GUARD_MS = 100;
 constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
 constexpr uint16_t PIEZO_ACTION_HZ = 2700;
-// Single SD SPI frequency, no diagnostic probing or speed fallback.
-// Conservative starting speed for breadboard wiring; tune after real testing.
-constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable
-// ST7735S was at 16MHz. 20/26.67MHz are optional OVERCLOCK values,
-// not guaranteed by ST7735S datasheet. Keep stable default first.
-constexpr uint32_t SPI_TFT_HZ = 16000000; // experimentally test 20000000 later
+// The microSD and ST7735S share SCK/MISO/MOSI but have separate CS.
+// Each driver must use its OWN SPI transaction frequency, not SPI.setFrequency().
+// ESP32-S3 N16R8 prototype: SD starts at 16MHz and falls back to 8/4MHz
+// on mount/readback error. Optional SD experiment: 20MHz (then 16/8/4).
+// The old ESP32-WROVER profile retains its established 8/16MHz defaults.
+#ifndef MONOPOD_SPI_SD_TARGET_HZ
+  #if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+    #define MONOPOD_SPI_SD_TARGET_HZ 16000000UL
+  #else
+    #define MONOPOD_SPI_SD_TARGET_HZ 8000000UL
+  #endif
+#endif
+#ifndef MONOPOD_SPI_TFT_TARGET_HZ
+  #if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+    #define MONOPOD_SPI_TFT_TARGET_HZ 20000000UL // verified on this ST7735S prototype
+  #else
+    #define MONOPOD_SPI_TFT_TARGET_HZ 16000000UL
+  #endif
+#endif
+constexpr uint32_t SPI_SD_HZ = MONOPOD_SPI_SD_TARGET_HZ;
+constexpr uint32_t SPI_TFT_HZ = MONOPOD_SPI_TFT_TARGET_HZ;
+static_assert(SPI_SD_HZ == 4000000UL || SPI_SD_HZ == 8000000UL ||
+              SPI_SD_HZ == 16000000UL || SPI_SD_HZ == 20000000UL,
+              "SD target must be 4, 8, 16 or 20 MHz");
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.

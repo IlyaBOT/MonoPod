@@ -82,7 +82,7 @@ void WiFiSyncService::otaFinished(){
  }
  ui.redraw();
 }
-bool WiFiSyncService::sessionAuthorized() const {
+bool WiFiSyncService::sessionAuthorized() {
   if(!syncModeActive)return false;
   if(!autoSession)return true; // Legacy explicit session remains compatible.
   return server.client().remoteIP()==requestIP &&

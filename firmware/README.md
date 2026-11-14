@@ -1,3 +1,14 @@
+## v0.10.7.4 — SPI tuning for the N16R8 prototype
+
+- ST7735S: **20 MHz** default (user-tested), including the emergency low-battery display.
+- microSD: **16 MHz** default; automatic startup/remount fallback 16 → 8 → 4 MHz on mount/readback failures.
+- Optional **20 MHz SD**: set `MONOPOD_SPI_SD_TARGET_HZ` to `20000000UL` in `Config.h`, then fallback is 20 → 16 → 8 → 4 MHz.
+- Read-only sector spot checks during mounting; no destructive speed tests. Actual selected clock is logged to UART and `$SD`.
+- The two peripherals share SPI wires but use independent transaction speeds and CS lines. No `SPI.setFrequency()` global override.
+- The original ESP32-WROVER profile still defaults to SD 8 MHz / TFT 16 MHz.
+- **Hardware caveats:** stability of extended streaming/writing is NOT proven by the quick readback check. At low VDD (below 3.0 V) do not test faster SD/write/OTA.
+- Initial field validation: read a large FLAC while scrolling text, transfer 100+ MiB through Wi-Fi Sync, verify CRC on PC, and reboot/remount several times. If any CRC or SD error occurs, set 8 MHz manually.
+
 ## v0.10.7.2 — HOLD Deep Sleep low-rail prototype
 
 - Critical 3V3 proxy on released GPIO9; show low-battery screen before full init.
