@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "author": "MonoPod DIY",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 60,
+      "left": -30,
+      "attrs": {}
+    },
+    {
+      "type": "chip-monopod-wheel",
+      "id": "wheel",
+      "top": 0,
+      "left": 340,
+      "attrs": {
+        "angle": "0",
+        "touch": "1"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "wheel:E0",
+      "esp:4",
+      "green",
+      []
+    ],
+    [
+      "wheel:E1",
+      "esp:13",
+      "green",
+      []
+    ],
+    [
+      "wheel:E2",
+      "esp:14",
+      "green",
+      []
+    ],
+    [
+      "wheel:E3",
+      "esp:27",
+      "green",
+      []
+    ],
+    [
+      "wheel:E4",
+      "esp:33",
+      "green",
+      []
+    ],
+    [
+      "wheel:E5",
+      "esp:32",
+      "green",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

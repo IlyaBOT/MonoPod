@@ -1,0 +1,1317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>C:\Users\IlyaBOT\Documents\Codex\2026-10-27\files-pasted-by-the-user-pcb\work\r2\TDA1308_HeadphoneAmp\TDA1308_HeadphoneAmp.kicad_sch</source>
+    <date>2026-10-27T15:29:44</date>
+    <tool>Eeschema 10.0.6</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>MonoPod TDA1308 Headphone Amplifier</title>
+        <company>3.3V / 32ohm | bench qualification required</company>
+        <rev>R2</rev>
+        <date>2026-10-27</date>
+        <source>TDA1308_HeadphoneAmp.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>22u / &gt;=10V</value>
+      <footprint>MonoPod_R2:CP_Radial_D5.0mm_P2.00mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:CP_Radial_D5.0mm_P2.00mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="CP_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e8a0b25a-7123-5041-8127-776a0162dbfa</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C2">
+      <value>100u / &gt;=10V</value>
+      <footprint>MonoPod_R2:CP_Radial_D6.3mm_P2.50mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:CP_Radial_D6.3mm_P2.50mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="CP_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b55c4d79-4fd6-5222-82d0-a221c96cb708</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C3">
+      <value>100n / &gt;=25V X7R</value>
+      <footprint>MonoPod_R2:C_Disc_D5.0mm_W2.5mm_P2.50mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:C_Disc_D5.0mm_W2.5mm_P2.50mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d8c5bee7-2d8e-58ee-acaf-e6a980da98c3</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C4">
+      <value>4.7u / &gt;=25V X7R</value>
+      <footprint>MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>aac09ed8-92d5-591b-8f95-030813c0b83a</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C5">
+      <value>4.7u / &gt;=25V X7R</value>
+      <footprint>MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>cd74a262-0f06-5d80-81f0-d81afd06d6ad</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C6">
+      <value>220u / &gt;=10V</value>
+      <footprint>MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="CP_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>a3273009-ba59-57f7-a0bb-93383e00f681</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C7">
+      <value>220u / &gt;=10V</value>
+      <footprint>MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="CP_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>463e6a23-ea04-5080-ac37-31da9b539754</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J1">
+      <value>VCC</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>bbb5c5d8-73da-54a7-a790-941a58926fb6</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J2">
+      <value>GND</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>697bfd2b-a2d1-5a31-931a-117bd66686d6</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J3">
+      <value>LIN</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>5bb96eb4-ba03-59ed-b807-5c9af4c39aff</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J4">
+      <value>RIN</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>edda049c-3c92-5073-a992-93998f8f25f4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J5">
+      <value>GND</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7c1f0db4-d3f0-54ec-abdd-fb5df36a1c3e</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J6">
+      <value>LOUT</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>74b50d4f-4be0-58f8-a6d8-422553ce0028</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="J7">
+      <value>ROUT</value>
+      <footprint>MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</footprint>
+      <fields>
+        <field name="Footprint">MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_01x01" description="Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>ff78b538-0681-5939-bae5-2f4d457df032</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="JP1">
+      <value>L_INPUT_SEL</value>
+      <footprint>Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</footprint>
+      <fields>
+        <field name="Footprint">Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Jumper" part="SolderJumper_3_Open" description="Solder Jumper, 3-pole, open"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="Solder Jumper SPDT"/>
+      <property name="ki_fp_filters" value="SolderJumper*Open*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>238baa6b-c192-5213-ba9e-2cacb19ec96f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="JP2">
+      <value>L_OUTPUT_SEL</value>
+      <footprint>Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</footprint>
+      <fields>
+        <field name="Footprint">Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Jumper" part="SolderJumper_3_Open" description="Solder Jumper, 3-pole, open"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="Solder Jumper SPDT"/>
+      <property name="ki_fp_filters" value="SolderJumper*Open*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e521b43b-dec3-5723-a3df-44b078f5dded</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="JP3">
+      <value>R_INPUT_SEL</value>
+      <footprint>Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</footprint>
+      <fields>
+        <field name="Footprint">Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Jumper" part="SolderJumper_3_Open" description="Solder Jumper, 3-pole, open"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="Solder Jumper SPDT"/>
+      <property name="ki_fp_filters" value="SolderJumper*Open*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>eaf606ef-8436-5714-96b5-2cd1d33a58dc</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="JP4">
+      <value>R_OUTPUT_SEL</value>
+      <footprint>Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</footprint>
+      <fields>
+        <field name="Footprint">Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Jumper" part="SolderJumper_3_Open" description="Solder Jumper, 3-pole, open"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="ki_keywords" value="Solder Jumper SPDT"/>
+      <property name="ki_fp_filters" value="SolderJumper*Open*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b983659e-99f1-5d8c-91c3-bd4303c7d2e5</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+            <pin num="3"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R1">
+      <value>10k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>4d134ec2-5e6c-5b44-badd-2cacc24e8a1b</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R2">
+      <value>10k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>57915e21-51d8-50c1-b142-b363d9a0f8cf</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R3">
+      <value>10k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2e8f8d28-097a-5c4e-85c7-230e6a85bf3d</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R4">
+      <value>3.3k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c600467e-3745-5c52-b9be-3d2ca9ad8462</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R5">
+      <value>10k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>3030a838-3069-5e01-8166-1a83e50ecaca</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R6">
+      <value>3.3k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>688a0c09-83d9-5e6b-94d0-380ccdf938fb</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R7">
+      <value>3.9k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>8661bcb5-ac8a-598f-acd9-095edf1c87d9</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R8">
+      <value>3.9k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>0ff57f53-3fd7-59b2-94e6-2689c8b7720a</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R9">
+      <value>3.9k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>523329f9-9cae-522f-8f95-b1c727441e47</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R10">
+      <value>3.9k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>be4f0795-a680-5106-96b9-8ee457f03b3f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R11">
+      <value>2.2R</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>2cccf6bb-6419-50b2-869e-06dbfd2b5de4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R12">
+      <value>2.2R</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>43bae66b-becd-5e4a-baa4-dac72e320bed</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R13">
+      <value>100k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e547f5db-6bae-53d3-b98e-227b4b1f4d57</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="R14">
+      <value>100k</value>
+      <footprint>Resistor_SMD:R_1206_3216Metric</footprint>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_1206_3216Metric</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>34cfa0c4-d03c-5f06-8d78-726ecdceeeb5</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP1">
+      <value>VDD</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f5ae8aea-0a51-587d-9e21-828cf8685ec2</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP2">
+      <value>GND</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f78b5dca-8f00-5dc8-b5e4-98f2bca383a4</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP3">
+      <value>VREF</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>69013f75-86dc-5ee2-9dd4-2bc87e77ac6f</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP4">
+      <value>INA</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e9cbcf63-899a-5ceb-8d7e-e050888842c5</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP5">
+      <value>INB</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>c28f7f28-8e5f-5f7c-9116-ecbe31af3561</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP6">
+      <value>OUTA_RAW</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d26458a4-a751-5f41-ac90-3b19ccc03920</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP7">
+      <value>OUTB_RAW</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>a6190c7c-737e-50a8-83f5-2357ba33defd</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP8">
+      <value>HP_L</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>98d275f6-aab2-598e-b776-39bc311f60e2</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="TP9">
+      <value>HP_R</value>
+      <footprint>TestPoint:TestPoint_Pad_D1.5mm</footprint>
+      <fields>
+        <field name="Footprint">TestPoint:TestPoint_Pad_D1.5mm</field>
+        <field name="Datasheet"/>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="test point tp"/>
+      <property name="ki_fp_filters" value="Pin* Test*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>02721a1e-825b-5b71-8655-66048a8d49ab</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="U1">
+      <value>TDA1308T</value>
+      <footprint>Package_SO:SOIC-8_3.9x4.9mm_P1.27mm</footprint>
+      <datasheet>https://www.nxp.com/docs/en/data-sheet/TDA1308.pdf</datasheet>
+      <fields>
+        <field name="Footprint">Package_SO:SOIC-8_3.9x4.9mm_P1.27mm</field>
+        <field name="Datasheet">https://www.nxp.com/docs/en/data-sheet/TDA1308.pdf</field>
+        <field name="Description"/>
+      </fields>
+      <libsource lib="Amplifier_Audio" part="TDA1308" description="Class-AB Stereo Headphone Driver, SOIC-8/TSSOP-8"/>
+      <property name="Sheetname" value="TDA1308_HeadphoneAmp"/>
+      <property name="Sheetfile" value="TDA1308_HeadphoneAmp.kicad_sch"/>
+      <property name="ki_keywords" value="audio amplifier"/>
+      <property name="ki_fp_filters" value="SOIC*3.9x4.9mm*P1.27mm* TSSOP*3x3mm*P0.65mm*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>e4e387d2-d94e-5eb7-baa1-5b4bf3327765 6e4a8ded-7305-50ac-ab88-01891401cb98 25af696c-c1ae-5961-862a-c668489c43c2</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="3"/>
+            <pin num="2"/>
+            <pin num="1"/>
+          </pins>
+        </unit>
+        <unit name="B">
+          <pins>
+            <pin num="5"/>
+            <pin num="6"/>
+            <pin num="7"/>
+          </pins>
+        </unit>
+        <unit name="C">
+          <pins>
+            <pin num="8"/>
+            <pin num="4"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Amplifier_Audio" part="TDA1308">
+      <description>Class-AB Stereo Headphone Driver, SOIC-8/TSSOP-8</description>
+      <docs>https://www.nxp.com/docs/en/data-sheet/TDA1308.pdf</docs>
+      <footprints>
+        <fp>SOIC*3.9x4.9mm*P1.27mm*</fp>
+        <fp>TSSOP*3x3mm*P0.65mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">TDA1308</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">https://www.nxp.com/docs/en/data-sheet/TDA1308.pdf</field>
+        <field name="Description">Class-AB Stereo Headphone Driver, SOIC-8/TSSOP-8</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="output"/>
+        <pin num="2" name="-" type="input"/>
+        <pin num="3" name="+" type="input"/>
+        <pin num="4" name="VSS" type="power_in"/>
+        <pin num="5" name="+" type="input"/>
+        <pin num="6" name="-" type="input"/>
+        <pin num="7" name="" type="output"/>
+        <pin num="8" name="V+" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="Connector" part="TestPoint">
+      <description>test point</description>
+      <footprints>
+        <fp>Pin*</fp>
+        <fp>Test*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">TP</field>
+        <field name="Value">TestPoint</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">test point</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Connector_Generic" part="Conn_01x01">
+      <description>Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <footprints>
+        <fp>Connector*:*_1x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x01</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C_Polarized">
+      <description>Polarized capacitor</description>
+      <footprints>
+        <fp>CP_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_Polarized</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Polarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Jumper" part="SolderJumper_3_Open">
+      <description>Solder Jumper, 3-pole, open</description>
+      <footprints>
+        <fp>SolderJumper*Open*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">JP</field>
+        <field name="Value">SolderJumper_3_Open</field>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Solder Jumper, 3-pole, open</field>
+        <field name="KLC_S5.1">This is a generic symbol, it has fp-filter, but no default footprint</field>
+        <field name="KLC_S3.3">Graphical-Symbol: thickness is 6mm, fill is background</field>
+      </fields>
+      <pins>
+        <pin num="1" name="A" type="passive"/>
+        <pin num="2" name="C" type="passive"/>
+        <pin num="3" name="B" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Amplifier_Audio">
+      <uri>${KIPRJMOD}/libraries/Amplifier_Audio.kicad_sym</uri>
+    </library>
+    <library logical="Connector">
+      <uri>${KIPRJMOD}/libraries/Connector.kicad_sym</uri>
+    </library>
+    <library logical="Connector_Generic">
+      <uri>${KIPRJMOD}/libraries/Connector_Generic.kicad_sym</uri>
+    </library>
+    <library logical="Device">
+      <uri>${KIPRJMOD}/libraries/Device.kicad_sym</uri>
+    </library>
+    <library logical="Jumper">
+      <uri>${KIPRJMOD}/libraries/Jumper.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="/AC_A" class="Default">
+      <node ref="C4" pin="2" pintype="passive"/>
+      <node ref="R7" pin="1" pintype="passive"/>
+    </net>
+    <net code="2" name="/AC_B" class="Default">
+      <node ref="C5" pin="2" pintype="passive"/>
+      <node ref="R8" pin="1" pintype="passive"/>
+    </net>
+    <net code="3" name="/ATT_L" class="Default">
+      <node ref="JP2" pin="1" pinfunction="A_1" pintype="passive"/>
+      <node ref="R3" pin="2" pintype="passive"/>
+      <node ref="R4" pin="1" pintype="passive"/>
+    </net>
+    <net code="4" name="/ATT_L_IN" class="Default">
+      <node ref="JP1" pin="1" pinfunction="A_1" pintype="passive"/>
+      <node ref="R3" pin="1" pintype="passive"/>
+    </net>
+    <net code="5" name="/ATT_R" class="Default">
+      <node ref="JP4" pin="1" pinfunction="A_1" pintype="passive"/>
+      <node ref="R5" pin="2" pintype="passive"/>
+      <node ref="R6" pin="1" pintype="passive"/>
+    </net>
+    <net code="6" name="/ATT_R_IN" class="Default">
+      <node ref="JP3" pin="1" pinfunction="A_1" pintype="passive"/>
+      <node ref="R5" pin="1" pintype="passive"/>
+    </net>
+    <net code="7" name="/DIRECT_L" class="Default">
+      <node ref="JP1" pin="3" pinfunction="B_3" pintype="passive"/>
+      <node ref="JP2" pin="3" pinfunction="B_3" pintype="passive"/>
+    </net>
+    <net code="8" name="/DIRECT_R" class="Default">
+      <node ref="JP3" pin="3" pinfunction="B_3" pintype="passive"/>
+      <node ref="JP4" pin="3" pinfunction="B_3" pintype="passive"/>
+    </net>
+    <net code="9" name="/GND" class="Default">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="C2" pin="2" pintype="passive"/>
+      <node ref="C3" pin="2" pintype="passive"/>
+      <node ref="J2" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="J5" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="R13" pin="2" pintype="passive"/>
+      <node ref="R14" pin="2" pintype="passive"/>
+      <node ref="R2" pin="2" pintype="passive"/>
+      <node ref="R4" pin="2" pintype="passive"/>
+      <node ref="R6" pin="2" pintype="passive"/>
+      <node ref="TP2" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U1" pin="4" pinfunction="VSS_4" pintype="power_in"/>
+    </net>
+    <net code="10" name="/HP_L" class="Default">
+      <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="J6" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="R13" pin="1" pintype="passive"/>
+      <node ref="TP8" pin="1" pinfunction="1_1" pintype="passive"/>
+    </net>
+    <net code="11" name="/HP_R" class="Default">
+      <node ref="C7" pin="2" pintype="passive"/>
+      <node ref="J7" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="R14" pin="1" pintype="passive"/>
+      <node ref="TP9" pin="1" pinfunction="1_1" pintype="passive"/>
+    </net>
+    <net code="12" name="/INA" class="Default">
+      <node ref="C4" pin="1" pintype="passive"/>
+      <node ref="JP2" pin="2" pinfunction="C_2" pintype="passive"/>
+      <node ref="TP4" pin="1" pinfunction="1_1" pintype="passive"/>
+    </net>
+    <net code="13" name="/INB" class="Default">
+      <node ref="C5" pin="1" pintype="passive"/>
+      <node ref="JP4" pin="2" pinfunction="C_2" pintype="passive"/>
+      <node ref="TP5" pin="1" pinfunction="1_1" pintype="passive"/>
+    </net>
+    <net code="14" name="/INV_A" class="Default">
+      <node ref="R7" pin="2" pintype="passive"/>
+      <node ref="R9" pin="2" pintype="passive"/>
+      <node ref="U1" pin="2" pinfunction="-_2" pintype="input"/>
+    </net>
+    <net code="15" name="/INV_B" class="Default">
+      <node ref="R10" pin="2" pintype="passive"/>
+      <node ref="R8" pin="2" pintype="passive"/>
+      <node ref="U1" pin="6" pinfunction="-_6" pintype="input"/>
+    </net>
+    <net code="16" name="/LIN" class="Default">
+      <node ref="J3" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="JP1" pin="2" pinfunction="C_2" pintype="passive"/>
+    </net>
+    <net code="17" name="/OUTA_C" class="Default">
+      <node ref="C6" pin="1" pintype="passive"/>
+      <node ref="R11" pin="2" pintype="passive"/>
+    </net>
+    <net code="18" name="/OUTA_RAW" class="Default">
+      <node ref="R11" pin="1" pintype="passive"/>
+      <node ref="R9" pin="1" pintype="passive"/>
+      <node ref="TP6" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U1" pin="1" pintype="output"/>
+    </net>
+    <net code="19" name="/OUTB_C" class="Default">
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="R12" pin="2" pintype="passive"/>
+    </net>
+    <net code="20" name="/OUTB_RAW" class="Default">
+      <node ref="R10" pin="1" pintype="passive"/>
+      <node ref="R12" pin="1" pintype="passive"/>
+      <node ref="TP7" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U1" pin="7" pintype="output"/>
+    </net>
+    <net code="21" name="/RIN" class="Default">
+      <node ref="J4" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="JP3" pin="2" pinfunction="C_2" pintype="passive"/>
+    </net>
+    <net code="22" name="/VDD" class="Default">
+      <node ref="C2" pin="1" pintype="passive"/>
+      <node ref="C3" pin="1" pintype="passive"/>
+      <node ref="J1" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="TP1" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U1" pin="8" pinfunction="V+_8" pintype="power_in"/>
+    </net>
+    <net code="23" name="/VREF" class="Default">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="R2" pin="1" pintype="passive"/>
+      <node ref="TP3" pin="1" pinfunction="1_1" pintype="passive"/>
+      <node ref="U1" pin="3" pinfunction="+_3" pintype="input"/>
+      <node ref="U1" pin="5" pinfunction="+_5" pintype="input"/>
+    </net>
+  </nets>
+</export>

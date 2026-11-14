@@ -1,0 +1,19 @@
+{
+  "attenuator_loaded_midband": 0.15164369034994699,
+  "attenuator_loaded_db": -16.38351310544533,
+  "total_midband_gain_with_2R2": 0.14188591238350834,
+  "headphone_Vrms_for_2_1Vrms_input": 0.2979604160053675,
+  "active_resistor_ratio": -1,
+  "input_corner_Hz_att_for_4_7u": 5.3066410533311466,
+  "input_corner_Hz_direct_for_4_7u": 8.68275739726652,
+  "output_corner_Hz_no_series": {
+    "100": 49.735919716217296,
+    "220": 22.607236234644223,
+    "470": 10.582110577918574
+  },
+  "output_corner_Hz_with_2R2": {
+    "100": 46.53653306780566,
+    "220": 21.152969576275297,
+    "470": 9.901390014426735
+  }
+}

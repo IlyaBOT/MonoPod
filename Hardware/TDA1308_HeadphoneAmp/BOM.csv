@@ -1,0 +1,15 @@
+﻿References;Value;Footprint;Quantity;Mounting_side;Install;Notes
+U1;TDA1308T;Package_SO:SOIC-8_3.9x4.9mm_P1.27mm;1;BOTTOM;YES;"U1: SOIC-8 on bottom copper; salvaged chip condition unverified"
+R1,R2,R3,R5;10k;Resistor_SMD:R_1206_3216Metric;4;BOTTOM;YES;R1: Reference divider upper, 1% | R2: Reference divider lower, 1% | R3: Left attenuator series, 1% | R5: Right attenuator series, 1%
+R4,R6;3.3k;Resistor_SMD:R_1206_3216Metric;2;BOTTOM;YES;R4: Left attenuator shunt, 1% | R6: Right attenuator shunt, 1%
+R7,R8,R9,R10;3.9k;Resistor_SMD:R_1206_3216Metric;4;BOTTOM;YES;R7: Left input, 1% | R8: Right input, 1% | R9: Left feedback, 1% | R10: Right feedback, 1%
+R11,R12;2.2R;Resistor_SMD:R_1206_3216Metric;2;BOTTOM;YES;"R11: Left cable isolation; retain for untested headphone cable | R12: Right cable isolation; retain for untested headphone cable"
+R13,R14;100k;Resistor_SMD:R_1206_3216Metric;2;BOTTOM;YES;R13: Left output bleed | R14: Right output bleed
+C1;22u / >=10V;MonoPod_R2:CP_Radial_D5.0mm_P2.00mm_SingleSide;1;TOP;YES;"C1: Reference electrolytic; + pin1"
+C2;100u / >=10V;MonoPod_R2:CP_Radial_D6.3mm_P2.50mm_SingleSide;1;TOP;YES;"C2: Supply bulk; + pin1; existing 100u25V if size fits"
+C3;100n / >=25V X7R;MonoPod_R2:C_Disc_D5.0mm_W2.5mm_P2.50mm_SingleSide;1;TOP;YES;C3: Leaded ceramic decoupling, short trimmed leads, 2.5mm pitch
+C4,C5;4.7u / >=25V X7R;MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide;2;TOP;YES;C4: Leaded multilayer ceramic, body <=7x4.5mm, 5mm pitch, effective >=2.2u | C5: Leaded multilayer ceramic, body <=7x4.5mm, 5mm pitch, effective >=2.2u
+C6,C7;220u / >=10V;MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide;2;TOP;YES;"C6: Left output electrolytic, + pin1; 470u/100u alternatives | C7: Right output electrolytic, + pin1; 470u/100u alternatives"
+JP1-JP4;Mode solder selector;Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm;4;BOTTOM;SOLDER ONLY;"No resistor or connector; default bridge 1-2, DIRECT bridge 2-3 on BOTH selectors of a channel"
+J1-J7;Wire pads;MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide;7;BOTTOM COPPER;PCB ONLY;"Drill 1.15mm, pad 2.15mm; wire AWG26-30"
+TP1-TP9;Test pads;TestPoint:TestPoint_Pad_D1.5mm;9;BOTTOM;PCB ONLY;"No purchased part; no drilled hole"

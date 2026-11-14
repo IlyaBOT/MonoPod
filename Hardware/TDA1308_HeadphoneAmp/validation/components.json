@@ -1,0 +1,752 @@
+{
+  "U1": {
+    "ref": "U1",
+    "key": "Amplifier_Audio:TDA1308",
+    "value": "TDA1308T",
+    "fp": "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+    "source_fp": "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+    "nets": {
+      "1": "OUTA_RAW",
+      "2": "INV_A",
+      "3": "VREF",
+      "4": "GND",
+      "5": "VREF",
+      "6": "INV_B",
+      "7": "OUTB_RAW",
+      "8": "VDD"
+    },
+    "x": 25,
+    "y": 17,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "e4e387d2-d94e-5eb7-baa1-5b4bf3327765",
+    "role": "SOIC-8 on bottom copper; salvaged chip condition unverified",
+    "side": "B"
+  },
+  "R1": {
+    "ref": "R1",
+    "key": "Device:R",
+    "value": "10k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "VDD",
+      "2": "VREF"
+    },
+    "x": 39.5,
+    "y": 15.5,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "4d134ec2-5e6c-5b44-badd-2cacc24e8a1b",
+    "role": "Reference divider upper, 1%",
+    "side": "B"
+  },
+  "R2": {
+    "ref": "R2",
+    "key": "Device:R",
+    "value": "10k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "VREF",
+      "2": "GND"
+    },
+    "x": 38,
+    "y": 20.5,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "57915e21-51d8-50c1-b142-b363d9a0f8cf",
+    "role": "Reference divider lower, 1%",
+    "side": "B"
+  },
+  "R3": {
+    "ref": "R3",
+    "key": "Device:R",
+    "value": "10k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "ATT_L_IN",
+      "2": "ATT_L"
+    },
+    "x": 34.5,
+    "y": 4.7,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "2e8f8d28-097a-5c4e-85c7-230e6a85bf3d",
+    "role": "Left attenuator series, 1%",
+    "side": "B"
+  },
+  "R4": {
+    "ref": "R4",
+    "key": "Device:R",
+    "value": "3.3k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "ATT_L",
+      "2": "GND"
+    },
+    "x": 34.5,
+    "y": 8.9,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "c600467e-3745-5c52-b9be-3d2ca9ad8462",
+    "role": "Left attenuator shunt, 1%",
+    "side": "B"
+  },
+  "R5": {
+    "ref": "R5",
+    "key": "Device:R",
+    "value": "10k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "ATT_R_IN",
+      "2": "ATT_R"
+    },
+    "x": 34.5,
+    "y": 32.3,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "3030a838-3069-5e01-8166-1a83e50ecaca",
+    "role": "Right attenuator series, 1%",
+    "side": "B"
+  },
+  "R6": {
+    "ref": "R6",
+    "key": "Device:R",
+    "value": "3.3k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "ATT_R",
+      "2": "GND"
+    },
+    "x": 34.5,
+    "y": 28.1,
+    "rot": 270,
+    "dnp": false,
+    "uuid": "688a0c09-83d9-5e6b-94d0-380ccdf938fb",
+    "role": "Right attenuator shunt, 1%",
+    "side": "B"
+  },
+  "R7": {
+    "ref": "R7",
+    "key": "Device:R",
+    "value": "3.9k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "AC_A",
+      "2": "INV_A"
+    },
+    "x": 29,
+    "y": 11.3,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "8661bcb5-ac8a-598f-acd9-095edf1c87d9",
+    "role": "Left input, 1%",
+    "side": "B"
+  },
+  "R8": {
+    "ref": "R8",
+    "key": "Device:R",
+    "value": "3.9k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "AC_B",
+      "2": "INV_B"
+    },
+    "x": 29,
+    "y": 25.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "0ff57f53-3fd7-59b2-94e6-2689c8b7720a",
+    "role": "Right input, 1%",
+    "side": "B"
+  },
+  "R9": {
+    "ref": "R9",
+    "key": "Device:R",
+    "value": "3.9k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "OUTA_RAW",
+      "2": "INV_A"
+    },
+    "x": 23.7,
+    "y": 10.9,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "523329f9-9cae-522f-8f95-b1c727441e47",
+    "role": "Left feedback, 1%",
+    "side": "B"
+  },
+  "R10": {
+    "ref": "R10",
+    "key": "Device:R",
+    "value": "3.9k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "OUTB_RAW",
+      "2": "INV_B"
+    },
+    "x": 24,
+    "y": 23,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "be4f0795-a680-5106-96b9-8ee457f03b3f",
+    "role": "Right feedback, 1%",
+    "side": "B"
+  },
+  "R11": {
+    "ref": "R11",
+    "key": "Device:R",
+    "value": "2.2R",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "OUTA_RAW",
+      "2": "OUTA_C"
+    },
+    "x": 17.5,
+    "y": 9.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "2cccf6bb-6419-50b2-869e-06dbfd2b5de4",
+    "role": "Left cable isolation; retain for untested headphone cable",
+    "side": "B"
+  },
+  "R12": {
+    "ref": "R12",
+    "key": "Device:R",
+    "value": "2.2R",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "OUTB_RAW",
+      "2": "OUTB_C"
+    },
+    "x": 17.5,
+    "y": 26.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "43bae66b-becd-5e4a-baa4-dac72e320bed",
+    "role": "Right cable isolation; retain for untested headphone cable",
+    "side": "B"
+  },
+  "R13": {
+    "ref": "R13",
+    "key": "Device:R",
+    "value": "100k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "HP_L",
+      "2": "GND"
+    },
+    "x": 7,
+    "y": 10,
+    "rot": 90,
+    "dnp": false,
+    "uuid": "e547f5db-6bae-53d3-b98e-227b4b1f4d57",
+    "role": "Left output bleed",
+    "side": "B"
+  },
+  "R14": {
+    "ref": "R14",
+    "key": "Device:R",
+    "value": "100k",
+    "fp": "Resistor_SMD:R_1206_3216Metric",
+    "source_fp": "Resistor_SMD:R_1206_3216Metric",
+    "nets": {
+      "1": "HP_R",
+      "2": "GND"
+    },
+    "x": 7,
+    "y": 24.5,
+    "rot": 270,
+    "dnp": false,
+    "uuid": "34cfa0c4-d03c-5f06-8d78-726ecdceeeb5",
+    "role": "Right output bleed",
+    "side": "B"
+  },
+  "JP1": {
+    "ref": "JP1",
+    "key": "Jumper:SolderJumper_3_Open",
+    "value": "L_INPUT_SEL",
+    "fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "source_fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "nets": {
+      "1": "ATT_L_IN",
+      "2": "LIN",
+      "3": "DIRECT_L"
+    },
+    "x": 41,
+    "y": 5.5,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "238baa6b-c192-5213-ba9e-2cacb19ec96f",
+    "role": "Default ATT: solder 1-2. DIRECT: remove 1-2, solder 2-3. No routing wire bridge.",
+    "side": "B"
+  },
+  "JP2": {
+    "ref": "JP2",
+    "key": "Jumper:SolderJumper_3_Open",
+    "value": "L_OUTPUT_SEL",
+    "fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "source_fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "nets": {
+      "1": "ATT_L",
+      "2": "INA",
+      "3": "DIRECT_L"
+    },
+    "x": 41,
+    "y": 9.3,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "e521b43b-dec3-5723-a3df-44b078f5dded",
+    "role": "Default ATT: solder 1-2. DIRECT: remove 1-2, solder 2-3. No routing wire bridge.",
+    "side": "B"
+  },
+  "JP3": {
+    "ref": "JP3",
+    "key": "Jumper:SolderJumper_3_Open",
+    "value": "R_INPUT_SEL",
+    "fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "source_fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "nets": {
+      "1": "ATT_R_IN",
+      "2": "RIN",
+      "3": "DIRECT_R"
+    },
+    "x": 41,
+    "y": 31.5,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "eaf606ef-8436-5714-96b5-2cd1d33a58dc",
+    "role": "Default ATT: solder 1-2. DIRECT: remove 1-2, solder 2-3. No routing wire bridge.",
+    "side": "B"
+  },
+  "JP4": {
+    "ref": "JP4",
+    "key": "Jumper:SolderJumper_3_Open",
+    "value": "R_OUTPUT_SEL",
+    "fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "source_fp": "Jumper:SolderJumper-3_P1.3mm_Open_Pad1.0x1.5mm",
+    "nets": {
+      "1": "ATT_R",
+      "2": "INB",
+      "3": "DIRECT_R"
+    },
+    "x": 41,
+    "y": 27.7,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "b983659e-99f1-5d8c-91c3-bd4303c7d2e5",
+    "role": "Default ATT: solder 1-2. DIRECT: remove 1-2, solder 2-3. No routing wire bridge.",
+    "side": "B"
+  },
+  "C1": {
+    "ref": "C1",
+    "key": "Device:C_Polarized",
+    "value": "22u / >=10V",
+    "fp": "MonoPod_R2:CP_Radial_D5.0mm_P2.00mm_SingleSide",
+    "source_fp": "Capacitor_THT:CP_Radial_D5.0mm_P2.00mm",
+    "nets": {
+      "1": "VREF",
+      "2": "GND"
+    },
+    "x": 41.5,
+    "y": 17,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "e8a0b25a-7123-5041-8127-776a0162dbfa",
+    "role": "Reference electrolytic; + pin1",
+    "side": "F"
+  },
+  "C2": {
+    "ref": "C2",
+    "key": "Device:C_Polarized",
+    "value": "100u / >=10V",
+    "fp": "MonoPod_R2:CP_Radial_D6.3mm_P2.50mm_SingleSide",
+    "source_fp": "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm",
+    "nets": {
+      "1": "VDD",
+      "2": "GND"
+    },
+    "x": 13.5,
+    "y": 17,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "b55c4d79-4fd6-5222-82d0-a221c96cb708",
+    "role": "Supply bulk; + pin1; existing 100u25V if size fits",
+    "side": "F"
+  },
+  "C3": {
+    "ref": "C3",
+    "key": "Device:C",
+    "value": "100n / >=25V X7R",
+    "fp": "MonoPod_R2:C_Disc_D5.0mm_W2.5mm_P2.50mm_SingleSide",
+    "source_fp": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+    "nets": {
+      "1": "VDD",
+      "2": "GND"
+    },
+    "x": 21,
+    "y": 20.8,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "d8c5bee7-2d8e-58ee-acaf-e6a980da98c3",
+    "role": "Leaded ceramic decoupling, short trimmed leads, 2.5mm pitch",
+    "side": "F"
+  },
+  "C4": {
+    "ref": "C4",
+    "key": "Device:C",
+    "value": "4.7u / >=25V X7R",
+    "fp": "MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide",
+    "source_fp": "Capacitor_THT:C_Rect_L7.0mm_W4.5mm_P5.00mm",
+    "nets": {
+      "1": "INA",
+      "2": "AC_A"
+    },
+    "x": 36,
+    "y": 13.8,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "aac09ed8-92d5-591b-8f95-030813c0b83a",
+    "role": "Leaded multilayer ceramic, body <=7x4.5mm, 5mm pitch, effective >=2.2u",
+    "side": "F"
+  },
+  "C5": {
+    "ref": "C5",
+    "key": "Device:C",
+    "value": "4.7u / >=25V X7R",
+    "fp": "MonoPod_R2:C_Rect_L7.0mm_W4.5mm_P5.00mm_SingleSide",
+    "source_fp": "Capacitor_THT:C_Rect_L7.0mm_W4.5mm_P5.00mm",
+    "nets": {
+      "1": "INB",
+      "2": "AC_B"
+    },
+    "x": 36,
+    "y": 23.5,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "cd74a262-0f06-5d80-81f0-d81afd06d6ad",
+    "role": "Leaded multilayer ceramic, body <=7x4.5mm, 5mm pitch, effective >=2.2u",
+    "side": "F"
+  },
+  "C6": {
+    "ref": "C6",
+    "key": "Device:C_Polarized",
+    "value": "220u / >=10V",
+    "fp": "MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide",
+    "source_fp": "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm",
+    "nets": {
+      "1": "OUTA_C",
+      "2": "HP_L"
+    },
+    "x": 13.5,
+    "y": 6,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "a3273009-ba59-57f7-a0bb-93383e00f681",
+    "role": "Left output electrolytic, + pin1; 470u/100u alternatives",
+    "side": "F"
+  },
+  "C7": {
+    "ref": "C7",
+    "key": "Device:C_Polarized",
+    "value": "220u / >=10V",
+    "fp": "MonoPod_R2:CP_Radial_D8.0mm_P3.50mm_SingleSide",
+    "source_fp": "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm",
+    "nets": {
+      "1": "OUTB_C",
+      "2": "HP_R"
+    },
+    "x": 13.5,
+    "y": 28.5,
+    "rot": 180,
+    "dnp": false,
+    "uuid": "463e6a23-ea04-5080-ac37-31da9b539754",
+    "role": "Right output electrolytic, + pin1; 470u/100u alternatives",
+    "side": "F"
+  },
+  "J1": {
+    "ref": "J1",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "VCC",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "VDD"
+    },
+    "x": 5,
+    "y": 14,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "bbb5c5d8-73da-54a7-a790-941a58926fb6",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "J2": {
+    "ref": "J2",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "GND",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "GND"
+    },
+    "x": 2,
+    "y": 18.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "697bfd2b-a2d1-5a31-931a-117bd66686d6",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "J3": {
+    "ref": "J3",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "LIN",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "LIN"
+    },
+    "x": 48,
+    "y": 4.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "5bb96eb4-ba03-59ed-b807-5c9af4c39aff",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "J4": {
+    "ref": "J4",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "RIN",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "RIN"
+    },
+    "x": 48,
+    "y": 30.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "edda049c-3c92-5073-a992-93998f8f25f4",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "J5": {
+    "ref": "J5",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "GND",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "GND"
+    },
+    "x": 2,
+    "y": 22.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "7c1f0db4-d3f0-54ec-abdd-fb5df36a1c3e",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "J6": {
+    "ref": "J6",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "LOUT",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "HP_L"
+    },
+    "x": 2,
+    "y": 6,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "74b50d4f-4be0-58f8-a6d8-422553ce0028",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "J7": {
+    "ref": "J7",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "ROUT",
+    "fp": "MonoPod_R2:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm_SingleSide",
+    "source_fp": "Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
+    "nets": {
+      "1": "HP_R"
+    },
+    "x": 2,
+    "y": 29,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "ff78b538-0681-5939-bae5-2f4d457df032",
+    "role": "Wire AWG26-30; drilled hole 1.15mm, bottom copper only",
+    "side": "F"
+  },
+  "TP1": {
+    "ref": "TP1",
+    "key": "Connector:TestPoint",
+    "value": "VDD",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "VDD"
+    },
+    "x": 16,
+    "y": 18,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "f5ae8aea-0a51-587d-9e21-828cf8685ec2",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP2": {
+    "ref": "TP2",
+    "key": "Connector:TestPoint",
+    "value": "GND",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "GND"
+    },
+    "x": 16,
+    "y": 22,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "f78b5dca-8f00-5dc8-b5e4-98f2bca383a4",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP3": {
+    "ref": "TP3",
+    "key": "Connector:TestPoint",
+    "value": "VREF",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "VREF"
+    },
+    "x": 31,
+    "y": 18,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "69013f75-86dc-5ee2-9dd4-2bc87e77ac6f",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP4": {
+    "ref": "TP4",
+    "key": "Connector:TestPoint",
+    "value": "INA",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "INA"
+    },
+    "x": 43,
+    "y": 13,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "e9cbcf63-899a-5ceb-8d7e-e050888842c5",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP5": {
+    "ref": "TP5",
+    "key": "Connector:TestPoint",
+    "value": "INB",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "INB"
+    },
+    "x": 43,
+    "y": 24.5,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "c28f7f28-8e5f-5f7c-9116-ecbe31af3561",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP6": {
+    "ref": "TP6",
+    "key": "Connector:TestPoint",
+    "value": "OUTA_RAW",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "OUTA_RAW"
+    },
+    "x": 20,
+    "y": 7,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "d26458a4-a751-5f41-ac90-3b19ccc03920",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP7": {
+    "ref": "TP7",
+    "key": "Connector:TestPoint",
+    "value": "OUTB_RAW",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "OUTB_RAW"
+    },
+    "x": 21,
+    "y": 29,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "a6190c7c-737e-50a8-83f5-2357ba33defd",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP8": {
+    "ref": "TP8",
+    "key": "Connector:TestPoint",
+    "value": "HP_L",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "HP_L"
+    },
+    "x": 6,
+    "y": 3,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "98d275f6-aab2-598e-b776-39bc311f60e2",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  },
+  "TP9": {
+    "ref": "TP9",
+    "key": "Connector:TestPoint",
+    "value": "HP_R",
+    "fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "source_fp": "TestPoint:TestPoint_Pad_D1.5mm",
+    "nets": {
+      "1": "HP_R"
+    },
+    "x": 6,
+    "y": 32,
+    "rot": 0,
+    "dnp": false,
+    "uuid": "02721a1e-825b-5b71-8655-66048a8d49ab",
+    "role": "Bottom exposed test pad, no hole",
+    "side": "B"
+  }
+}

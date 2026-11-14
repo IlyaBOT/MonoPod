@@ -1,0 +1,16 @@
+﻿References;Value;Footprint;Quantity;Fit_default;Notes
+U1;TDA1308T;Package_SO:SOIC-8_3.9x4.9mm_P1.27mm;1;YES;"U1: SO8, salvaged chip marked TDA1308; functionality unverified"
+R1,R2,R3,R5;10k;Resistor_SMD:R_0805_2012Metric;4;YES;R1: VREF upper divider, 1% | R2: VREF lower divider, 1% | R3: Left attenuation series, 1% | R5: Right attenuation series, 1%
+R4,R6;3.3k;Resistor_SMD:R_0805_2012Metric;2;YES;R4: Left attenuation shunt, 1% | R6: Right attenuation shunt, 1%
+R7,R8,R9,R10;3.9k;Resistor_SMD:R_0805_2012Metric;4;YES;R7: Left input, 1% | R8: Right input, 1% | R9: Left feedback, 1% | R10: Right feedback, 1%
+R11,R12;2.2R;Resistor_SMD:R_0805_2012Metric;2;YES;R11: Left output isolation, 0R permitted after bench test | R12: Right output isolation, 0R permitted after bench test
+R13,R14;100k;Resistor_SMD:R_0805_2012Metric;2;YES;R13: Left output bleed | R14: Right output bleed
+R15,R16,R17,R18;0R;Resistor_SMD:R_0805_2012Metric;4;YES;R15: ATT L input link, FIT default | R16: ATT L output link, FIT default | R17: ATT R input link, FIT default | R18: ATT R output link, FIT default
+R19,R20;0R;Resistor_SMD:R_0805_2012Metric;2;DNP;"R19: DIRECT L, DNP default; remove R15/R16 before fitting | R20: DIRECT R, DNP default; remove R17/R18 before fitting"
+C1;22u / >=10V;Capacitor_THT:CP_Radial_D5.0mm_P2.00mm;1;YES;C1: VREF, plus pin1
+C2;100u / >=10V;Capacitor_THT:CP_Radial_D6.3mm_P2.50mm;1;YES;"C2: Supply bulk, plus pin1; 100u 25V possible if size fits"
+C3;100n / 25V X7R;Capacitor_SMD:C_0805_2012Metric;1;YES;"C3: Local bypass next to U1 pin8; nearby GND via to pin4 return plane"
+C4,C5;4.7u / 25V X7R;Capacitor_SMD:C_1206_3216Metric;2;YES;"C4: Nonpolar input; effective capacitance >=2.2u at bias | C5: Nonpolar input; effective capacitance >=2.2u at bias"
+C6,C7;220u / >=10V;Capacitor_THT:CP_Radial_D8.0mm_P3.50mm;2;YES;"C6: Left output, plus pin1 toward IC; 470u or 100u25V alternatives | C7: Right output, plus pin1 toward IC; 470u or 100u25V alternatives"
+J1-J7;Wire landing only;Connector_Wire:SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm;7;PCB ONLY;"No connector purchase; actual plated drill 1.15 mm; AWG26-30"
+TP1-TP9;Exposed test pad;TestPoint:TestPoint_Pad_D1.5mm;9;PCB ONLY;No component purchase

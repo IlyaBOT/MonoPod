@@ -1,0 +1,6 @@
+{
+  "checked_pad_count": 78,
+  "covered_pad_centers": [],
+  "result": "PASS",
+  "method": "Point-in-region check of actual bottom-mask Gerber for every native pad center"
+}

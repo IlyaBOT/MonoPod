@@ -1,0 +1,1 @@
+PASS: all schematic net members match independently specified component pin/net map.

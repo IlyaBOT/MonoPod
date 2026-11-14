@@ -1,0 +1,12 @@
+TDA1308 HeadphoneAmp R2 - SINGLE COPPER SIDE
+Nominal outline centerline: 50 x 35 mm. FR4 1.6 mm, copper 35 um.
+ONE physical copper foil: BOTTOM ONLY (B_Cu.gbl). NO TOP COPPER.
+ALL 21 COMPONENT HOLES UNPLATED: 14 x 0.80 mm + 7 x 1.15 mm.
+NO VIAS. NO ROUTING WIRE JUMPERS.
+Solder mask bottom; silkscreen both sides. Standard solderable finish (HASL).
+Tracks 0.60 mm, copper clearance 0.25 mm; GND pour minimum neck 0.40 mm.
+Excellon is metric with minimal header; coordinates exported directly by KiCad.
+Use Gerbers as supplied: do not mirror or scale. Edge_Cuts is routed outline.
+KiCad internal project uses two logical layers; ignore that software-only stackup.
+The supplied fabrication set contains exactly ONE copper Gerber.
+No board assembly/order has been requested.

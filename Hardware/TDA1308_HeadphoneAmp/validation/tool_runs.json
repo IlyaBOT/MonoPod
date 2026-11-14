@@ -1,0 +1,86 @@
+[
+  {
+    "command": [
+      "C:\\Program Files\\KiCad\\10.0\\bin\\kicad-cli.exe",
+      "sch",
+      "erc",
+      "--severity-all",
+      "--exit-code-violations",
+      "-o",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\validation\\ERC.rpt",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\TDA1308_HeadphoneAmp.kicad_sch"
+    ],
+    "returncode": 0,
+    "stdout": "Found 0 violations\nSaved ERC Report to C:/Users/IlyaBOT/Documents/Codex/2026-10-27/files-pasted-by-the-user-pcb/work/r2/TDA1308_HeadphoneAmp/validation/ERC.rpt\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Program Files\\KiCad\\10.0\\bin\\kicad-cli.exe",
+      "pcb",
+      "drc",
+      "--schematic-parity",
+      "--all-track-errors",
+      "--severity-all",
+      "--exit-code-violations",
+      "-o",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\validation\\DRC.rpt",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\TDA1308_HeadphoneAmp.kicad_pcb"
+    ],
+    "returncode": 0,
+    "stdout": "Found 0 violations\nFound 0 unconnected items\nFound 0 schematic parity issues\nSaved DRC Report to C:/Users/IlyaBOT/Documents/Codex/2026-10-27/files-pasted-by-the-user-pcb/work/r2/TDA1308_HeadphoneAmp/validation/DRC.rpt\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Program Files\\KiCad\\10.0\\bin\\kicad-cli.exe",
+      "sch",
+      "erc",
+      "--severity-all",
+      "--exit-code-violations",
+      "--format",
+      "json",
+      "-o",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\validation\\ERC.json",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\TDA1308_HeadphoneAmp.kicad_sch"
+    ],
+    "returncode": 0,
+    "stdout": "Found 0 violations\nSaved ERC Report to C:/Users/IlyaBOT/Documents/Codex/2026-10-27/files-pasted-by-the-user-pcb/work/r2/TDA1308_HeadphoneAmp/validation/ERC.json\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Program Files\\KiCad\\10.0\\bin\\kicad-cli.exe",
+      "pcb",
+      "drc",
+      "--schematic-parity",
+      "--all-track-errors",
+      "--severity-all",
+      "--exit-code-violations",
+      "--format",
+      "json",
+      "-o",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\validation\\DRC.json",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\TDA1308_HeadphoneAmp.kicad_pcb"
+    ],
+    "returncode": 0,
+    "stdout": "Found 0 violations\nFound 0 unconnected items\nFound 0 schematic parity issues\nSaved DRC Report to C:/Users/IlyaBOT/Documents/Codex/2026-10-27/files-pasted-by-the-user-pcb/work/r2/TDA1308_HeadphoneAmp/validation/DRC.json\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "C:\\Program Files\\KiCad\\10.0\\bin\\kicad-cli.exe",
+      "sch",
+      "export",
+      "netlist",
+      "--format",
+      "kicadxml",
+      "-o",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\validation\\netlist.xml",
+      "C:\\Users\\IlyaBOT\\Documents\\Codex\\2026-10-27\\files-pasted-by-the-user-pcb\\work\\r2\\TDA1308_HeadphoneAmp\\TDA1308_HeadphoneAmp.kicad_sch"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

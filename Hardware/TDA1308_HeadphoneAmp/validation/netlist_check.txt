@@ -1,0 +1,1 @@
+PASS: every native PCB pad net matches schematic XML and independent circuit pin map; U1 pins, electrolytic polarities, input selector modes and divider isolation checked.

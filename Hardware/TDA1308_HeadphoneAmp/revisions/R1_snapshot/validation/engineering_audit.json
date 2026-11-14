@@ -1,0 +1,60 @@
+{
+  "kicad_version": "10.0.6",
+  "board_mm": [
+    45,
+    25,
+    1.6
+  ],
+  "layers": 2,
+  "footprints": 44,
+  "fitted_electronic_components": 26,
+  "dnp": [
+    "R19",
+    "R20"
+  ],
+  "signal_and_ground_track_segments": 349,
+  "vias": 14,
+  "bottom_track_segments": 10,
+  "minimum_track_mm": 0.25,
+  "via_diameters_mm": [
+    0.65
+  ],
+  "via_drills_mm": [
+    0.3
+  ],
+  "pad_drills_mm": {
+    "J1": [
+      1.15
+    ],
+    "C2": [
+      0.8
+    ],
+    "C1": [
+      0.8
+    ],
+    "C7": [
+      0.8
+    ],
+    "C6": [
+      0.8
+    ]
+  },
+  "ground_zones": [
+    {
+      "layer": "F.Cu",
+      "filled_contours": 4,
+      "net": "/GND"
+    },
+    {
+      "layer": "B.Cu",
+      "filled_contours": 2,
+      "net": "/GND"
+    }
+  ],
+  "unverified": [
+    "Salvaged U1 electrical condition / identity beyond user supplied SOIC-8 marking",
+    "Salvaged electrolytic actual diameter, height, pitch, ESR and leakage",
+    "Built assembly audio THD, noise, output power and cable stability",
+    "Mechanical fit in final MonoPod enclosure"
+  ]
+}

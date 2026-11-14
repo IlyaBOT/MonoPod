@@ -1,0 +1,27 @@
+{
+  "name": "MonoPod Click Wheel (6 pads)",
+  "author": "MonoPod DIY",
+  "pins": ["E0", "E1", "E2", "E3", "E4", "E5"],
+  "controls": [
+    {
+      "id": "angle",
+      "label": "Finger angle (0-359 degrees)",
+      "type": "range",
+      "min": 0,
+      "max": 359,
+      "step": 1
+    },
+    {
+      "id": "touch",
+      "label": "Finger touching (1=down)",
+      "type": "range",
+      "min": 0,
+      "max": 1,
+      "step": 1
+    }
+  ],
+  "display": {
+    "width": 180,
+    "height": 180
+  }
+}

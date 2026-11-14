@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MonoPod Click Wheel — pointer drag preview</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#ecedf0;background:#17191d}
+*{box-sizing:border-box}body{margin:0;display:grid;place-items:center;min-height:100vh;padding:22px}
+main{width:min(510px,100%);text-align:center}h1{font-size:23px;margin:0 0 6px}p{color:#a9afb9;line-height:1.5}
+.wheel{width:310px;height:310px;margin:20px auto;position:relative;border-radius:50%;touch-action:none;user-select:none;cursor:grab;filter:drop-shadow(0 15px 25px #0009)}
+.wheel:active{cursor:grabbing}.wheel svg{width:100%;height:100%}
+#center{position:absolute;left:36.5%;top:36.5%;width:27%;height:27%;border-radius:50%;border:1px solid #bec2c6;background:#e9eaec;color:#485057;font-weight:700;cursor:pointer}
+.pads{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:12px auto 18px}
+.pad{border:1px solid #434b55;background:#2c3137;border-radius:10px;padding:10px 3px;font-weight:700}.pad.on{background:#83afca;border-color:#d5eafa;color:#192c37}
+pre{font:12px/1.6 ui-monospace,Consolas,monospace;background:#0b0e12;border-radius:12px;padding:14px;text-align:left;white-space:pre-wrap;min-height:86px}
+.note{font-size:13px}
+</style></head>
+<body><main><h1>MonoPod Click Wheel</h1><p>Зажми кольцо мышью или пальцем и проведи по окружности. Это отдельный интерактивный макет — не встроенный Wokwi Custom Chip.</p>
+<div id="wheel" class="wheel"><svg viewBox="0 0 300 300" aria-label="Click Wheel" id="drawing">
+  <circle cx="150" cy="150" r="145" fill="#d7d9dd" stroke="#777c82" stroke-width="2"/>
+  <g id="sectors"></g>
+  <circle cx="150" cy="150" r="51" fill="#e5e7ea" stroke="#999da2" stroke-width="1.5"/>
+  <text x="150" y="45" fill="#4a5158" font-size="17" font-weight="700" text-anchor="middle">MENU</text>
+  <text x="50" y="156" fill="#4a5158" font-size="25" font-weight="700" text-anchor="middle">◀◀</text>
+  <text x="250" y="156" fill="#4a5158" font-size="25" font-weight="700" text-anchor="middle">▶▶</text>
+  <text x="150" y="258" fill="#4a5158" font-size="23" font-weight="700" text-anchor="middle">▶❙❙</text>
+  <circle id="dot" cx="150" cy="60" r="6" fill="#588baa" visibility="hidden"/>
+</svg><button id="center" type="button">SELECT</button></div>
+<div id="pads" class="pads"></div><pre id="log">Ready. Drag the ring.</pre><p class="note">Цифровые E0–E5 — эквивалентные события для Wokwi. В реальном ESP32 используются ёмкостные измерения <code>touchRead()</code>.</p>
+</main><script>
+const wheel=document.getElementById('wheel'),drawing=document.getElementById('drawing');
+const sectorGroup=document.getElementById('sectors'),dot=document.getElementById('dot'),log=document.getElementById('log'),pads=document.getElementById('pads');
+let pressed=false,angle=0,lastAngle=null,travel=0;
+const ns='http://www.w3.org/2000/svg';
+function xy(a,r){const p=(a-90)*Math.PI/180;return [150+r*Math.cos(p),150+r*Math.sin(p)];}
+function arcPath(start,end){const [x1,y1]=xy(start,143),[x2,y2]=xy(end,143),[u2,v2]=xy(end,61),[u1,v1]=xy(start,61);return `M${x1},${y1} A143,143 0 0,1 ${x2},${y2} L${u2},${v2} A61,61 0 0,0 ${u1},${v1}Z`}
+const shapes=[];for(let i=0;i<6;i++){const el=document.createElementNS(ns,'path');el.setAttribute('d',arcPath(i*60-28.5,i*60+28.5));el.setAttribute('stroke','#b1b5b9');el.setAttribute('stroke-width','1');sectorGroup.append(el);shapes.push(el);const p=document.createElement('div');p.className='pad';p.textContent='E'+i;pads.append(p)}
+function cd(a,b){return((a-b+540)%360)-180}
+function render(){const bits=shapes.map((el,i)=>{const on=pressed&&Math.abs(cd(angle,i*60))<=34;el.setAttribute('fill',on?'#91b8ce':(i%2?'#e1e4e7':'#eef0f2'));pads.children[i].classList.toggle('on',on);return on?'1':'0'});const [x,y]=xy(angle,100);dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('visibility',pressed?'visible':'hidden');return bits.join('')}
+function update(e){const r=drawing.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*300-150,y=(e.clientY-r.top)/r.height*300-150;const a=(Math.atan2(x,-y)*180/Math.PI+360)%360;if(lastAngle!==null){const delta=cd(a,lastAngle);if(Math.abs(delta)<90){travel+=delta;while(Math.abs(travel)>=25){const cw=travel>0;travel-=cw?25:-25;log.textContent=`${cw?'CW ↻':'CCW ↺'} · ${Math.round(a)}° · E0..E5: ${render()}`}}}angle=a;lastAngle=a;render()}
+wheel.addEventListener('pointerdown',e=>{const r=drawing.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*300-150,y=(e.clientY-r.top)/r.height*300-150,d=Math.hypot(x,y);if(d<64||d>146)return;pressed=true;travel=0;lastAngle=null;wheel.setPointerCapture(e.pointerId);update(e)});
+wheel.addEventListener('pointermove',e=>{if(pressed)update(e)});
+function end(){pressed=false;lastAngle=null;const bits=render();log.textContent=`Release · E0..E5: ${bits}`}
+wheel.addEventListener('pointerup',end);wheel.addEventListener('pointercancel',end);
+document.getElementById('center').addEventListener('click',()=>log.textContent='SELECT pressed (separate mechanical button)');
+render();
+</script></body></html>
