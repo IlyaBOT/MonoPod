@@ -13,6 +13,7 @@
 #include "AudioEngine.h"
 #include "UI.h"
 #include "WiFiSync.h"
+#include "WiFiNetworks.h"
 #include "ClockService.h"
 #include "UsbSync.h"
 #include "SyncMode.h"
@@ -29,7 +30,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC is reserved for MonoPod USB Sync v1
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.8.8 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.8.9.1 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -61,6 +62,7 @@ void setup(){
   MONOPOD_LOG.printf("MonoPod device GUID=%s (%s)\n",IpodIdentity::guid(),IpodIdentity::fromEfuse()?"eFuse MAC":"NVS fallback");
   usbSync.begin();
   randomSeed(esp_random());
+  wifiNetworks.begin(); // restore last successful Wi-Fi connection from NVS at boot
   ui.begin();
   if(!media.sdOK())ui.notify("No microSD card");
   devConsole.begin();

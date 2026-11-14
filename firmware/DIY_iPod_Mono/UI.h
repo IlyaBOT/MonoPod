@@ -18,6 +18,7 @@ private:
   int selected=0,scroll=0;
   bool dirty=true,blank=false,brightnessEditing=false;
   uint32_t lastTouch=0,lastRender=0,sleepDeadline=0;
+  uint8_t lastWiFiIndicator=255;
   // Network password keyboard. MENU toggles case; SELECT types; NEXT joins;
   // PREVIOUS deletes; Play/Pause cancels, Scroll moves selection.
   String wifiSSID,wifiPassword;

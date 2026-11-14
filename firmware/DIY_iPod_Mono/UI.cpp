@@ -18,10 +18,11 @@
 #include "UsbSync.h"
 #include <time.h>
 PlayerUI ui;
-void PlayerUI::begin(){page=Page::Home;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
+void PlayerUI::begin(){page=Page::Home;lastWiFiIndicator=255;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
 void PlayerUI::notify(const String& msg){blank=false;lastTouch=millis();backlight.wake();showMessage(msg);}
 void PlayerUI::navigate(Page next){
   history.push_back({page,selected,scroll,activeCategory,filter});
+  if(page==Page::WiFiNetworks && next!=Page::WiFiNetworks)wifiNetworks.leave();
   page=next;selected=0;scroll=0;brightnessEditing=false;
   if(page==Page::WiFiNetworks)wifiNetworks.enter();
 #if FEATURE_BLUETOOTH
@@ -36,6 +37,7 @@ void PlayerUI::back(){
   if(history.empty()){page=Page::Home;selected=scroll=0;build();dirty=true;return;}
   History h=history.back();history.pop_back();
   page=h.page;selected=h.selection;scroll=h.scroll;filter=h.filter;
+  if(page==Page::WiFiNetworks)wifiNetworks.enter();
   activeCategory=h.category;build();dirty=true;
 }
 void PlayerUI::showMessage(const String& msg){toast=msg;toastDeadline=millis()+2400;dirty=true;}
@@ -551,7 +553,9 @@ void PlayerUI::paint(){
     dirty=false;lastRender=millis();return;
   }
   display.clear();
-  display.header(title(),input.held() && !devConsole.hardwareDisabled(),player.active()&&!player.paused(),wifiNetworks.connected());
+  lastWiFiIndicator=wifiNetworks.indicator();
+  const uint8_t bars=lastWiFiIndicator==5?3:(lastWiFiIndicator==4?0:lastWiFiIndicator);
+  display.header(title(),input.held() && !devConsole.hardwareDisabled(),player.active()&&!player.paused(),bars);
   if(page==Page::WiFiPassword){paintKeyboard();}
 #if FEATURE_BLUETOOTH
   else if(page==Page::BluetoothPin || page==Page::BluetoothPairConfirm || page==Page::BluetoothDelete){paintBluetoothDialog();}
@@ -648,7 +652,9 @@ void PlayerUI::loop(){
     return;
   }
   wifiNetworks.tick();
-  if(page==Page::WiFiNetworks && wifiNetworks.changed()){
+  const bool wifiChanged=wifiNetworks.changed();
+  if(page==Page::WiFi && wifiChanged)dirty=true;
+  if(page==Page::WiFiNetworks && wifiChanged){
     String keep=(selected>=0&&selected<(int)items.size())?items[selected].title:"";
     build();
     for(int i=0;i<(int)items.size();i++)if(items[i].title==keep){selected=i;break;}
@@ -702,6 +708,14 @@ void PlayerUI::loop(){
 #if WOKWI_SIMULATION
     display.fillRect(0,0,160,128,0); // simulator has no hardware backlight
 #endif
+  }
+  // Update only the Wi-Fi glyph while idle; do not clear/redraw the menu.
+  if(!blank && !dirty){
+    const uint8_t next=wifiNetworks.indicator();
+    if(next!=lastWiFiIndicator){
+      lastWiFiIndicator=next;
+      display.wifiSignal(next==5?3:(next==4?0:next));
+    }
   }
   if(!blank && (dirty || (page==Page::NowPlaying&&millis()-lastRender>1000UL) ||
     (page==Page::Clock&&millis()-lastRender>5000UL)))paint();

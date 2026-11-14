@@ -5,7 +5,6 @@
 #include <Arduino.h>
 // Select the board at COMPILE time, not in the runtime Settings screen.
 // AUTO follows the board selected in Arduino IDE; explicit selection is possible.
-#define FEATURE_SD_FORMAT 1
 #define MONOPOD_BOARD_ESP32 1
 #define MONOPOD_BOARD_ESP32_S3 2
 #ifndef MONOPOD_BOARD

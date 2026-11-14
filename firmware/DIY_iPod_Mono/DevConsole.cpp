@@ -9,6 +9,8 @@
 #include "Feedback.h"
 #include "AudioEngine.h"
 #include "Settings.h"
+#include "WiFiNetworks.h"
+#include <WiFi.h>
 
 DevelopmentConsole devConsole;
 namespace {
@@ -44,7 +46,9 @@ void DevelopmentConsole::printHelp(){
   MONOPOD_LOG.println("[DEV] $KEY=MENU|SELECT|SELECT_LONG|UP|DOWN|PREV|NEXT|PLAY_PAUSE");
   MONOPOD_LOG.println("[DEV] $SCROLL=UP,5 | $SCROLL=DOWN,5 (max 32)");
   MONOPOD_LOG.println("[DEV] $STATUS $BATTERY $SD $SD_RETRY $HELP");
-  MONOPOD_LOG.println("[DEV] $CLICKER_MUTE=1|0 $CLICKER_STATUS");
+  MONOPOD_LOG.println("[DEV] $CLICKER_MUTE=1|0 $CLICKER=1|0 $CLICKER_STATUS");
+  MONOPOD_LOG.println("[DEV] $ADC_DIAG (GPIO4; 0/2.5/6/11dB, non-destructive)");
+  MONOPOD_LOG.println("[DEV] $WIFI_STATUS (NVS/STA/RSSI, does not show password)");
   MONOPOD_LOG.println("[DEV] End commands with newline. No NVS persistence.");
 }
 void DevelopmentConsole::printStatus(){
@@ -67,6 +71,36 @@ void DevelopmentConsole::handle(const char* command){
     MONOPOD_LOG.printf("[DEV] BATTERY_ADC=DISABLED PERCENT=%d\n",battery.level());
 #endif
     return;
+  case Type::WifiStatus:
+    MONOPOD_LOG.printf("[DEV] WIFI=%s SAVED=%s CONNECTING=%s BARS=%u RSSI=%ld dBm SSID=%s\n",
+      wifiNetworks.connected()?"CONNECTED":(wifiNetworks.connecting()?"CONNECTING":"OFFLINE"),
+      wifiNetworks.hasSavedNetwork()?"YES":"NO",wifiNetworks.connecting()?"YES":"NO",
+      (unsigned)wifiNetworks.signalBars(),
+      wifiNetworks.connected()?(long)WiFi.RSSI():0L,
+      wifiNetworks.connectedSSID().c_str());
+    return;
+  case Type::AdcDiag:
+#if FEATURE_BATTERY_ADC
+    // Compare calibrated and raw conversions at each hardware attenuation.
+    // Avoid measuring with power connected directly: ADC is driven through a divider.
+    MONOPOD_LOG.printf("[DEV] ADC_DIAG pin=%u (expect ~1970mV at 11dB if multimeter reads 1.97V)\n",
+                       (unsigned)Config::PIN_BATTERY_ADC);
+    for (uint8_t i=0;i<4;++i){
+      const adc_attenuation_t att = (adc_attenuation_t)(i==0?ADC_0db:i==1?ADC_2_5db:i==2?ADC_6db:ADC_11db);
+      analogSetPinAttenuation(Config::PIN_BATTERY_ADC, att);
+      delay(3);
+      (void)analogReadMilliVolts(Config::PIN_BATTERY_ADC);
+      const uint16_t raw=(uint16_t)analogRead(Config::PIN_BATTERY_ADC);
+      const uint32_t mv=analogReadMilliVolts(Config::PIN_BATTERY_ADC);
+      MONOPOD_LOG.printf("[DEV] ADC attenuation=%s RAW=%u CAL=%lu mV\n",
+        i==0?"0dB":i==1?"2.5dB":i==2?"6dB":"11dB",
+        (unsigned)raw,(unsigned long)mv);
+    }
+    analogSetPinAttenuation(Config::PIN_BATTERY_ADC,ADC_11db);
+#else
+    MONOPOD_LOG.println("[DEV] ADC_DIAG unavailable: FEATURE_BATTERY_ADC=0");
+#endif
+    return;
   case Type::Sd:
     MONOPOD_LOG.printf("[DEV] SD=%s TRACKS=%u SPI_HZ=%lu TOTAL=%llu ERROR=%s\n",
       media.sdOK()?"OK":"NOT_MOUNTED",(unsigned)media.size(),
@@ -85,12 +119,16 @@ void DevelopmentConsole::handle(const char* command){
     return;
   case Type::ClickerMute:
     clickerMuteRequested=c.muteClicker;
-    feedback.setRuntimeMuted(clickerMuteRequested || disabled);
+    feedback.setRuntimeMuted(clickerMuteRequested);
     MONOPOD_LOG.printf("[DEV] CLICKER=%s\n",feedback.runtimeMuted()?"MUTED":"ACTIVE");
     return;
   case Type::SetHardwareDisabled:
     disabled=c.disableHardware;
-    feedback.setRuntimeMuted(disabled || clickerMuteRequested);
+    // Disable PHYSICAL input only. The developer needs audible feedback for
+    // virtual $SELECT/$UP/etc. independent of floating/unassembled GPIOs.
+    // Silence any click already queued by the hardware before switching.
+    feedback.quiet();
+    feedback.setRuntimeMuted(clickerMuteRequested);
     repeats=0;queued=Key::None;keySequenceStarted=false;
     input.resetState();
     ui.redraw();

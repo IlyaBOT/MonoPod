@@ -107,13 +107,24 @@ void Display::centerText(int y,const String& s,bool small,bool inv){
   const int w=textWidth(s,small);int x=max(2,(160-w)/2);
   drawString(x,y,s,inv?bg:fg,inv?hi:bg,small,0);
 }
-void Display::header(const String& title,bool held,bool playing,bool wifi){
+void Display::wifiSignal(uint8_t bars){
+  // Clear only the 16x19 status area; avoids a full-screen redraw and flicker.
+  tft.fillRect(OX+117,OY+0,17,19,bg);
+  if(bars==0)return;
+  if(bars>3)bars=3;
+  // 3 discrete rising signal bars, 3px/6px/9px, monochrome palette.
+  for(uint8_t i=0;i<bars;i++){
+    const int height=3+3*i;
+    tft.fillRect(OX+119+5*i,OY+16-height,3,height,fg);
+  }
+}
+void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars){
   tft.fillRect(OX,OY,160,20,bg);
   // Reserve a permanent top-right area for power and connection status.
-  drawString(5,2,title,fg,bg,false,0,113);
-  if(held)smallText(117,3,"H",fg,bg);
-  else if(wifi)smallText(117,3,"W",fg,bg);
-  else if(playing)smallText(117,3,">",fg,bg);
+  drawString(5,2,title,fg,bg,false,0,107);
+  if(held)smallText(108,3,"H",fg,bg);
+  else if(playing)smallText(108,3,">",fg,bg);
+  wifiSignal(wifiBars);
   const int x=136,y=6;
   // 18x9 monochrome battery icon, plus a 2px terminal.
   tft.drawRect(OX+x,OY+y,19,9,fg);

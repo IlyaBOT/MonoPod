@@ -178,10 +178,11 @@ void WiFiSyncService::begin(){
   SD.remove("/Music/.monopod-wifi.part");
   // The moment the user explicitly starts Wi-Fi Sync, audio and UI are locked.
   if(!syncMode.enter(SyncTransport::WiFi))return;
-  wifiNetworks.leave();  // stop STA scans before switching radio to AP mode
+  wifiNetworks.suspendForSync(); // AP owns radio until safe exit
   WiFi.mode(WIFI_AP);
   if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){
     WiFi.mode(WIFI_OFF);syncMode.leave(SyncTransport::WiFi);
+    wifiNetworks.resumeAfterSync();
     ui.notify("Wi-Fi AP failed");return;
   }
   server.on("/",HTTP_GET,[this](){page();});
@@ -223,6 +224,7 @@ void WiFiSyncService::end(){
   server.stop();if(uploadFile)uploadFile.close();if(themeUploadFile)themeUploadFile.close();
   WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);running=false;
   syncMode.leave(SyncTransport::WiFi);
+  wifiNetworks.resumeAfterSync();
 }
 void WiFiSyncService::loop(){if(running)server.handleClient();}
 #endif

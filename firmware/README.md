@@ -1,3 +1,7 @@
+# MonoPod v0.8.9 — ESP32-S3 Wi-Fi auto-reconnect, signal indicator, UART improvements
+
+See `CHANGELOG_v0.8.9.md` and `docs/MonoPod_v0.8.9_WiFi_and_UART_Diagnostics_RU.md`.
+
 # MonoPod v0.8.7 — UART development console, PWM backlight, explicit USB/Wi-Fi Sync Mode
 
 **MonoPod v0.8.7** uses a **shared, exclusive Sync Mode** for its custom USB CDC protocol and Wi-Fi/HTTP transfer via MonoPod Studio. An ordinary USB connection or Wi-Fi association no longer causes a Sync transition. It does **not** yet emulate a genuine iPod for Apple iTunes.

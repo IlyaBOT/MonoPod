@@ -11,7 +11,8 @@ def test_hardware_disable_silences_both_click_paths():
     for folder in ('DIY_iPod_Mono', 'Wokwi_ILI9341'):
         dev = source('DevConsole.cpp', folder)
         fb = source('Feedback.cpp', folder)
-        assert 'feedback.setRuntimeMuted(disabled || clickerMuteRequested)' in dev
+        assert 'feedback.setRuntimeMuted(clickerMuteRequested);' in dev
+        assert 'feedback.quiet();' in dev
         assert 'void FeedbackController::quiet()' in fb
         assert 'player.stopHeadphoneClick()' in fb
         assert 'if(syncMode.active() || suppressed)return;' in fb
@@ -22,7 +23,7 @@ def test_mute_persists_until_unmuted():
     for folder in ('DIY_iPod_Mono','Wokwi_ILI9341'):
         dev=source('DevConsole.cpp',folder)
         assert 'clickerMuteRequested=c.muteClicker;' in dev
-        assert 'feedback.setRuntimeMuted(clickerMuteRequested || disabled)' in dev
+        assert 'feedback.setRuntimeMuted(clickerMuteRequested);' in dev
         assert 'case Type::ClickerStatus:' in dev
 
 

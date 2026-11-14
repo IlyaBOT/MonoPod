@@ -29,6 +29,10 @@ int main(){
   assert(mute.type==Type::ClickerMute && !mute.muteClicker);
   assert(parse("$CLICKER_MUTE=2").type==Type::Invalid);
   assert(parse("$SD_RETRY").type==Type::SdRetry);
+  assert(parse("$ADC_DIAG").type==Type::AdcDiag);
+  assert(parse("$WIFI_STATUS").type==Type::WifiStatus);
+  mute=parse("$CLICKER=1");assert(mute.type==Type::ClickerMute && !mute.muteClicker);
+  mute=parse("$CLICKER=0");assert(mute.type==Type::ClickerMute && mute.muteClicker);
   puts("PASS console parser: hardware toggle, keys, bounded scroll, status, invalid commands");
 }
 // v0.8.8: clicker isolation and SD re-probe commands.

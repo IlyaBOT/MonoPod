@@ -18,7 +18,8 @@ public:
   bool reloadTheme();
   bool themeLoaded() const;
   void clear();
-  void header(const String& title,bool held,bool playing,bool wifi);
+  void header(const String& title,bool held,bool playing,uint8_t wifiBars);
+  void wifiSignal(uint8_t bars); // refresh only the icon region; 0 hides it
   void footer(const String& message=""); // Explicit info only; no generic item counter
   void listRow(uint8_t row,const String& label,bool selected,bool submenu);
   void text(int x,int y,const String& value,uint16_t front,uint16_t back,uint8_t maxChars=0);
