@@ -1,0 +1,68 @@
+{
+  "buttons": [
+    {
+      "button": "MENU",
+      "R_ohm": 0,
+      "mV": 0.0,
+      "min_mV_with_1pct_R_and_5pct_supply": 0.0,
+      "max_mV_with_1pct_R_and_5pct_supply": 0.0,
+      "firmware_window_mV": [
+        0,
+        200
+      ],
+      "press_tau_ms": 0
+    },
+    {
+      "button": "PREV",
+      "R_ohm": 2200,
+      "mV": 595.0819672131148,
+      "min_mV_with_1pct_R_and_5pct_supply": 556.1190747678775,
+      "max_mV_with_1pct_R_and_5pct_supply": 635.1451905626134,
+      "firmware_window_mV": [
+        350,
+        820
+      ],
+      "press_tau_ms": 0.180327868852459
+    },
+    {
+      "button": "NEXT",
+      "R_ohm": 4700,
+      "mV": 1055.1020408163265,
+      "min_mV_with_1pct_R_and_5pct_supply": 988.7585575815089,
+      "max_mV_with_1pct_R_and_5pct_supply": 1122.9845702191576,
+      "firmware_window_mV": [
+        870,
+        1290
+      ],
+      "press_tau_ms": 0.3197278911564626
+    },
+    {
+      "button": "PLAY",
+      "R_ohm": 10000,
+      "mV": 1650.0,
+      "min_mV_with_1pct_R_and_5pct_supply": 1551.825,
+      "max_mV_with_1pct_R_and_5pct_supply": 1749.825,
+      "firmware_window_mV": [
+        1440,
+        1840
+      ],
+      "press_tau_ms": 0.5
+    },
+    {
+      "button": "SELECT",
+      "R_ohm": 22000,
+      "mV": 2268.75,
+      "min_mV_with_1pct_R_and_5pct_supply": 2141.7910915934754,
+      "max_mV_with_1pct_R_and_5pct_supply": 2397.0205479452056,
+      "firmware_window_mV": [
+        2010,
+        2580
+      ],
+      "press_tau_ms": 0.6875
+    }
+  ],
+  "idle_mV": 3300,
+  "release_tau_ms": 1,
+  "worst_release_5tau_ms": 5.555,
+  "note": "Calculation only; ADC calibration, supply, wiring and actual switches require bench measurement."
+}

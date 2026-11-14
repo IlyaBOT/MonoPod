@@ -39,10 +39,23 @@ bool MediaLibrary::begin() {
 }
 void MediaLibrary::rescan() {
   tracks.clear();if(!mounted)return;
+  // Large contiguous Track storage prefers PSRAM via the ESP32 heap allocator.
+  // Allocate once, avoiding transient vector-growth copies during long scans.
+#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+  if(psramFound() && tracks.capacity()<Config::MAX_TRACKS)
+    tracks.reserve(Config::MAX_TRACKS);
+#endif
   error="";scanFolder("/Music",0);
   if(tracks.empty()) scanFolder("/",0);
   std::sort(tracks.begin(),tracks.end(),[](const Track &a,const Track &b){return strLess(a.title,b.title);});
   if(tracks.size()>=Config::MAX_TRACKS) error="Library limit reached";
+  // The index owns String metadata; actual RAM use depends on filename/ID3 lengths.
+  // Report heap state so 1024+ track builds can be validated on real hardware.
+#if defined(ARDUINO_ARCH_ESP32) && !WOKWI_SIMULATION
+  MONOPOD_LOG.printf("Library: %u/%u tracks, heap free=%u B, PSRAM free=%u B\n",
+    (unsigned)tracks.size(),(unsigned)Config::MAX_TRACKS,
+    (unsigned)ESP.getFreeHeap(),(unsigned)ESP.getFreePsram());
+#endif
 }
 void MediaLibrary::scanFolder(const String &path,uint8_t depth) {
   if(depth>Config::MAX_SCAN_DEPTH || tracks.size()>=Config::MAX_TRACKS) return;
@@ -173,10 +186,10 @@ bool MediaLibrary::formatCard(){
   bool ok=false;
   if(sectors>67108864UL){
     ExFatFormatter formatter;
-    ok=formatter.format(card,sectorBuffer,&Serial);
+    ok=formatter.format(card,sectorBuffer,&MONOPOD_LOG);
   }else{
     FatFormatter formatter;
-    ok=formatter.format(card,sectorBuffer,&Serial);
+    ok=formatter.format(card,sectorBuffer,&MONOPOD_LOG);
   }
   if(!ok){error="SD formatter failed";return false;}
   return begin();

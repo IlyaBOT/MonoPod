@@ -6,12 +6,13 @@ public:
   void begin();
   Key poll();
   bool held() const {return hold;}
-  uint16_t wheelRaw(uint8_t i) const {return raw[i];}
+  uint32_t wheelRaw(uint8_t i) const {return raw[i];}
 private:
   bool hold=false;
   Key keyStable=Key::None,keyLast=Key::None;
   uint32_t changed=0,pressed=0,lastRepeat=0,lastWheel=0;
-  uint16_t raw[6]={},base[6]={};
+  bool selectLongSent=false;
+  uint32_t raw[6]={},base[6]={};
   bool wheelTouch=false;
   float lastAngle=0,angleDelta=0;
   Key readButtons();

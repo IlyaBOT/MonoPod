@@ -1,0 +1,42 @@
+{
+  "kicad": "10.0.6",
+  "ERC_violations": 0,
+  "DRC_violations": 0,
+  "unconnected": 0,
+  "vias": 0,
+  "B_Cu_tracks": 0,
+  "B_Cu_flashes": 0,
+  "B_Cu_graphics": 0,
+  "copper_pours": 0,
+  "switch_coordinates": "PASS",
+  "J1_pinout": "PASS",
+  "schematic_vs_PCB_nets": "PASS",
+  "resistor_values": "PASS",
+  "firmware_v086_S3": "PASS",
+  "Excellon_PTH_hits": 10,
+  "Excellon_NPTH_hits": 4,
+  "track_count": 204,
+  "track_widths_mm": [
+    0.3,
+    0.35
+  ],
+  "trace_lengths_mm": {
+    "3V3": 2.194,
+    "BTN_ADC": 118.071,
+    "GND": 60.246,
+    "MENU_RET": 10.112,
+    "NEXT_RET": 8.056,
+    "PLAY_RET": 11.478,
+    "PREV_RET": 8.056,
+    "SELECT_RET": 8.608,
+    "TOUCH1": 3.385,
+    "TOUCH2": 2.0,
+    "TOUCH3": 2.54,
+    "TOUCH4": 2.12,
+    "TOUCH5": 3.385,
+    "TOUCH6": 2.06
+  },
+  "physical_mechanics": "UNVERIFIED",
+  "kit_switch_land_match": "UNVERIFIED",
+  "live_ESP32_ADC_and_touch": "UNVERIFIED"
+}

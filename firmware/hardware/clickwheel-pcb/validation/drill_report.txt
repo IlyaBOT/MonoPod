@@ -1,0 +1,23 @@
+Drill report for MonoPod_ClickWheel.kicad_pcb
+Created on 2026-10-29T00:51:59
+
+Copper Layer Stackup:
+    =============================================================
+    L1 :  F.Cu                      front
+    L2 :  B.Cu                      back
+
+
+Drill file 'MonoPod_ClickWheel-PTH.drl' contains
+    plated through holes:
+    =============================================================
+    T1  1.000mm  0.0394"  (10 holes))
+
+    Total plated holes count 10
+
+
+Drill file 'MonoPod_ClickWheel-NPTH.drl' contains
+    unplated through holes:
+    =============================================================
+    T1  2.200mm  0.0866"  (4 holes))
+
+    Total unplated holes count 4

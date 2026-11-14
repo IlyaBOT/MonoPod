@@ -22,8 +22,10 @@ public:
   int current() const {return activeTrack;}
   uint32_t elapsedSeconds() const;
   uint8_t approximateProgress() const;
+#if FEATURE_BLUETOOTH
   bool bluetooth() const {return bluetoothOn;}
   bool switchBluetooth(bool on);
+#endif
   String errorText() const {return error;}
 private:
   AudioFileSourceSD *source=nullptr;
@@ -34,7 +36,10 @@ private:
   std::vector<size_t> queue;
   int queuePos=-1;
   int activeTrack=-1;
-  bool pausedState=false,bluetoothOn=false;
+  bool pausedState=false;
+#if FEATURE_BLUETOOTH
+  bool bluetoothOn=false;
+#endif
   uint32_t playStarted=0,pauseStarted=0,pausedMs=0;
   String error;
   bool startFile(size_t index);

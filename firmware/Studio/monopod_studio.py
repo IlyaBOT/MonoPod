@@ -5,18 +5,19 @@ import tempfile
 import threading
 from pathlib import Path
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, simpledialog
 from tkinter.scrolledtext import ScrolledText
 from PIL import ImageTk
 from theme_format import ThemeOptions, encode_theme, demo_preview, verify_theme, find_default_font
 from device_api import DeviceClient
+from usb_sync import UsbClient, get_ports
 
 BG='#151a1e'
 PANEL='#20272d'
 TEXT='#e9edf1'
 MUTED='#a7b3bc'
 ACCENT='#75b7a0'
-APP='MonoPod Studio 0.6'
+APP='MonoPod Studio 0.8.4'
 
 class Studio(tk.Tk):
     def __init__(self):
@@ -27,6 +28,7 @@ class Studio(tk.Tk):
         self.configure(bg=BG)
         self.font_path=tk.StringVar(value=find_default_font())
         self.device=tk.StringVar(value='http://192.168.4.1')
+        self.usb_port=tk.StringVar(value='')
         self.main_size=tk.IntVar(value=15)
         self.small_size=tk.IntVar(value=11)
         self.smoothing=tk.BooleanVar(value=False)
@@ -70,7 +72,7 @@ class Studio(tk.Tk):
         head=tk.Frame(self,bg=BG,padx=22,pady=16);head.pack(fill='x')
         self.label(head,'MonoPod',font=('Arial',22,'bold')).pack(side='left')
         self.label(head,' / Studio',font=('Arial',17),fg=MUTED).pack(side='left',padx=(2,0))
-        self.label(head,'160 × 128   •   ESP32-WROVER',font=('Arial',10),fg=MUTED).pack(side='right')
+        self.label(head,'160 × 128   •   ESP32 / ESP32-S3',font=('Arial',10),fg=MUTED).pack(side='right')
         tabs=ttk.Notebook(self,style='Main.TNotebook');tabs.pack(fill='both',expand=True,padx=20,pady=(0,8))
         editor=tk.Frame(tabs,bg=BG);device_tab=tk.Frame(tabs,bg=BG)
         tabs.add(editor,text='Theme Editor');tabs.add(device_tab,text='Device & Music')
@@ -123,6 +125,10 @@ class Studio(tk.Tk):
         top.columnconfigure(1,weight=1)
         self.device_info=self.label(top,'Not connected',fg=MUTED,font=('Arial',10),justify='left')
         self.device_info.grid(row=2,column=0,columnspan=3,sticky='w',pady=(15,0))
+        self.label(top,'USB CDC port (ESP32-S3):').grid(row=3,column=0,sticky='w',pady=(12,0))
+        self.entry(top,self.usb_port,34).grid(row=3,column=1,sticky='we',padx=(10,10),pady=(12,0))
+        self.btn(top,'Detect USB ports',self.detect_usb).grid(row=3,column=2,pady=(12,0))
+        self.btn(top,'USB Connect / Refresh',self.connect_usb).grid(row=4,column=2,pady=(8,0))
         mid=self.panel(device_tab);mid.pack(fill='x',padx=10,pady=10)
         self.label(mid,'THEME SYNC',fg=ACCENT,font=('Arial',10,'bold')).pack(anchor='w',pady=(0,10))
         row=tk.Frame(mid,bg=PANEL);row.pack(fill='x')
@@ -131,12 +137,15 @@ class Studio(tk.Tk):
         self.btn(row,'Apply smoothing setting',self.push_smoothing).pack(side='left')
         music=self.panel(device_tab);music.pack(fill='both',expand=True,padx=10,pady=10)
         self.label(music,'MUSIC TRANSFER',fg=ACCENT,font=('Arial',10,'bold')).pack(anchor='w',pady=(0,10))
-        self.btn(music,'Select music files and upload to /Music',self.send_music).pack(anchor='w')
+        row=tk.Frame(music,bg=PANEL);row.pack(fill='x')
+        self.btn(row,'Upload over Wi-Fi',self.send_music).pack(side='left',padx=(0,10))
+        self.btn(row,'Upload / Update USB-C',self.send_music_usb,True).pack(side='left',padx=(0,10))
+        self.btn(row,'Delete USB track',self.delete_music_usb).pack(side='left')
         self.progress=ttk.Progressbar(music,maximum=100);self.progress.pack(fill='x',pady=(14,6))
         self.log=ScrolledText(music,bg='#10171b',fg=TEXT,height=8,insertbackground=TEXT,
                               relief='flat',font=('Consolas',10))
         self.log.pack(fill='both',expand=True)
-        self.log.insert('end','To connect: start Wi-Fi Sync on the player and join its Wi-Fi hotspot.\n')
+        self.log.insert('end','USB-C (ESP32-S3): select native USB CDC port; Wi-Fi sync is a separate option.\n')
         self.log.configure(state='disabled')
         bottom=tk.Frame(self,bg=BG,padx=22,pady=8);bottom.pack(fill='x')
         self.label(bottom,'MonoPod Studio • standalone offline editor',fg=MUTED,font=('Arial',9)).pack(side='left')
@@ -228,6 +237,58 @@ class Studio(tk.Tk):
         self.write_log(f'{title}: ERROR — {error}')
         self.progress['value']=0
         messagebox.showerror(APP,error)
+
+    def detect_usb(self):
+        try:
+            ports=get_ports()
+            if not ports:raise RuntimeError('No serial devices found; connect native USB port and install driver if required')
+            # User can always edit this selection manually.
+            picked=next((name for name,desc in ports if 'usb' in desc.lower() or 'jtag' in desc.lower()),ports[0][0])
+            self.usb_port.set(picked)
+            self.write_log('Serial devices: '+', '.join(f'{a} ({b})' for a,b in ports))
+        except Exception as exc:messagebox.showerror(APP,str(exc))
+
+    def connect_usb(self):
+        port=self.usb_port.get().strip()
+        if not port:messagebox.showerror(APP,'Set a native USB CDC port first');return
+        def work():
+            with UsbClient(port) as dev:return dev.info()
+        def finish(title,info):
+            self.device_info.configure(text=f'USB CDC {port} • {info}')
+            self.done_job(title,info)
+        self._run_custom('USB status',work,finish)
+
+    def send_music_usb(self):
+        paths=filedialog.askopenfilenames(title='Select audio files to transfer over USB',
+            filetypes=[('Audio','*.mp3 *.wav *.flac *.aac'),('All','*.*')])
+        if not paths:return
+        port=self.usb_port.get().strip()
+        if not port:messagebox.showerror(APP,'Set a native USB CDC port first');return
+        def work():
+            result=[]
+            with UsbClient(port) as dev:
+                for filename in paths:
+                    def progress(sent,total):
+                        percent=int(sent*100/max(1,total))
+                        self.after(0,lambda p=percent:self.progress.configure(value=p))
+                    result.append(dev.upload(filename,progress=progress,replace=True))
+                scan=dev.scan()
+            return '\n'.join(result+[scan])
+        self.async_job('USB music transfer',work)
+
+    def delete_music_usb(self):
+        port=self.usb_port.get().strip()
+        if not port:
+            messagebox.showerror(APP,'Set a native USB CDC port first');return
+        name=simpledialog.askstring(APP,'Enter the exact filename on /Music to delete (including extension):')
+        if not name:return
+        if not messagebox.askyesno(APP, f'Permanently delete {name!r} from microSD?'):
+            return
+        def work():
+            with UsbClient(port) as dev:
+                result=dev.delete(name)
+                return result+'\n'+dev.scan()
+        self.async_job('USB track deletion',work)
 
     def connect_device(self):
         url=self.device.get().strip()

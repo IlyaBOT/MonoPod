@@ -8,6 +8,7 @@ class FeedbackController {
 public:
   void begin();
   void loop();
+  void quiet();
   void fire(FeedbackEvent event);
   void setMode(ClickerMode route);
   ClickerMode nextMode(ClickerMode current) const;

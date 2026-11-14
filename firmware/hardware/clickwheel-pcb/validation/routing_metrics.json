@@ -1,0 +1,10 @@
+{
+  "tracks": 204,
+  "vias": 0,
+  "layers": [
+    "F.Cu"
+  ],
+  "min_width_mm": 0.3,
+  "ground_zone": false,
+  "attempts": 1
+}

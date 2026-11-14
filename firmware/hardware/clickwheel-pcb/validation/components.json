@@ -1,0 +1,360 @@
+{
+  "SW1": {
+    "ref": "SW1",
+    "key": "Switch:SW_Push",
+    "value": "MENU",
+    "fp": "ClickWheel:TS1187A_4x4x0p8_REF",
+    "nets": {
+      "1": "BTN_ADC",
+      "2": "MENU_RET"
+    },
+    "x": 0,
+    "y": -16.5,
+    "rot": 0,
+    "uuid": "57899b01-1b74-59d7-a463-8618ed66947f",
+    "role": "User kit 4x4x0.8; verify against 6.0x3.7mm pad centres; logical pin1=physical A/B, pin2=C/D",
+    "mpn": "TS-1187A 4x4x0.8 (kit, manufacturer unconfirmed)"
+  },
+  "SW2": {
+    "ref": "SW2",
+    "key": "Switch:SW_Push",
+    "value": "PREV",
+    "fp": "ClickWheel:TS1187A_4x4x0p8_REF",
+    "nets": {
+      "1": "BTN_ADC",
+      "2": "PREV_RET"
+    },
+    "x": -16.5,
+    "y": 0,
+    "rot": 0,
+    "uuid": "93b26337-a5c5-5530-b90d-a8d1c727b6ab",
+    "role": "User kit 4x4x0.8; verify against 6.0x3.7mm pad centres; logical pin1=physical A/B, pin2=C/D",
+    "mpn": "TS-1187A 4x4x0.8 (kit, manufacturer unconfirmed)"
+  },
+  "SW3": {
+    "ref": "SW3",
+    "key": "Switch:SW_Push",
+    "value": "NEXT",
+    "fp": "ClickWheel:TS1187A_4x4x0p8_REF",
+    "nets": {
+      "1": "BTN_ADC",
+      "2": "NEXT_RET"
+    },
+    "x": 16.5,
+    "y": 0,
+    "rot": 0,
+    "uuid": "687d482c-b94c-590a-a0c1-a122d4f1dfce",
+    "role": "User kit 4x4x0.8; verify against 6.0x3.7mm pad centres; logical pin1=physical A/B, pin2=C/D",
+    "mpn": "TS-1187A 4x4x0.8 (kit, manufacturer unconfirmed)"
+  },
+  "SW4": {
+    "ref": "SW4",
+    "key": "Switch:SW_Push",
+    "value": "PLAY",
+    "fp": "ClickWheel:TS1187A_4x4x0p8_REF",
+    "nets": {
+      "1": "BTN_ADC",
+      "2": "PLAY_RET"
+    },
+    "x": 0,
+    "y": 16.5,
+    "rot": 0,
+    "uuid": "b31d9cd5-d58b-581b-9c77-1ec6693c0d56",
+    "role": "User kit 4x4x0.8; verify against 6.0x3.7mm pad centres; logical pin1=physical A/B, pin2=C/D",
+    "mpn": "TS-1187A 4x4x0.8 (kit, manufacturer unconfirmed)"
+  },
+  "SW5": {
+    "ref": "SW5",
+    "key": "Switch:SW_Push",
+    "value": "SELECT",
+    "fp": "ClickWheel:TS1187A_4x4x0p8_REF",
+    "nets": {
+      "1": "BTN_ADC",
+      "2": "SELECT_RET"
+    },
+    "x": 0,
+    "y": 0,
+    "rot": 0,
+    "uuid": "6edc4911-88d5-53b6-bbeb-d68657f6e009",
+    "role": "User kit 4x4x0.8; verify against 6.0x3.7mm pad centres; logical pin1=physical A/B, pin2=C/D",
+    "mpn": "TS-1187A 4x4x0.8 (kit, manufacturer unconfirmed)"
+  },
+  "R1": {
+    "ref": "R1",
+    "key": "Device:R",
+    "value": "10k",
+    "fp": "ClickWheel:R_0603",
+    "nets": {
+      "1": "3V3",
+      "2": "BTN_ADC"
+    },
+    "x": -4,
+    "y": 13,
+    "rot": 0,
+    "uuid": "86d5ffbe-5e8f-509a-85a4-a1aeea604077",
+    "role": "1%, 0603 (0R jumper tolerance not applicable)",
+    "mpn": "RC0603FR-0710KL"
+  },
+  "R2": {
+    "ref": "R2",
+    "key": "Device:R",
+    "value": "0R",
+    "fp": "ClickWheel:R_0603",
+    "nets": {
+      "1": "MENU_RET",
+      "2": "GND"
+    },
+    "x": 0,
+    "y": -12,
+    "rot": 270,
+    "uuid": "0dc769d3-a0fb-50a5-a029-5d7be720329d",
+    "role": "Required MENU 0 ohm link",
+    "mpn": "RC0603JR-070RL"
+  },
+  "R3": {
+    "ref": "R3",
+    "key": "Device:R",
+    "value": "2.2k",
+    "fp": "ClickWheel:R_0603",
+    "nets": {
+      "1": "PREV_RET",
+      "2": "GND"
+    },
+    "x": -11,
+    "y": 1.85,
+    "rot": 0,
+    "uuid": "867cee12-7aee-5e52-b1bd-101600024de8",
+    "role": "1%, 0603 (0R jumper tolerance not applicable)",
+    "mpn": "RC0603FR-072K2L"
+  },
+  "R4": {
+    "ref": "R4",
+    "key": "Device:R",
+    "value": "4.7k",
+    "fp": "ClickWheel:R_0603",
+    "nets": {
+      "1": "NEXT_RET",
+      "2": "GND"
+    },
+    "x": 11,
+    "y": 1.85,
+    "rot": 180,
+    "uuid": "561e26a6-3d9c-5284-ad18-c09605b56852",
+    "role": "1%, 0603 (0R jumper tolerance not applicable)",
+    "mpn": "RC0603FR-074K7L"
+  },
+  "R5": {
+    "ref": "R5",
+    "key": "Device:R",
+    "value": "10k",
+    "fp": "ClickWheel:R_0603",
+    "nets": {
+      "1": "PLAY_RET",
+      "2": "GND"
+    },
+    "x": 8,
+    "y": 16,
+    "rot": 0,
+    "uuid": "ce8699e2-ac16-546d-b09f-2b28bbc15c5b",
+    "role": "1%, 0603 (0R jumper tolerance not applicable)",
+    "mpn": "RC0603FR-0710KL"
+  },
+  "R6": {
+    "ref": "R6",
+    "key": "Device:R",
+    "value": "22k",
+    "fp": "ClickWheel:R_0603",
+    "nets": {
+      "1": "SELECT_RET",
+      "2": "GND"
+    },
+    "x": 6,
+    "y": 2,
+    "rot": 0,
+    "uuid": "3ba397f2-a125-50a6-a625-043ff373e1fb",
+    "role": "1%, 0603 (0R jumper tolerance not applicable)",
+    "mpn": "RC0603FR-0722KL"
+  },
+  "C1": {
+    "ref": "C1",
+    "key": "Device:C",
+    "value": "100n",
+    "fp": "ClickWheel:C_0603",
+    "nets": {
+      "1": "BTN_ADC",
+      "2": "GND"
+    },
+    "x": -8,
+    "y": 8,
+    "rot": 0,
+    "uuid": "4608d7bc-b56e-5aed-b819-eda10e02670e",
+    "role": "X7R 50V +/-10%",
+    "mpn": "GRM188R71H104KA93D"
+  },
+  "J1": {
+    "ref": "J1",
+    "key": "Connector_Generic:Conn_02x05_Odd_Even",
+    "value": "WIRE / 2x05 P2.54",
+    "fp": "ClickWheel:Header_2x05_P2p54_TopOnly",
+    "nets": {
+      "1": "3V3",
+      "2": "GND",
+      "3": "BTN_ADC",
+      "4": "TOUCH1",
+      "5": "TOUCH2",
+      "6": "TOUCH3",
+      "7": "TOUCH4",
+      "8": "TOUCH5",
+      "9": "TOUCH6",
+      "10": null
+    },
+    "x": -5.08,
+    "y": 11,
+    "rot": 90,
+    "uuid": "64258546-c52b-553a-9520-c255c17305cd",
+    "role": "Bare plated holes; no connector populated; optional header from underside",
+    "mpn": ""
+  },
+  "E1": {
+    "ref": "E1",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "TOUCH1",
+    "fp": "ClickWheel:TouchWire_2x1p5",
+    "nets": {
+      "1": "TOUCH1"
+    },
+    "x": -4.5,
+    "y": 6,
+    "rot": 0,
+    "uuid": "428f6437-6516-5fe4-b6fe-fb39a0bc748a",
+    "role": "Fine flexible electrode wire, exposed front land",
+    "mpn": ""
+  },
+  "E2": {
+    "ref": "E2",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "TOUCH2",
+    "fp": "ClickWheel:TouchWire_2x1p5",
+    "nets": {
+      "1": "TOUCH2"
+    },
+    "x": 0,
+    "y": 13,
+    "rot": 0,
+    "uuid": "2c6fa7ea-e474-5ddb-94fa-ba57b0566ebd",
+    "role": "Fine flexible electrode wire, exposed front land",
+    "mpn": ""
+  },
+  "E3": {
+    "ref": "E3",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "TOUCH3",
+    "fp": "ClickWheel:TouchWire_2x1p5",
+    "nets": {
+      "1": "TOUCH3"
+    },
+    "x": 0,
+    "y": 6,
+    "rot": 0,
+    "uuid": "7d9d98c9-5630-501b-9913-c6a29bbc77e9",
+    "role": "Fine flexible electrode wire, exposed front land",
+    "mpn": ""
+  },
+  "E4": {
+    "ref": "E4",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "TOUCH4",
+    "fp": "ClickWheel:TouchWire_2x1p5",
+    "nets": {
+      "1": "TOUCH4"
+    },
+    "x": 2.54,
+    "y": 13,
+    "rot": 0,
+    "uuid": "ed95c7e3-7d11-54e4-92bc-5e44acc6c046",
+    "role": "Fine flexible electrode wire, exposed front land",
+    "mpn": ""
+  },
+  "E5": {
+    "ref": "E5",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "TOUCH5",
+    "fp": "ClickWheel:TouchWire_2x1p5",
+    "nets": {
+      "1": "TOUCH5"
+    },
+    "x": 4.5,
+    "y": 6,
+    "rot": 0,
+    "uuid": "90c1cd68-8c87-5614-8dd7-5daf92a6c375",
+    "role": "Fine flexible electrode wire, exposed front land",
+    "mpn": ""
+  },
+  "E6": {
+    "ref": "E6",
+    "key": "Connector_Generic:Conn_01x01",
+    "value": "TOUCH6",
+    "fp": "ClickWheel:TouchWire_2x1p5",
+    "nets": {
+      "1": "TOUCH6"
+    },
+    "x": 5.08,
+    "y": 13,
+    "rot": 0,
+    "uuid": "91047be4-a68e-59d6-b95f-a7e9b8f20c5e",
+    "role": "Fine flexible electrode wire, exposed front land",
+    "mpn": ""
+  },
+  "H1": {
+    "ref": "H1",
+    "key": "Mechanical:MountingHole",
+    "value": "M2 / 2.2 NPTH",
+    "fp": "ClickWheel:Mount_M2_Keepout5",
+    "nets": {},
+    "x": -13,
+    "y": -13,
+    "rot": 0,
+    "uuid": "faa489b5-da51-52bd-9d44-8ef4877f0220",
+    "role": "M2 screw head/washer envelope diameter 5.0mm",
+    "mpn": ""
+  },
+  "H2": {
+    "ref": "H2",
+    "key": "Mechanical:MountingHole",
+    "value": "M2 / 2.2 NPTH",
+    "fp": "ClickWheel:Mount_M2_Keepout5",
+    "nets": {},
+    "x": 13,
+    "y": -13,
+    "rot": 0,
+    "uuid": "f27db856-3c7b-5110-9281-9febe9957fbd",
+    "role": "M2 screw head/washer envelope diameter 5.0mm",
+    "mpn": ""
+  },
+  "H3": {
+    "ref": "H3",
+    "key": "Mechanical:MountingHole",
+    "value": "M2 / 2.2 NPTH",
+    "fp": "ClickWheel:Mount_M2_Keepout5",
+    "nets": {},
+    "x": -13,
+    "y": 13,
+    "rot": 0,
+    "uuid": "52832d47-da45-5797-ad4b-fe88182dbd99",
+    "role": "M2 screw head/washer envelope diameter 5.0mm",
+    "mpn": ""
+  },
+  "H4": {
+    "ref": "H4",
+    "key": "Mechanical:MountingHole",
+    "value": "M2 / 2.2 NPTH",
+    "fp": "ClickWheel:Mount_M2_Keepout5",
+    "nets": {},
+    "x": 13,
+    "y": 13,
+    "rot": 0,
+    "uuid": "2bd8da14-2eac-5804-a5c6-b4404fc185a3",
+    "role": "M2 screw head/washer envelope diameter 5.0mm",
+    "mpn": ""
+  }
+}

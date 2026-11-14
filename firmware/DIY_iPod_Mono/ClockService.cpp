@@ -11,7 +11,7 @@ void ClockService::begin(){
   setenv("TZ",Config::TIMEZONE_TZ,1);tzset();
 #if FEATURE_DS3231
   // DS3231 requires two extra I2C pins. See README; disabled by default.
-  Wire.begin(32,33); // conflicts with touch wheel! repin in custom hardware revision
+  Wire.begin(Config::PIN_HAPTIC_SDA,Config::PIN_HAPTIC_SCL); // board-dependent I2C pins
   Wire.beginTransmission(0x68);Wire.write((uint8_t)0);if(Wire.endTransmission(false)!=0)return;
   if(Wire.requestFrom(0x68,7)!=7)return;
   int second=bcd(Wire.read()&0x7f),minute=bcd(Wire.read()&0x7f),hour=bcd(Wire.read()&0x3f);

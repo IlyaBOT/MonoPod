@@ -1,0 +1,32 @@
+digraph G {
+ graph [rankdir=LR, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.65, fontname="DejaVu Sans"];
+ node [shape=box, style="rounded,filled", fillcolor="#F3F5F8", color="#60758A", fontname="DejaVu Sans", fontsize=11, margin="0.18,0.11"];
+ edge [color="#526980", fontname="DejaVu Sans", fontsize=9];
+ esp [label="ESP32-WROVER\nMonoPod firmware", fillcolor="#DCECF8"];
+ screen [label="ST7735S TFT\n160×128 UI"];
+ sd [label="microSD FAT32"];
+ wheel [label="Click Wheel 6× touch\n5 buttons ADC + HOLD"];
+ pcm [label="PCM5102A\nI²S DAC"];
+ amp [label="TDA1308\nHeadphone amplifier", fillcolor="#FFF4DD"];
+ jack [label="3.5 mm TRS\n32 Ω headphones"];
+ bt [label="A2DP SBC → Bluetooth\nAVRCP ← headset", fillcolor="#E8F5EA"];
+ wifi [label="Wi-Fi + Studio\nMusic / theme upload"];
+ battery [label="Li-Po 1S 1000 mAh\nprotected cell"];
+ power [label="TP4056 + protection\nRev. A-P / UNVALIDATED", fillcolor="#FFF1F1"];
+ dcdc [label="3.3 V buck-boost\nPower switch / UNVALIDATED", fillcolor="#FFF1F1"];
+ usb_charge [label="Separate USB 5 V\nCharging only / OFF"];
+ usb [label="Existing USB-C\nUSB-UART + VBUS"];
+ screen -> esp [label="SPI"];
+ sd -> esp [label="SPI"];
+ wheel -> esp [label="touch / ADC"];
+ esp -> pcm [label="BCLK / WS / DIN"];
+ pcm -> amp [label="L/R analog"];
+ amp -> jack [label="AC-coupled"];
+ esp -> bt [label="source"];
+ wifi -> esp [label="HTTP / AP"];
+ usb_charge -> power [label="5 V / OFF"];
+ battery -> power [label="BAT"];
+ power -> dcdc [label="OUT ± / switch"];
+ dcdc -> esp [label="3.3 V (checked)"];
+ usb -> esp [label="UART / bench only"];
+}

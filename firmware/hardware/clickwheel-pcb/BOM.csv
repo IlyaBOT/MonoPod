@@ -1,0 +1,12 @@
+﻿References,Quantity,Value,MPN,Footprint / description,Notes
+SW1-SW5,5,TS-1187A low-profile 4x4x0.8,User kit / manufacturer unconfirmed,ClickWheel:TS1187A_4x4x0p8_REF,Verify land pattern and contact pairing before fabrication
+R1,1,10k,RC0603FR-0710KL,ClickWheel:R_0603,"1%, 0603 (0R jumper tolerance not applicable)"
+R2,1,0R,RC0603JR-070RL,ClickWheel:R_0603,Required MENU 0 ohm link
+R3,1,2.2k,RC0603FR-072K2L,ClickWheel:R_0603,"1%, 0603 (0R jumper tolerance not applicable)"
+R4,1,4.7k,RC0603FR-074K7L,ClickWheel:R_0603,"1%, 0603 (0R jumper tolerance not applicable)"
+R5,1,10k,RC0603FR-0710KL,ClickWheel:R_0603,"1%, 0603 (0R jumper tolerance not applicable)"
+R6,1,22k,RC0603FR-0722KL,ClickWheel:R_0603,"1%, 0603 (0R jumper tolerance not applicable)"
+C1,1,100n,GRM188R71H104KA93D,ClickWheel:C_0603,X7R 50V +/-10%
+J1,0,PCB feature / DNP,,10 bare PTH holes; optional underside 2x05 P2.54 header NOT populated,No connector supplied
+E1-E6,0,PCB feature / DNP,,"PCB wire lands only, not purchased parts",No connector supplied
+H1-H4,0,PCB feature / DNP,,PCB NPTH mounting holes only,No connector supplied

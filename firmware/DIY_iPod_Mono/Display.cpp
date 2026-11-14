@@ -1,6 +1,7 @@
 #include "Display.h"
 #include "MonoFont.h"
 #include "Settings.h"
+#include "Battery.h"
 #include "Theme.h"
 #include <pgmspace.h>
 Display display;
@@ -90,12 +91,12 @@ int Display::textWidth(const String& s,bool small)const{
   while(utf8next(s,i,cp))width+=glyphAdvance(cp,small);
   return width;
 }
-void Display::drawString(int x,int y,const String& value,uint16_t f,uint16_t b,bool small,uint8_t maxChars){
+void Display::drawString(int x,int y,const String& value,uint16_t f,uint16_t b,bool small,uint8_t maxChars,int maxX){
   size_t i=0;uint32_t cp;uint8_t count=0;
   tft.startWrite();
   while(utf8next(value,i,cp) && (!maxChars || count<maxChars)){
     const int advance=glyphAdvance(cp,small);
-    if(x+advance>160)break;
+    if(x+advance>maxX)break;
     drawGlyph(x,y,cp,f,b,small);x+=advance;count++;
   }
   tft.endWrite();
@@ -108,13 +109,27 @@ void Display::centerText(int y,const String& s,bool small,bool inv){
 }
 void Display::header(const String& title,bool held,bool playing,bool wifi){
   tft.fillRect(OX,OY,160,20,bg);
-  text(5,2,title,fg,bg);
-  if(held)smallText(139,4,"H",fg,bg);
-  else if(wifi)smallText(139,4,"W",fg,bg);
-  else if(playing)smallText(141,4,">",fg,bg);
+  // Reserve a permanent top-right area for power and connection status.
+  drawString(5,2,title,fg,bg,false,0,113);
+  if(held)smallText(117,3,"H",fg,bg);
+  else if(wifi)smallText(117,3,"W",fg,bg);
+  else if(playing)smallText(117,3,">",fg,bg);
+  const int x=136,y=6;
+  // 18x9 monochrome battery icon, plus a 2px terminal.
+  tft.drawRect(OX+x,OY+y,19,9,fg);
+  tft.fillRect(OX+x+19,OY+y+3,2,3,fg);
+  int pct=battery.level();
+  if(pct>=0){
+    const int bars=(pct*15+50)/100;
+    if(bars>0)tft.fillRect(OX+x+2,OY+y+2,bars,5,fg);
+  } else {
+    tft.fillRect(OX+x+8,OY+y+2,2,3,fg);
+    tft.drawPixel(OX+x+8,OY+y+6,fg); // unknown voltage, not a fake charge estimate
+  }
   tft.drawFastHLine(OX,OY+19,160,fg);
 }
 void Display::footer(const String& s){
+  if(s.isEmpty())return;
   tft.drawFastHLine(OX,OY+114,160,fg);
   tft.fillRect(OX,OY+115,160,13,bg);
   smallText(5,115,s,fg,bg);
@@ -132,6 +147,37 @@ void Display::progress(int x,int y,int w,int percent){
   tft.drawRect(OX+x,OY+y,w,8,fg);
   tft.fillRect(OX+x+2,OY+y+2,w-4,4,bg);
   if(percent) tft.fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,fg);
+}
+void Display::syncScreen(bool wifi,bool transferring){
+  clear();
+  // Minimal 160x128 monochrome-like lock screen. No status bar/navigation.
+  const int cx=80;
+  if(wifi){
+    // Three circular Wi-Fi arcs (show upper half only), plus center dot.
+    for(int r=23;r>=9;r-=7)tft.drawCircle(OX+cx,OY+37,r,fg);
+    tft.fillRect(OX+51,OY+38,58,30,bg);
+    tft.fillCircle(OX+cx,OY+38,3,fg);
+  }else{
+    // USB trident icon: stem, square/circle/triangle tips.
+    tft.drawLine(OX+cx,OY+41,OX+cx,OY+13,fg);
+    tft.drawLine(OX+cx,OY+24,OX+65,OY+24,fg);
+    tft.drawLine(OX+65,OY+24,OX+65,OY+17,fg);
+    tft.fillRect(OX+62,OY+12,7,7,fg);
+    tft.drawLine(OX+cx,OY+32,OX+95,OY+32,fg);
+    tft.drawLine(OX+95,OY+32,OX+95,OY+23,fg);
+    tft.fillCircle(OX+95,OY+22,4,fg);
+    tft.fillTriangle(OX+cx,OY+5,OX+cx-5,OY+14,OX+cx+5,OY+14,fg);
+    tft.fillCircle(OX+cx,OY+41,3,fg);
+  }
+  // Adafruit 5x7 bitmap scaled to ~18x24. Duplicate by 1px for boldness.
+  tft.setTextSize(3);tft.setTextColor(fg);
+  tft.setCursor(OX+44,OY+49);tft.print("SYNC");
+  tft.setCursor(OX+45,OY+49);tft.print("SYNC");
+  tft.setTextSize(1);
+  const uint16_t color=fg,back=bg;
+  smallText(3,82,transferring?"DATA TRANSFER ACTIVE":(wifi?"Wi-Fi sync active":"USB sync active"),color,back);
+  smallText(3,96,"DO NOT REMOVE SD",color,back);
+  smallText(3,110,wifi?"KEEP Wi-Fi CONNECTED":"DO NOT UNPLUG USB",color,back);
 }
 void Display::clock(const String& dt){centerText(47,dt,true);}
 void Display::nowPlaying(const String& title,const String& artist,bool paused,int done,uint32_t seconds,uint8_t volume){

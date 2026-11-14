@@ -9,6 +9,7 @@ public:
   void end();
   void loop();
   bool active() const {return running;}
+  bool busy() const {return uploadActive || themeUploadActive;}
   String ip() const;
 private:
   WebServer server{80};
@@ -18,7 +19,8 @@ private:
   String themeUploadError;
   size_t themeUploadSize=0;
   bool running=false, uploadSuccess=false;
-  String uploadError;
+  bool uploadActive=false,themeUploadActive=false;
+  String uploadError,uploadName;
   void page();
   void upload();
   void finished();
@@ -29,6 +31,7 @@ private:
 class WiFiSyncService {
 public:
   void begin(){}void end(){}void loop(){}bool active() const{return false;}
+  bool busy() const{return false;}
   String ip()const{return "Disabled";}
 };
 #endif

@@ -22,7 +22,7 @@ bool ThemeManager::reload(const char* path){
   const size_t fileSize=f.size();
   if(fileSize<28 || fileSize>MAX_BYTES+28){f.close();return false;}
   uint8_t h[28];
-  if(f.read(h,sizeof(h))!=sizeof(h) || memcmp(h,"MPT1",4)!=0 || h[4]!=1 || h[5]!=0){f.close();return false;}
+  if(f.read(h,sizeof(h))!=sizeof(h) || memcmp(h,"MPT1",4)!=0 || h[4]!=1 || h[5]!=1){f.close();return false;}
   const uint8_t bh=h[6],sh=h[7];
   const uint16_t bc=rd16(h+8),sc=rd16(h+10);
   if(bh<8||bh>24||sh<8||sh>24||bc>256||sc>256||bc==0||sc==0){f.close();return false;}

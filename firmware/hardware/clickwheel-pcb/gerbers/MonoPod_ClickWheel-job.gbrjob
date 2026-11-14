@@ -1,0 +1,99 @@
+{
+  "Header": {
+    "GenerationSoftware": {
+      "Vendor": "KiCad",
+      "Application": "KiCad / single-copper manufacturing metadata",
+      "Version": "10.0.6"
+    },
+    "CreationDate": "2026-10-29T00:51:58+03:00"
+  },
+  "GeneralSpecs": {
+    "ProjectId": {
+      "Name": "MonoPod_ClickWheel",
+      "GUID": "4d6f6e6f-506f-4645-9f43-6c69636b5768",
+      "Revision": "R1"
+    },
+    "Size": {
+      "X": 44.0,
+      "Y": 44.0
+    },
+    "LayerNumber": 1,
+    "BoardThickness": 1.6,
+    "Finish": "ENIG"
+  },
+  "DesignRules": [
+    {
+      "Layers": "Outer",
+      "PadToPad": 0.25,
+      "PadToTrack": 0.25,
+      "TrackToTrack": 0.25,
+      "MinLineWidth": 0.3
+    }
+  ],
+  "FilesAttributes": [
+    {
+      "Path": "MonoPod_ClickWheel-F_Cu.gtl",
+      "FileFunction": "Copper,L1,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "MonoPod_ClickWheel-F_Paste.gtp",
+      "FileFunction": "SolderPaste,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "MonoPod_ClickWheel-F_Silkscreen.gto",
+      "FileFunction": "Legend,Top",
+      "FilePolarity": "Positive"
+    },
+    {
+      "Path": "MonoPod_ClickWheel-F_Mask.gts",
+      "FileFunction": "SolderMask,Top",
+      "FilePolarity": "Negative"
+    },
+    {
+      "Path": "MonoPod_ClickWheel-B_Mask.gbs",
+      "FileFunction": "SolderMask,Bot",
+      "FilePolarity": "Negative"
+    },
+    {
+      "Path": "MonoPod_ClickWheel-Edge_Cuts.gm1",
+      "FileFunction": "Profile",
+      "FilePolarity": "Positive"
+    }
+  ],
+  "MaterialStackup": [
+    {
+      "Type": "Legend",
+      "Name": "Top Silk Screen"
+    },
+    {
+      "Type": "SolderPaste",
+      "Name": "Top Solder Paste"
+    },
+    {
+      "Type": "SolderMask",
+      "Thickness": 0.01,
+      "Name": "Top Solder Mask",
+      "Color": "Green"
+    },
+    {
+      "Type": "Copper",
+      "Thickness": 0.035,
+      "Name": "F.Cu"
+    },
+    {
+      "Type": "Dielectric",
+      "Thickness": 1.545,
+      "Material": "FR4",
+      "Name": "FR4 core",
+      "Notes": "Single copper side F.Cu only"
+    },
+    {
+      "Type": "SolderMask",
+      "Thickness": 0.01,
+      "Name": "Bottom Solder Mask",
+      "Color": "Green"
+    }
+  ]
+}

@@ -21,12 +21,12 @@ void InputManager::begin() {
 #endif
 #if FEATURE_TOUCH_WHEEL
   // Never touch wheel while starting; average 32 baseline readings per electrode.
-  uint32_t accum[6]={};
+  uint64_t accum[6]={};
   for(int t=0;t<32;t++){
     for(int i=0;i<Config::WHEEL_COUNT;i++)accum[i]+=(uint32_t)touchRead(Config::WHEEL_PINS[i]);
     delay(2);
   }
-  for(int i=0;i<Config::WHEEL_COUNT;i++)base[i]=min(65535UL,accum[i]/32UL);
+  for(int i=0;i<Config::WHEEL_COUNT;i++)base[i]=(uint32_t)(accum[i]/32ULL);
 #endif
 }
 Key InputManager::readButtons() {
@@ -66,7 +66,12 @@ Key InputManager::readWheel() {
   float x=0,y=0,total=0;
   for(int i=0;i<Config::WHEEL_COUNT;i++){
     raw[i]=touchRead(Config::WHEEL_PINS[i]);
-    float amplitude=(float)base[i]-(float)raw[i]; // original ESP32: touching lowers raw
+    // Original ESP32: touched = lower count; S3: touched = higher count.
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+    float amplitude=(float)raw[i]-(float)base[i];
+#else
+    float amplitude=(float)base[i]-(float)raw[i];
+#endif
     float threshold=max(5.0f,(float)base[i]*0.10f);
     float weight=max(0.0f,amplitude-threshold);
     const float angle=i*(6.283185307f/(float)Config::WHEEL_COUNT);
@@ -95,13 +100,23 @@ Key InputManager::poll() {
 #else
   bool nowHold=digitalRead(Config::PIN_HOLD)==LOW;
 #endif
-  if(hold!=nowHold){hold=nowHold;keyLast=keyStable=Key::None;wheelTouch=false;return Key::HoldChanged;}
+  if(hold!=nowHold){hold=nowHold;keyLast=keyStable=Key::None;selectLongSent=false;wheelTouch=false;return Key::HoldChanged;}
   if(hold)return Key::None;
   const Key b=readButtons();
   if(b!=keyLast){keyLast=b;changed=millis();}
   if(millis()-changed>=35 && keyStable!=keyLast){
+    const Key old=keyStable;
     keyStable=keyLast;pressed=lastRepeat=millis();
-    if(keyStable!=Key::None)return keyStable;
+    if(old==Key::Select && keyStable!=Key::Select && !selectLongSent){
+      selectLongSent=false;
+      return Key::Select; // Short select fires on release, never after a long press.
+    }
+    if(keyStable==Key::Select){selectLongSent=false;}
+    else if(keyStable!=Key::None)return keyStable;
+  }
+  if(keyStable==Key::Select && !selectLongSent && millis()-pressed>=1500){
+    selectLongSent=true;
+    return Key::SelectLong;
   }
   if(keyStable==Key::Previous || keyStable==Key::Next){
     if(millis()-pressed>600 && millis()-lastRepeat>160){lastRepeat=millis();return keyStable;}

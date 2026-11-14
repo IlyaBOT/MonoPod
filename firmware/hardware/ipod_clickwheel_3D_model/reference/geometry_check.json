@@ -1,0 +1,176 @@
+{
+  "units": "mm",
+  "prototype": "0.2",
+  "parameters": {
+    "wheel_diameter": 44.0,
+    "select_diameter": 15.0,
+    "radial_gap": 0.2,
+    "face_thickness": 1.0,
+    "engraving_depth": 0.2,
+    "front_chamfer": 0.15,
+    "button_radius": 16.0,
+    "pusher_height": 2.4,
+    "pusher_tip_diameter": 2.4,
+    "pusher_root_diameter": 3.6,
+    "ring_lip_overhang": 0.8,
+    "select_lip_overhang": 2.5,
+    "select_guide_depth": 2.0,
+    "select_guide_wall": 1.2,
+    "select_axial_clearance": 0.3,
+    "select_flange_thickness": 0.8,
+    "lip_land": 0.3,
+    "ring_lip_wall": 1.0,
+    "pcb_thickness": 1.6,
+    "switch_height": 0.8,
+    "switch_width": 4.0,
+    "trial_travel": 0.2,
+    "copper_gap": 1.2,
+    "copper_inner_radius": 9.5,
+    "copper_outer_radius": 20.8,
+    "copper_pusher_clearance_radius": 2.4
+  },
+  "derived": {
+    "opening_diameter": 15.4,
+    "cap_depth": 3.4,
+    "reference_stack": 5.800000000000001,
+    "select_radial_retention_overlap": 2.3,
+    "select_flange_start": 2.3,
+    "select_flange_end": 3.0999999999999996
+  },
+  "parts": {
+    "wheel_44": {
+      "brep_valid": true,
+      "solids": 1,
+      "brep_volume_mm3": 1668.512,
+      "triangles": 11152,
+      "watertight": true,
+      "consistent_winding": true,
+      "mesh_volume_mm3": 1668.165,
+      "bounds_mm": [
+        [
+          -22.8,
+          -22.8,
+          0.0
+        ],
+        [
+          22.8,
+          22.8,
+          3.4
+        ]
+      ]
+    },
+    "select_15": {
+      "brep_valid": true,
+      "solids": 1,
+      "brep_volume_mm3": 658.602,
+      "triangles": 2876,
+      "watertight": true,
+      "consistent_winding": true,
+      "mesh_volume_mm3": 658.468,
+      "bounds_mm": [
+        [
+          -10.0,
+          -10.0,
+          0.0
+        ],
+        [
+          10.0,
+          10.0,
+          3.4
+        ]
+      ]
+    },
+    "wheel_44_plain": {
+      "brep_valid": true,
+      "solids": 1,
+      "brep_volume_mm3": 1671.655,
+      "triangles": 10800,
+      "watertight": true,
+      "consistent_winding": true,
+      "mesh_volume_mm3": 1671.309,
+      "bounds_mm": [
+        [
+          -22.8,
+          -22.8,
+          0.0
+        ],
+        [
+          22.8,
+          22.8,
+          3.4
+        ]
+      ]
+    },
+    "select_fit_test": {
+      "brep_valid": true,
+      "solids": 1,
+      "brep_volume_mm3": 1824.87,
+      "triangles": 6504,
+      "watertight": true,
+      "consistent_winding": true,
+      "mesh_volume_mm3": 1825.098,
+      "bounds_mm": [
+        [
+          -32.0,
+          -11.5,
+          -0.0
+        ],
+        [
+          32.0,
+          11.5,
+          2.0
+        ]
+      ]
+    }
+  },
+  "collision_tests": {
+    "rest": {
+      "intersection_mm3": 0.0
+    },
+    "select_down_0p2": {
+      "intersection_mm3": 0.0
+    },
+    "ring_down_0p2": {
+      "intersection_mm3": 0.0
+    },
+    "select_side_shift_0p15": {
+      "intersection_mm3": 0.0
+    },
+    "select_up_to_stop": {
+      "intersection_mm3": 0.0
+    },
+    "ring_rock_0deg": {
+      "tilt_angle_deg": 0.35809,
+      "intersection_mm3": 0.0
+    },
+    "ring_rock_90deg": {
+      "tilt_angle_deg": 0.35809,
+      "intersection_mm3": 0.0
+    },
+    "ring_rock_180deg": {
+      "tilt_angle_deg": 0.35809,
+      "intersection_mm3": 0.0
+    },
+    "ring_rock_270deg": {
+      "tilt_angle_deg": 0.35809,
+      "intersection_mm3": 0.0
+    }
+  },
+  "retention_check": {
+    "straight_withdrawal_blocked": true,
+    "intersection_after_stop_plus_0p1_mm3": 6.258053,
+    "nominal_upward_float_mm": 0.3
+  },
+  "step_roundtrip": {
+    "valid": true,
+    "solids": 2,
+    "units": "mm"
+  },
+  "openscad_render": {
+    "success": true,
+    "simple": true,
+    "solid_components": 2,
+    "stl_volume_mm3": 2326.995,
+    "cadquery_volume_difference_fraction": 5.1e-05
+  }
+}

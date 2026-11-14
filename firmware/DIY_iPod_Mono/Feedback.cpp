@@ -1,5 +1,6 @@
 #include "Feedback.h"
 #include "Settings.h"
+#include "SyncMode.h"
 #include "AudioEngine.h"
 #if FEATURE_HAPTIC_DRV2605
 #include <Wire.h>
@@ -59,6 +60,7 @@ void FeedbackController::silencePiezo(){
   piezoPlaying=false;
   secondPulsePending=false;
 }
+void FeedbackController::quiet(){silencePiezo();}
 void FeedbackController::setMode(ClickerMode mode){
   silencePiezo();
   if(!available(mode))mode=available(ClickerMode::Speaker)?ClickerMode::Speaker:
@@ -113,6 +115,7 @@ void FeedbackController::localEffect(FeedbackEvent event,uint32_t now){
 #endif
 }
 void FeedbackController::fire(FeedbackEvent event){
+  if(syncMode.active())return;
   if(selected==ClickerMode::Off)return;
   uint32_t now=millis();
   if(event==FeedbackEvent::Scroll){

@@ -4,7 +4,7 @@
 #ifndef FEATURE_DS3231
 #define FEATURE_DS3231 0
 #endif
-#if FEATURE_DS3231 && FEATURE_TOUCH_WHEEL && !FEATURE_HAPTIC_DRV2605
+#if FEATURE_DS3231 && FEATURE_TOUCH_WHEEL && !FEATURE_HAPTIC_DRV2605 && MONOPOD_BOARD == MONOPOD_BOARD_ESP32
 #error "DS3231 uses I2C 32/33; six-electrode touch wheel owns those pins. Select four-sector wheel with Haptic or disable touch."
 #endif
 class ClockService {

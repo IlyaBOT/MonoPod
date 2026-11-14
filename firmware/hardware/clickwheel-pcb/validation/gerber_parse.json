@@ -1,0 +1,56 @@
+{
+  "parser": "PyGerber 2.4.3, strict mode",
+  "layers": {
+    "MonoPod_ClickWheel-B_Mask.gbs": {
+      "min_x_mm": "85.853545",
+      "max_x_mm": "114.146455",
+      "min_y_mm": "-114.146455",
+      "max_y_mm": "-85.853545",
+      "width_mm": "28.292910",
+      "height_mm": "28.292910"
+    },
+    "MonoPod_ClickWheel-Edge_Cuts.gm1": {
+      "min_x_mm": "77.950000",
+      "max_x_mm": "122.050000",
+      "min_y_mm": "-122.050000",
+      "max_y_mm": "-77.950000",
+      "width_mm": "44.100000",
+      "height_mm": "44.100000"
+    },
+    "MonoPod_ClickWheel-F_Cu.gtl": {
+      "min_x_mm": "79.250000",
+      "max_x_mm": "120.0000000",
+      "min_y_mm": "-118.8500000",
+      "max_y_mm": "-81.1500000",
+      "width_mm": "40.7500000",
+      "height_mm": "37.7000000"
+    },
+    "MonoPod_ClickWheel-F_Mask.gts": {
+      "min_x_mm": "79.950000",
+      "max_x_mm": "120.050000",
+      "min_y_mm": "-118.900000",
+      "max_y_mm": "-81.100000",
+      "width_mm": "40.100000",
+      "height_mm": "37.800000"
+    },
+    "MonoPod_ClickWheel-F_Paste.gtp": {
+      "min_x_mm": "80.0000000",
+      "max_x_mm": "120.0000000",
+      "min_y_mm": "-118.8500000",
+      "max_y_mm": "-81.1500000",
+      "width_mm": "40.0000000",
+      "height_mm": "37.7000000"
+    },
+    "MonoPod_ClickWheel-F_Silkscreen.gto": {
+      "min_x_mm": "79.890000",
+      "max_x_mm": "120.110000",
+      "min_y_mm": "-120.673855",
+      "max_y_mm": "-79.253855",
+      "width_mm": "40.220000",
+      "height_mm": "41.420000"
+    }
+  },
+  "drill_overlay": "Excellon coordinates and diameters, no manual redraw",
+  "outline_centreline_diameter_mm": 44.0,
+  "outline_stroke_mm": 0.05
+}

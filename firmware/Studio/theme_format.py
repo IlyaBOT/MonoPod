@@ -1,7 +1,7 @@
 """MonoPod MPT1 font/theme format, using only user-supplied/local fonts.
 
 28-byte little-endian header: <4sBBBBHHHHHHII>
- magic, version, flags, bigHeight, smallHeight, bigCount, smallCount,
+ magic, version, flags (1=baseline-corrected), bigHeight, smallHeight, bigCount, smallCount,
  bg565, fg565, selection565, muted565, payload_size, crc32(payload)
 Followed by two sorted glyph tables. A record is <IBBB>: UTF32 codepoint,
 bitmap width, horizontal advance, reserved=0, then tightly packed 4bpp
@@ -69,17 +69,21 @@ def font_for(path, size):
     return ImageFont.load_default()
 
 
-def raster(char,font,height):
-    # Text is placed into a fixed-height virtual line to keep all glyphs
-    # including descenders consistent, rather than vertically centering each.
-    advance = max(1,min(32,round(font.getlength(char))+1))
-    box = font.getbbox(char)
-    width = max(1,min(24,max(advance,box[2]-min(box[0],0))))
-    im = Image.new('L',(width,height),0)
+def raster(char, font, height):
+    """Render with ONE baseline shared by every glyph (Pillow 'ls' anchor).
+
+    Old 'lt' aligned glyph ink-top independently, causing M/u/i/g to bounce.
+    The baseline stays fixed at y=12 (16px) or y=9 (12px), leaving descent
+    space for g/p/q/y and keeping the menu rows visually level.
+    """
+    advance = max(1, min(32, round(font.getlength(char)) + 1))
+    box = font.getbbox(char, anchor='ls')
+    width = max(1, min(24, max(advance, box[2], box[2]-min(box[0], 0))))
+    im = Image.new('L', (width, height), 0)
     d = ImageDraw.Draw(im)
-    # PIL top-origin anchor, keeps ascenders/descenders consistently aligned.
-    d.text((0,0), char, fill=255, font=font, anchor='lt')
-    return im,advance
+    baseline = 12 if height == 16 else 9 if height == 12 else max(0, height-4)
+    d.text((0, baseline), char, fill=255, font=font, anchor='ls')
+    return im, advance
 
 
 def glyph_table(path,size,height):
@@ -101,7 +105,7 @@ def encode_theme(opts):
     payload=glyph_table(opts.font_path,opts.main_size,16)+glyph_table(opts.font_path,opts.small_size,12)
     if len(payload)>MAX_BYTES:raise ValueError('Theme is larger than firmware limit')
     palette=[rgb565(c) for c in (opts.bg,opts.fg,opts.selected,opts.muted)]
-    header=HEADER.pack(b'MPT1',1,0,16,12,len(CHARS),len(CHARS),*palette,len(payload),binascii.crc32(payload)&0xffffffff)
+    header=HEADER.pack(b'MPT1',1,1,16,12,len(CHARS),len(CHARS),*palette,len(payload),binascii.crc32(payload)&0xffffffff)
     return header+payload
 
 
@@ -109,7 +113,7 @@ def verify_theme(raw):
     if len(raw)<HEADER.size:raise ValueError('Missing header')
     (magic,version,flags,main_h,small_h,mc,sc,*rest)=HEADER.unpack_from(raw)
     *colors,amount,crc=rest
-    if magic!=b'MPT1' or version!=1 or flags!=0 or main_h!=16 or small_h!=12:
+    if magic!=b'MPT1' or version!=1 or flags!=1 or main_h!=16 or small_h!=12:
         raise ValueError('Incompatible theme header')
     data=raw[HEADER.size:]
     if amount!=len(data) or amount>MAX_BYTES or binascii.crc32(data)&0xffffffff!=crc:
@@ -151,6 +155,10 @@ def demo_preview(opts):
                     im.putpixel((x+xx,y+yy),tuple(round(base[i]*(1-a)+fore[i]*a) for i in range(3)))
             x+=adv
     text_at(5,2,'iPod',opts.main_size,fg)
+    # 18x9 battery pictogram; this editor does not know the device voltage.
+    d.rectangle((136,6,154,14),outline=fg)
+    d.rectangle((155,9,156,11),fill=fg)
+    d.rectangle((138,8,148,12),fill=fg)  # sample battery level, preview only
     d.line((0,19,159,19),fill=fg)
     entries=('Music','Extras','Settings','Shuffle Songs','Backlight')
     for row,s in enumerate(entries):
@@ -161,6 +169,5 @@ def demo_preview(opts):
         if row<3:
             x=151
             d.polygon(((x,y+6),(x+5,y+9),(x,y+12)),fill=bg if selected else fg)
-    d.line((0,114,159,114),fill=fg)
-    text_at(5,115,'5 items',opts.small_size,fg)
+    # No meaningless "5 items" status bar in the main menu.
     return im

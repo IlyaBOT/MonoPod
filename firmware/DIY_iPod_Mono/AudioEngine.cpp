@@ -126,15 +126,15 @@ void AudioEngine::loop(){
     }
   }else {releaseDecoder();next(false);}
 }
+ #if FEATURE_BLUETOOTH
 bool AudioEngine::switchBluetooth(bool on){
-#if FEATURE_BLUETOOTH
   if(on==bluetoothOn)return true;
+  if(on && !btOutput.begin()){error="Bluetooth stack failed to start";return false;}
 
   int previous=activeTrack;
   std::vector<size_t> previousQueue=queue;
   releaseDecoder();activeTrack=-1;
   if(on){
-    btOutput.begin(); // start Bluetooth discovery before selecting headphones
     if(clickMix)clickMix->setTarget(&btOutput);
     sink=clickMix;
     btOutput.SetGain((settings.data.volume/100.0f)*(settings.data.volume/100.0f));
@@ -145,7 +145,5 @@ bool AudioEngine::switchBluetooth(bool on){
   }
   if(previous>=0)play(previous,previousQueue);
   return true;
-#else
-  (void)on;error="Bluetooth disabled in Config.h";return false;
-#endif
 }
+#endif // FEATURE_BLUETOOTH

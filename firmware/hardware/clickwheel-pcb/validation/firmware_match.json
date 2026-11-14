@@ -1,0 +1,20 @@
+{
+  "source_directory": "I:\\DIY_iPod_Mono\\MonoPod_v0.8.6\\DIY_iPod_Mono",
+  "profile": "MONOPOD_BOARD_ESP32_S3",
+  "ADC_GPIO": 9,
+  "touch_GPIOs": [
+    1,
+    2,
+    5,
+    6,
+    7,
+    8
+  ],
+  "attenuation": "ADC_11db",
+  "debounce_ms": 35,
+  "files": {
+    "Config.h": "d944de0cb46cf8a2465bedc12cba727a80c5fe9aecc6cc07874ce9423faad216",
+    "Input.cpp": "83a85da3a4a655efebce2b225634a3a0076491f85dcb3aa527e0208b4bf1d229",
+    "Input.h": "d7cf10bf3de28d190303d59aba04e1bdd8fd47f200814764a4aba17e0b2b5a4a"
+  }
+}
