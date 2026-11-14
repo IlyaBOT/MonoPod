@@ -10,6 +10,7 @@
 #include "ClickMixOutput.h"
 #if FEATURE_FLAC
 #include "ChunkedFlacSource.h"
+#include "FlacPictureSkipSource.h"
 #endif
 class AudioEngine {
 public:
@@ -52,6 +53,7 @@ private:
   AudioFileSourceSD *source=nullptr;
 #if FEATURE_FLAC
   ChunkedFlacSource *flacBuffer=nullptr;
+  FlacPictureSkipSource *flacCleanSource=nullptr;
 #endif
   AudioGenerator *decoder=nullptr;
   AudioOutputI2S *i2s=nullptr;

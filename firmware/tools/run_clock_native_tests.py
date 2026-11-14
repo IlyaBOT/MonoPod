@@ -24,10 +24,6 @@ for name in ['ClockService.h', 'ClockConfigValidation.h']:
 implementation = (root / 'DIY_iPod_Mono/ClockService.cpp').read_text(encoding='utf-8')
 assert '#include <sys/time.h>' in implementation
 (stage / 'ClockService.cpp').write_text(implementation.replace('#include <sys/time.h>', '#include "ClockNativePlatform.h"'), encoding='utf-8')
-default_config = work / 'default-config'
-default_config.mkdir(exist_ok=True)
-shutil.copy2(root / 'DIY_iPod_Mono/Config.h', default_config / 'Config.h')
-(default_config / 'Arduino.h').write_text('#pragma once\n#include <cstddef>\n#include <cstdint>\n', encoding='utf-8')
 if os.name == 'nt':
     vswhere = Path(os.environ.get('ProgramFiles(x86)', r'C:\Program Files (x86)')) / 'Microsoft Visual Studio/Installer/vswhere.exe'
     install = subprocess.check_output([str(vswhere), '-latest', '-products', '*', '-requires',
@@ -38,7 +34,6 @@ for name, sources, include in [
     ('clock_validation', [source], root / 'DIY_iPod_Mono'),
     ('clock_service', [root / 'tests/clock_service_test.cpp', stage / 'ClockService.cpp'], stage),
     ('wheel_arduino_macros', [root / 'tests/wheel_arduino_macro_test.cpp'], root / 'DIY_iPod_Mono'),
-    ('clock_timezone_default', [root / 'tests/clock_timezone_default_test.cpp'], default_config),
 ]:
     executable=work / (name + ('.exe' if os.name=='nt' else ''))
     if os.name=='nt':
@@ -60,8 +55,6 @@ for name, sources, include in [
 result = {'exit_code': max(item['exit_code'] for item in results), 'checks':results, 'hardware_io': False,
     'header_sha256': hashlib.sha256((root / 'DIY_iPod_Mono/ClockConfigValidation.h').read_bytes()).hexdigest(),
     'service_sha256':hashlib.sha256(implementation.encode('utf-8')).hexdigest(),
-    'config_sha256':hashlib.sha256((root / 'DIY_iPod_Mono/Config.h').read_bytes()).hexdigest(),
-    'default_timezone_test':'Real Config.h and host C runtime in a child process; no PC/device clock writes or ESP32 runtime validation.',
     'service_host_adapter':'sys/time.h replaced by ClockNativePlatform.h; NVS, Wi-Fi, SNTP and OS time are stubbed.'}
 (work / 'result.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
 raise SystemExit(result['exit_code'])

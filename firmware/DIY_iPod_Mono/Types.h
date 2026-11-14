@@ -12,7 +12,15 @@ enum class Category : uint8_t { Artist, Album, Genre, Folder, Playlist };
 enum class RepeatMode : uint8_t { Off=0, One=1, All=2 };
 enum class ClickerMode : uint8_t { Off=0, Speaker=1, Headphones=2, Both=3 };
 struct Track {
-  String path, title, artist, album, genre, folder;
+  String path, title, artist, album, albumArtist, genre, folder, extension, codec;
+  uint64_t fileSize=0;
+  uint32_t modifiedUnix=0; // FAT last write; 0 means invalid/unknown
+  uint32_t fingerprint=0;  // CRC32 of sampled content, NOT full-file integrity
+  uint32_t fullCrc32=0;    // 0 = not verified with full-file CRC32
+  uint32_t durationMs=0;
+  uint32_t sampleRate=0;
+  uint32_t bitrateKbps=0;
+  uint16_t trackNumber=0;
   uint32_t durationSeconds=0; // 0=unknown; ID3 TLEN or WAV duration
   uint16_t year=0; // 0=unknown; ID3 TDRC/TYER or ID3v1
   uint32_t flacSampleRate=0; // FLAC STREAMINFO, needed for sample-accurate seek

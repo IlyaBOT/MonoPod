@@ -5,7 +5,11 @@
 class MediaLibrary {
 public:
   bool begin(bool scanOnMount=true);
-  void rescan();
+  void rescan(bool verifyFingerprints=false);
+  void markDirty(const String& path="/",uint32_t fullCRC=0);
+  bool dirty()const{return indexDirty;}
+  uint32_t generation()const{return indexGeneration;}
+  bool indexReady()const{return indexReady_;}
   void eject();
   bool remount(){return begin();}
   bool formatCard();  // guarded: never formats a different drive accidentally
@@ -24,6 +28,13 @@ public:
 private:
   std::vector<Track> tracks;
   bool mounted=false;
+  bool indexDirty=true,indexReady_=false;
+  uint32_t indexGeneration=0;
+  std::vector<Track> oldIndex;
+  std::vector<String> dirtyPaths;
+  std::vector<uint32_t> dirtyCRCs;
+  bool verifyFingerprintsNow=false,indexChanged=false;
+  unsigned reused=0,parsed=0;
   uint32_t activeSpiHz=0;
   String error;
   void scanFolder(const String &path,uint8_t depth);

@@ -1,3 +1,21 @@
+## v0.10.7.1 — Skip embedded FLAC cover art
+
+- Virtual FLAC stream replaces PICTURE metadata payload with empty PADDING headers, without changing files on microSD.
+- Avoids reading 9+ MiB images into the decoder; retains all audio/metadata and FLAC seek support.
+- Added a native regression test using a 9 MiB cover and random seek checks.
+- See `README_FLAC_PICTURE_SKIP_v0.10.7.1_RU.md`.
+
+## v0.10.7.0 — MonoPodDB indexed media library
+
+- Сохраняемый индекс `/MonoPod/MonoPodDB` с CRC32-контролем целостности самой БД и безопасной заменой через `.tmp/.bak`.
+- Быстрый повторный scan: сравнение размера и FAT mtime, CRC32-отпечаток заголовка/хвоста при недостоверной дате и точечная инвалидация после Sync.
+- Теги Title / Artist / Album / Album Artist / Year / Genre / Track Number, длительность, codec, bitrate, sample rate, размер, timestamp, sampled CRC32 и известный полный CRC32 загрузки.
+- Wi-Fi: `/api/library/info`, `/api/library/refresh`, `/api/library/db`. USB: `MPOD1 X DBINFO`, `DBREFRESH`, `DBREAD` (Sync Protocol v4 не изменён).
+- Даты FAT 1980/1981 считаются неизвестными и передаются как нулевые.
+- Эталонный Python-клиент с редактированием тегов MP3/FLAC и задача для интеграции в MonoPod Desktop.
+
+Полное описание: `docs/README_MONOPODDB_v1_RU.md`. **В самом MonoPod Desktop UI ещё не интегрировано:** исходники Desktop не были приложены, см. задание для Codex.
+
 # MonoPod v0.10.6.8 — ESP32 / ESP32-S3
 
 **Новое в v0.10.6.8:** адаптивный FLAC ring buffer до 2 МиБ в PSRAM (доступно для ESP32-S3 N16R8), с резервом >= 50% свободной PSRAM; старт по 12 КиБ без ожидания заполнения. Предыдущие изменения: см. `README_FLAC_AUDIO_CORE_v0.10.6.8.md` — потоковый FLAC, метаданные и seek, аудиозадача Core 0, расширенный I2S DMA.

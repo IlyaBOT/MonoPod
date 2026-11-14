@@ -7,6 +7,7 @@
 #include <new>
 #include "Id3Parser.h"
 #include "FlacMetadata.h"
+#include "MonoPodDB.h"
 #if FEATURE_SD_FORMAT
 #define DISABLE_FS_H_WARNING
 #include <SdFat.h>
@@ -24,7 +25,7 @@ static uint32_t bigEndian4(const uint8_t* p) {
 }
 // MP3 duration: exact when Xing/Info frame count is available; otherwise CBR estimate.
 // Accurate remaining time needs TLEN/Xing. Unknown files display --:-- instead.
-static uint32_t probeMp3Duration(const String& path){
+static uint32_t probeMp3Duration(const String& path,Track& track){
   File f=SD.open(path.c_str());if(!f)return 0;
   uint32_t start=0;
   uint8_t id3[10];
@@ -54,6 +55,7 @@ static uint32_t probeMp3Duration(const String& path){
     const int sampleRate=base[sampleIndex]>>(version==3?0:(version==2?1:2));
     const int samplesPerFrame=(version==3?1152:576);
     if(!rate||!sampleRate)continue;
+    track.sampleRate=sampleRate;track.bitrateKbps=rate;
     // MPEG layer III Xing/Info frame count, including optional CRC and side information.
     const int mono=((b[i+3]>>6)&3)==3;
     const int side=(version==3?(mono?17:32):(mono?9:17));
@@ -98,8 +100,40 @@ bool MediaLibrary::begin(bool scanOnMount) {
   error="microSD mount failed (check CS GPIO, MISO, wiring and filesystem)";
   return false;
 }
-void MediaLibrary::rescan() {
-  tracks.clear();if(!mounted)return;
+void MediaLibrary::markDirty(const String& path,uint32_t fullCRC){
+  indexDirty=true;
+  // Persistent marker closes the reboot-after-write, before-rescan window.
+  if(mounted){
+    if(!SD.exists("/MonoPod"))SD.mkdir("/MonoPod");
+    File f=SD.open("/MonoPod/.MonoPodDB.dirty",FILE_WRITE);
+    if(f){f.print(path);f.print('\t');f.println(MonoPodDB::hex32(fullCRC));f.flush();f.close();}
+  }
+}
+void MediaLibrary::rescan(bool verifyFingerprints) {
+  if(!mounted)return;
+  verifyFingerprints=verifyFingerprints||SD.exists("/MonoPod/.MonoPodDB.dirty");
+  dirtyPaths.clear();dirtyCRCs.clear();
+  if(SD.exists("/MonoPod/.MonoPodDB.dirty")){
+    File changed=SD.open("/MonoPod/.MonoPodDB.dirty",FILE_READ);
+    // Bound the recovery journal even when it is corrupt.
+    while(changed && changed.available() && dirtyPaths.size()<Config::MAX_TRACKS){
+      String value=changed.readStringUntil('\n');value.trim();
+      int sep=value.indexOf('\t');
+      if(sep<0)continue;
+      String path=value.substring(0,sep);uint32_t crc=0;
+      if(path.length() && path.length()<=240 && MonoPodDB::hexNumber(value.substring(sep+1),crc)){
+        dirtyPaths.push_back(path);dirtyCRCs.push_back(crc);
+      }
+    }
+    if(changed)changed.close();
+  }
+  // Load the last committed cache. An interrupted write is automatically rolled back.
+  oldIndex.clear();uint32_t oldGeneration=0;
+  bool oldValid=MonoPodDB::load(oldIndex,oldGeneration);
+  indexGeneration=oldValid?oldGeneration:0;
+  std::sort(oldIndex.begin(),oldIndex.end(),[](const Track& a,const Track& b){return a.path.compareTo(b.path)<0;});
+  tracks.clear();indexReady_=false;verifyFingerprintsNow=verifyFingerprints;
+  indexChanged=!oldValid;reused=0;parsed=0;
   // Large contiguous Track storage prefers PSRAM via the ESP32 heap allocator.
   // Allocate once, avoiding transient vector-growth copies during long scans.
 #if defined(ARDUINO_ARCH_ESP32)
@@ -110,6 +144,19 @@ void MediaLibrary::rescan() {
   if(tracks.empty()) scanFolder("/",0);
   std::sort(tracks.begin(),tracks.end(),[](const Track &a,const Track &b){return strLess(a.title,b.title);});
   if(tracks.size()>=Config::MAX_TRACKS) error="Library limit reached";
+  // Removed files are absent from the newly enumerated list; save rebuilds the
+  // full live set, rather than leaving stale/tombstone records.
+  if(tracks.size()!=oldIndex.size())indexChanged=true;
+  if(indexChanged){
+    if(MonoPodDB::save(tracks,indexGeneration+1))indexGeneration++;
+    else error="MonoPodDB save failed; will rebuild on next scan";
+  }
+  indexReady_=MonoPodDB::dbSize()!=0;
+  indexDirty=!indexReady_ || error=="MonoPodDB save failed; will rebuild on next scan";
+  if(!indexDirty && SD.exists("/MonoPod/.MonoPodDB.dirty"))SD.remove("/MonoPod/.MonoPodDB.dirty");
+  MONOPOD_LOG.printf("MonoPodDB: generation=%lu reused=%u parsed=%u tracks=%u %s\n",
+    (unsigned long)indexGeneration,reused,parsed,(unsigned)tracks.size(),indexDirty?"DIRTY":"OK");
+  oldIndex.clear();oldIndex.shrink_to_fit();dirtyPaths.clear();dirtyCRCs.clear();
   // The index owns String metadata; actual RAM use depends on filename/ID3 lengths.
   // Report heap state so 1024+ track builds can be validated on real hardware.
 #if defined(ARDUINO_ARCH_ESP32)
@@ -126,25 +173,61 @@ void MediaLibrary::scanFolder(const String &path,uint8_t depth) {
     String name=entry.name();
     if(!name.startsWith("/")) {name=path + (path=="/"?"":"/") + name;}
     bool isDir=entry.isDirectory();
+    uint32_t fileSize=entry.size();
+    uint32_t fileMtime=(uint32_t)entry.getLastWrite();
+    if(!MonoPodDB::validTime(fileMtime))fileMtime=0;
     entry.close(); // avoid too many open File handles while descending
     if(isDir) {
       if(!name.startsWith("/System Volume") && !name.startsWith("/iPod_Control"))scanFolder(name,depth+1);
     } else if(isAudio(name)) {
+      // Size+mtime is the fast path. Unknown FAT dates (1980/1981) always
+      // require the sampled fingerprint, so same-size tag edits can be seen.
+      const auto it=std::lower_bound(oldIndex.begin(),oldIndex.end(),name,
+        [](const Track& a,const String& n){return a.path.compareTo(n)<0;});
+      bool exists=(it!=oldIndex.end()&&it->path==name);
+      uint32_t fp=0;bool unchanged=false;
+      bool explicitlyChanged=false;
+      for(const auto& dirtyPath:dirtyPaths){
+        if(dirtyPath==name || dirtyPath=="/"){explicitlyChanged=true;break;}
+      }
+      if(exists && !explicitlyChanged && it->fileSize==fileSize && fileMtime && it->modifiedUnix==fileMtime && !verifyFingerprintsNow)
+        unchanged=true;
+      else if(exists && !explicitlyChanged && it->fileSize==fileSize){
+        fp=MonoPodDB::fingerprint(name);
+        unchanged=fp!=0 && fp==it->fingerprint;
+      }
+      if(unchanged){Track t=*it;t.fileSize=fileSize;
+        if(t.modifiedUnix!=fileMtime)indexChanged=true;
+        t.modifiedUnix=fileMtime;
+        if(fp)t.fingerprint=fp;
+        tracks.push_back(t);reused++;entry=dir.openNextFile();continue;}
       Track t;t.path=name;t.title=noExt(name);t.folder=parent(name);
-      t.album="Unknown Album";
-      t.artist="Unknown Artist";t.genre="Unknown Genre";
+      t.fileSize=fileSize;t.modifiedUnix=fileMtime;
+      t.album="Unknown Album";t.artist="Unknown Artist";t.genre="Unknown Genre";
+      int lastDot=name.lastIndexOf('.');if(lastDot>=0){t.extension=name.substring(lastDot);t.extension.toLowerCase();}
+      t.codec=t.extension.length()>1?t.extension.substring(1):String("unknown");t.codec.toUpperCase();
       metadata(t);
-      if(t.durationSeconds==0 && (name.endsWith(".mp3") || name.endsWith(".MP3")))t.durationSeconds=probeMp3Duration(name);
+      if(t.extension==".mp3"){
+        uint32_t probed=probeMp3Duration(name,t);
+        if(!t.durationSeconds)t.durationSeconds=probed;
+      }
       // Read canonical PCM WAV header (RIFF/WAVE, fmt/data). Do not estimate MP3 VBR duration.
       if(name.endsWith(".wav") || name.endsWith(".WAV")){
         File wf=SD.open(name.c_str()); uint8_t wh[44];
         if(wf && wf.read(wh,sizeof(wh))==sizeof(wh) && memcmp(wh,"RIFF",4)==0 && memcmp(wh+8,"WAVE",4)==0 && memcmp(wh+12,"fmt ",4)==0){
+          t.sampleRate=(uint32_t)wh[24]|((uint32_t)wh[25]<<8)|((uint32_t)wh[26]<<16)|((uint32_t)wh[27]<<24);
           uint32_t bytesPerSecond=(uint32_t)wh[28]|((uint32_t)wh[29]<<8)|((uint32_t)wh[30]<<16)|((uint32_t)wh[31]<<24);
           if(bytesPerSecond && memcmp(wh+36,"data",4)==0){uint32_t dataBytes=(uint32_t)wh[40]|((uint32_t)wh[41]<<8)|((uint32_t)wh[42]<<16)|((uint32_t)wh[43]<<24);t.durationSeconds=(dataBytes+bytesPerSecond/2)/bytesPerSecond;}
         }
         if(wf)wf.close();
       }
-      tracks.push_back(t);
+      if(t.durationMs==0)t.durationMs=t.durationSeconds*1000;
+      if(!t.bitrateKbps && t.durationMs)
+        t.bitrateKbps=(uint32_t)(((uint64_t)t.fileSize*8*1000)/(uint64_t)t.durationMs/1000);
+      if(!t.fingerprint)t.fingerprint=fp?fp:MonoPodDB::fingerprint(name);
+      for(size_t changed=0;changed<dirtyPaths.size();changed++)
+        if(dirtyPaths[changed]==name && dirtyCRCs[changed])t.fullCrc32=dirtyCRCs[changed];
+      tracks.push_back(t);parsed++;indexChanged=true;
     }
     entry=dir.openNextFile();
   }
@@ -161,10 +244,13 @@ void MediaLibrary::metadata(Track &t) {
       if(flac.artist[0])t.artist=flac.artist;
       if(flac.album[0])t.album=flac.album;
       if(flac.genre[0])t.genre=flac.genre;
+      if(flac.albumArtist[0])t.albumArtist=flac.albumArtist;
+      t.trackNumber=flac.trackNumber;
       if(flac.year)t.year=flac.year;
       t.durationSeconds=flac.durationSeconds;
       t.flacSampleRate=flac.sampleRate;
-      t.flacTotalSamples=flac.totalSamples;
+      t.flacTotalSamples=flac.totalSamples;t.sampleRate=flac.sampleRate;
+      if(flac.sampleRate)t.durationMs=(uint32_t)((flac.totalSamples*1000ULL)/flac.sampleRate);
     }
     return;
   }
@@ -176,6 +262,8 @@ void MediaLibrary::metadata(Track &t) {
     if(tags.artist[0])t.artist=tags.artist;
     if(tags.album[0])t.album=tags.album;
     if(tags.genre[0])t.genre=tags.genre;
+    if(tags.albumArtist[0])t.albumArtist=tags.albumArtist;
+    t.trackNumber=tags.trackNumber;
     if(tags.year)t.year=tags.year;
     if(tags.durationSeconds)t.durationSeconds=tags.durationSeconds;
   }
@@ -240,7 +328,7 @@ void MediaLibrary::readPlaylistNames(std::vector<String>& out)const {
 }
 
 void MediaLibrary::eject(){
-  tracks.clear();
+  tracks.clear();oldIndex.clear();indexReady_=false;indexDirty=true;
   if(mounted){SD.end();mounted=false;}
   activeSpiHz=0;
   error="Card safely ejected";

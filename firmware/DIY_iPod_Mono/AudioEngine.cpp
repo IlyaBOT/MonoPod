@@ -85,6 +85,7 @@ void AudioEngine::releaseDecoder() {
   if(decoder){decoder->stop();delete decoder;decoder=nullptr;}
 #if FEATURE_FLAC
   if(flacBuffer){delete flacBuffer;flacBuffer=nullptr;}
+  if(flacCleanSource){delete flacCleanSource;flacCleanSource=nullptr;}
 #endif
   if(source){source->close();delete source;source=nullptr;}
 }
@@ -103,7 +104,14 @@ bool AudioEngine::startFile(size_t index) {
   else if(p.endsWith(".wav"))decoder=new AudioGeneratorWAV();
 #if FEATURE_FLAC
   else if(p.endsWith(".flac")){
-    flacBuffer=new ChunkedFlacSource(source);
+    flacCleanSource=new FlacPictureSkipSource(source);
+    if(!flacCleanSource || !flacCleanSource->valid()){
+      error="Malformed FLAC metadata";releaseDecoder();activeTrack=-1;return false;
+    }
+    if(flacCleanSource->skippedPictures())
+      MONOPOD_LOG.printf("FLAC: ignored %u artwork block(s), %lu bytes (no allocation)\n",
+        flacCleanSource->skippedPictures(),(unsigned long)flacCleanSource->skippedBytes());
+    flacBuffer=new ChunkedFlacSource(flacCleanSource);
     if(flacBuffer)MONOPOD_LOG.printf("FLAC: compressed buffer=%lu KiB, free PSRAM=%lu KiB\n",
       (unsigned long)(flacBuffer->capacityBytes()/1024),
       (unsigned long)(heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)/1024));

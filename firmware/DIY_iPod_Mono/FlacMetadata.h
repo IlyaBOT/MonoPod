@@ -7,7 +7,8 @@
 
 namespace FlacMetadata {
 struct Info {
-  char title[81]={},artist[81]={},album[81]={},genre[81]={};
+  char title[81]={},artist[81]={},album[81]={},albumArtist[81]={},genre[81]={};
+  uint16_t trackNumber=0;
   uint16_t year=0;
   uint32_t sampleRate=0;
   uint64_t totalSamples=0;
@@ -60,6 +61,8 @@ template<typename FileT> static bool comments(FileT& f,uint32_t length,Info& inf
     if(eqAscii(field,eq,"TITLE"))boundedCopy(info.title,sizeof(info.title),value,n);
     else if(eqAscii(field,eq,"ARTIST"))boundedCopy(info.artist,sizeof(info.artist),value,n);
     else if(eqAscii(field,eq,"ALBUM"))boundedCopy(info.album,sizeof(info.album),value,n);
+    else if(eqAscii(field,eq,"ALBUMARTIST")||eqAscii(field,eq,"ALBUM ARTIST"))boundedCopy(info.albumArtist,sizeof(info.albumArtist),value,n);
+    else if(eqAscii(field,eq,"TRACKNUMBER")){uint16_t no=0;for(size_t j=0;j<n;j++){if(value[j]<'0'||value[j]>'9')break;no=no*10+(value[j]-'0');if(no>999)break;}if(no>0&&no<=999)info.trackNumber=no;}
     else if(eqAscii(field,eq,"GENRE"))boundedCopy(info.genre,sizeof(info.genre),value,n);
     else if(eqAscii(field,eq,"DATE")||eqAscii(field,eq,"YEAR")){
       if(n>=4 && value[0]>='0'&&value[0]<='9'&&value[1]>='0'&&value[1]<='9'&&value[2]>='0'&&value[2]<='9'&&value[3]>='0'&&value[3]<='9')

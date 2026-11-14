@@ -9,6 +9,7 @@
 #include "Settings.h"
 #include "ClockService.h"
 #include "ClockConfigValidation.h"
+#include "MonoPodDB.h"
 #include <WiFi.h>
 WiFiSyncService wifiSync;
 #if FEATURE_WIFI_SYNC
@@ -87,6 +88,49 @@ void WiFiSyncService::routes(){
  server.on("/api/ota/upload",HTTP_POST,[this](){otaFinished();},[this](){otaUpload();});
  server.on("/api/info",HTTP_GET,[this](){server.send(200,"application/json",SyncFiles::info());});
  server.on("/api/storage",HTTP_GET,[this](){if(allowed())server.send(200,"application/json",SyncFiles::info());});
+ server.on("/api/library/info",HTTP_GET,[this](){
+   if(!allowed())return;
+   server.send(200,"application/json",String("{\"schema\":1,\"generation\":")+String(media.generation())+
+     ",\"count\":"+String((unsigned)media.size())+",\"size\":"+String(MonoPodDB::dbSize())+
+     ",\"dirty\":"+(media.dirty()?"true":"false")+"}");
+ });
+ server.on("/api/library/refresh",HTTP_POST,[this](){
+   if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}
+   // Force sampled CRC even if timestamp/size match (metadata edits).
+   media.rescan(true);
+   if(media.dirty()){server.send(500,"text/plain","DB_WRITE_FAILED");return;}
+   server.send(200,"application/json",String("{\"ok\":true,\"generation\":")+String(media.generation())+
+     ",\"count\":"+String((unsigned)media.size())+"}");
+ });
+ server.on("/api/library/db",HTTP_GET,[this](){
+   if(!allowed())return;
+   if(media.dirty()||!media.indexReady()){server.send(409,"text/plain","DB_STALE_REFRESH_REQUIRED");return;}
+   uint32_t offset=0,count=0;
+   if(!number(server.arg("offset"),offset)||!number(server.arg("count"),count)||count>16384){server.send(400,"text/plain","INVALID_RANGE");return;}
+   File db=SD.open(MonoPodDB::PATH,FILE_READ);
+   if(!db){server.send(500,"text/plain","DB_READ");return;}
+   const uint32_t size=db.size();if(offset>size){db.close();server.send(416,"text/plain","INVALID_RANGE");return;}
+   const uint32_t total=min(count,size-offset);uint32_t crc=~0u;
+   uint8_t chunk[512];
+   if(!db.seek(offset)){db.close();server.send(500,"text/plain","DB_SEEK");return;}
+   for(uint32_t sent=0;sent<total;){
+     const size_t step=min((uint32_t)sizeof(chunk),total-sent);
+     const size_t got=db.read(chunk,step);
+     if(got!=step){db.close();server.send(500,"text/plain","DB_READ");return;}
+     crc=MonoPodDB::crcStep(crc,chunk,got);sent+=got;
+   }
+   if(!db.seek(offset)){db.close();server.send(500,"text/plain","DB_SEEK");return;}
+   server.sendHeader("X-CRC32",MonoPodDB::hex32(~crc));
+   server.sendHeader("X-DB-Generation",String(media.generation()));
+   server.setContentLength(total);server.send(200,"application/octet-stream","");
+   for(uint32_t sent=0;sent<total;){
+     const size_t step=min((uint32_t)sizeof(chunk),total-sent);
+     const size_t got=db.read(chunk,step);
+     if(got!=step)break;
+     if(server.client().write(chunk,got)!=got)break;sent+=got;yield();
+   }
+   db.close();
+ });
  server.on("/api/fs/list",HTTP_GET,[this](){if(!allowed())return;uint32_t offset=0,limit=32;if((server.hasArg("offset")&&!number(server.arg("offset"),offset))||(server.hasArg("limit")&&!number(server.arg("limit"),limit))||limit>32||!limit){server.send(400,"text/plain","INVALID_ARGUMENTS");return;}String json=SyncFiles::list(server.arg("path"),offset,limit,SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);});
  auto stat=[this](){if(!allowed())return;String json=SyncFiles::stat(server.arg("path"),SyncTransport::WiFi);if(json.length())server.send(200,"application/json",json);else result(false);};
  server.on("/api/fs/stat",HTTP_GET,stat);server.on("/api/fs/metadata",HTTP_GET,stat);
@@ -106,7 +150,7 @@ void WiFiSyncService::routes(){
  server.on("/api/theme",HTTP_POST,[this](){finished();},[this](){upload();});
  server.on("/api/smoothing",HTTP_POST,[this](){if(!allowed())return;if(!server.hasArg("enabled")){server.send(400,"text/plain","Missing enabled");return;}settings.data.fontSmoothing=server.arg("enabled")=="1";settings.markDirty();result(true);});
  server.on("/api/theme/reset",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}if(SD.exists("/MonoPod/theme.mpt")&&!SD.remove("/MonoPod/theme.mpt")){server.send(500,"text/plain","DELETE_FAILED");return;}theme.unload();display.palette(settings.data.contrast);result(true);});
- server.on("/api/scan",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}media.rescan();result(true);});
+ server.on("/api/scan",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}media.rescan(true);if(media.dirty())server.send(500,"text/plain","DB_WRITE_FAILED");else result(true);});
  server.on("/api/sync/end",HTTP_POST,[this](){if(!allowed())return;if(busy()){server.send(409,"text/plain","TRANSFER_ACTIVE");return;}server.send(200,"application/json","{\"ok\":true}");stopRequested=true;});
  server.on("/api/clock",HTTP_POST,[this](){
    if(!allowed())return;
@@ -142,6 +186,6 @@ void WiFiSyncService::begin(){
  if(!routesReady){routes();routesReady=true;}wifiOta.newSession();server.begin();running=true;stopRequested=false;
  MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP at http://%s:80\n",usingSta?"LAN":"AP",ip().c_str());ui.redraw();
 }
-void WiFiSyncService::end(){if(!running||busy())return;wifiOta.stopSession();server.stop();if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}running=false;stopRequested=false;media.rescan();syncMode.leave(SyncTransport::WiFi);if(!usingSta)wifiNetworks.resumeAfterSync();ui.begin();}
+void WiFiSyncService::end(){if(!running||busy())return;wifiOta.stopSession();server.stop();if(!usingSta){WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);}running=false;stopRequested=false;media.rescan(true);syncMode.leave(SyncTransport::WiFi);if(!usingSta)wifiNetworks.resumeAfterSync();ui.begin();}
 void WiFiSyncService::loop(){if(running){if(usingSta)wifiNetworks.tick();server.handleClient();SyncFiles::tick();wifiOta.loop();if(uploadActive&&!SyncFiles::busy()){uploadActive=false;uploadOk=false;}if(stopRequested)end();}}
 #endif

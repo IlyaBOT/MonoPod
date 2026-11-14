@@ -140,20 +140,20 @@ constexpr bool TFT_BL_ACTIVE_LOW = false; // direct GPIO15 LED/BL, active-high; 
 constexpr bool TFT_BL_BRIGHTNESS_CONTROL = false;
 constexpr uint32_t TFT_BL_PWM_HZ = 16000;
 constexpr uint8_t TFT_BL_PWM_BITS = 10;
-constexpr uint16_t TFT_BL_FADE_ON_MS = 350;
-// Calibration from prototype measurement: Vbat=4.22 V when GPIO4=2.10 V.
+constexpr uint16_t TFT_BL_FADE_ON_MS = 250;
+// Calibration from prototype measurement: Vbat=4.23 V when GPIO4=2.10 V.
 // Applied to analogReadMilliVolts() output, not raw 12-bit ADC counts.
 // Effective conversion: Vbat = ADC_mV * BATTERY_ADC_RATIO / 1000 + BATTERY_ADC_OFFSET_V.
-constexpr float BATTERY_ADC_RATIO = 4.22f / 2.10f;
+constexpr float BATTERY_ADC_RATIO = 4.23f / 2.10f;
 constexpr float BATTERY_ADC_OFFSET_V = 0.0f;
-constexpr float BATTERY_FULL_VOLTAGE = 4.22f;
+constexpr float BATTERY_FULL_VOLTAGE = 4.23f;
 // Voltage-only charge indication (NOT proof of current flowing into the cell).
 // Starts STRICTLY above 2.15 V at GPIO4, clears below 2.13 V (20 mV hysteresis).
 // Use a TP4056 CHRG/STAT signal for reliable charging detection on future PCB.
 constexpr uint16_t BATTERY_CHARGE_ADC_ON_MV = 2150;
 constexpr uint16_t BATTERY_CHARGE_ADC_OFF_MV = 2130;
 constexpr uint32_t BATTERY_SAMPLE_INTERVAL_MS = 60000UL;
-constexpr uint16_t TFT_BL_FADE_OFF_MS = 500;
+constexpr uint16_t TFT_BL_FADE_OFF_MS = 400;
 // Minimum visible splash duration; SD library scan and STA connection overlap it.
 constexpr uint32_t BOOT_LOGO_MIN_MS = 1850UL;
 constexpr uint8_t MAX_VOLUME = 100; // clamp 0..100, no wraparound
@@ -167,7 +167,7 @@ constexpr char WIFI_AP_PASS[] = "MonoPod2026!"; // CHANGE before enabling Wi-Fi 
 constexpr char BT_TARGET_NAME[] = ""; // only built for original ESP32
 #endif
 constexpr uint16_t SCREEN_W = 160, SCREEN_H = 128;
-constexpr char TIMEZONE_TZ[] = "UTC-3"; // Moscow UTC+03:00; POSIX uses the opposite offset sign. Saved NVS timezone takes precedence.
+constexpr char TIMEZONE_TZ[] = "UTC0"; // POSIX TZ string for user timezone
 }
 // Real prototype ADC, six capacitive wheel electrodes and Wi-Fi Sync.
 #ifndef FEATURE_BATTERY_ADC

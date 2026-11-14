@@ -7,6 +7,7 @@
 #include "WiFiSync.h"
 #include "ClockService.h"
 #include "ClockConfigValidation.h"
+#include "MonoPodDB.h"
 #include <errno.h>
 UsbSyncService usbSync;
 #if FEATURE_USB_SYNC
@@ -22,7 +23,7 @@ void UsbSyncService::command(const String& cmd){
  if(cmd=="MPOD1 HELLO"){reply(String("READY 4 SD=")+(media.sdOK()?"1":"0"));return;}
  if(cmd=="MPOD1 X INFO"||cmd=="MPOD1 X STORAGE"){reply("OK "+SyncFiles::info());return;}
  if(cmd=="MPOD1 SYNC START"){if(!media.sdOK()){reply("ERR NO_SD");return;}reply(syncMode.enter(SyncTransport::UsbCdc)?"OK SYNC_STARTED":"ERR SYNC_BUSY");return;}
- if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan();syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
+ if(cmd=="MPOD1 SYNC END"){if(sending||SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}if(!syncMode.is(SyncTransport::UsbCdc)){reply("ERR NO_USB_SYNC");return;}media.rescan(true);syncMode.leave(SyncTransport::UsbCdc);ui.begin();reply("OK SYNC_ENDED");return;}
  if(!SyncFiles::gate(SyncTransport::UsbCdc)){reply("ERR "+SyncFiles::error);return;}
  if(cmd.startsWith("MPOD1 X CLOCK ")){
   int p=14;String epochText=token(cmd,p),tzText=token(cmd,p),ntpText=token(cmd,p),serverText=token(cmd,p);
@@ -49,7 +50,26 @@ void UsbSyncService::command(const String& cmd){
   clockService.setUnix((time_t)epoch);
   reply("OK CLOCK_SET");return;
  }
- if(cmd=="MPOD1 SCAN"){if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}media.rescan();reply("OK SCANNED "+String((unsigned)media.size()));return;}
+ if(cmd=="MPOD1 SCAN"){if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}media.rescan(true);reply("OK SCANNED "+String((unsigned)media.size()));return;}
+ if(cmd=="MPOD1 X DBINFO"){
+  reply(String("OK {\"schema\":1,\"generation\":")+String(media.generation())+
+    ",\"count\":"+String((unsigned)media.size())+",\"size\":"+String(MonoPodDB::dbSize())+
+    ",\"dirty\":"+(media.dirty()?"true":"false")+"}");return;
+ }
+ if(cmd=="MPOD1 X DBREFRESH"){
+  if(SyncFiles::busy()){reply("ERR TRANSFER_ACTIVE");return;}
+  media.rescan(true);
+  if(media.dirty())reply("ERR DB_WRITE_FAILED");
+  else reply(String("OK GENERATION ")+String(media.generation()));return;
+ }
+ if(cmd.startsWith("MPOD1 X DBREAD ")){
+  if(media.dirty()||!media.indexReady()){reply("ERR DB_STALE_REFRESH_REQUIRED");return;}
+  int pos=15;uint32_t offset=0,count=0;
+  if(!uintArg(token(cmd,pos),offset)||!uintArg(token(cmd,pos),count)||count>1024){reply("ERR INVALID_RANGE");return;}
+  size_t got=0;if(!MonoPodDB::read(offset,buffer,count,got)){reply("ERR DB_READ");return;}
+  reply("DATA "+String(got)+" "+MonoPodDB::hex32(~MonoPodDB::crcStep(~0u,buffer,got)));
+  Serial.write(buffer,got);return;
+ }
  if(cmd.startsWith("MPOD1 X ")){
   int i=8;String op=token(cmd,i),path=SyncFiles::fromHex(token(cmd,i));
   if(op=="SMOOTH"){String value=cmd.substring(15);if(value!="0" && value!="1"){reply("ERR ARGUMENTS");return;}settings.data.fontSmoothing=(value=="1");settings.markDirty();reply("OK SMOOTHING");return;}

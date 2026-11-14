@@ -30,7 +30,7 @@ def test_id3_uses_new_decoder():
 
 def test_fw_version_updated_protocol_unchanged():
     for fname in ('DIY_iPod_Mono.ino','UI.cpp','SyncFiles.cpp'):
-        assert '0.10.6' in (ROOT/fname).read_text()
+        assert '0.10.7' in (ROOT/fname).read_text()
     assert '"protocol":4' in (ROOT/'SyncFiles.cpp').read_text().replace('\\','')
 
 

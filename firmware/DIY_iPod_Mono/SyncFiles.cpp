@@ -4,6 +4,7 @@
 #include "Display.h"
 #include "Settings.h"
 #include "ClockService.h"
+#include "MonoPodDB.h"
 #include <WiFi.h>
 namespace SyncFiles {
 String error;
@@ -16,7 +17,7 @@ bool active=false,isTheme=false;
 bool fail(const char* text){error=text;return false;}
 bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes"||p=="/monopod";}
 String number(uint64_t n){char buf[24];snprintf(buf,sizeof(buf),"%llu",(unsigned long long)n);return String(buf);}
-String entry(File& f,const String& path){return "{\"name\":"+quote(path.substring(path.lastIndexOf('/')+1))+",\"path\":"+quote(path)+",\"directory\":"+(f.isDirectory()?"true":"false")+",\"size\":"+number(f.size())+",\"modified\":"+number(f.getLastWrite())+"}";}
+String entry(File& f,const String& path){uint32_t modified=(uint32_t)f.getLastWrite();bool valid=MonoPodDB::validTime(modified);return "{\"name\":"+quote(path.substring(path.lastIndexOf('/')+1))+",\"path\":"+quote(path)+",\"directory\":"+(f.isDirectory()?"true":"false")+",\"size\":"+number(f.size())+",\"modified\":"+number(valid?modified:0)+",\"modified_valid\":"+(valid?"true":"false")+"}";}
 }
 uint32_t crcStep(uint32_t c,const uint8_t* b,size_t n){for(size_t i=0;i<n;i++){c^=b[i];for(uint8_t j=0;j<8;j++)c=(c>>1)^((c&1)?0xedb88320UL:0);}return c;}
 String quote(const String& s){String out="\"";for(size_t i=0;i<s.length();i++){uint8_t c=s[i];if(c=='"'||c=='\\'){out+='\\';out+=(char)c;}else if(c<32){char h[7];snprintf(h,sizeof(h),"\\u%04x",c);out+=h;}else out+=(char)c;}return out+'"';}
@@ -51,7 +52,7 @@ String info(){
  formats+=",\".aac\"";
 #endif
  formats+="]";
- return "{\"firmware\":\"0.10.6.9\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"ntp_server\":"+quote(clockService.ntpServer())+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"ntp_server\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\",\"ota_update_v1\"]}";
+ return "{\"firmware\":\"0.10.7.1\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"ntp_server\":"+quote(clockService.ntpServer())+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"ntp_server\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\",\"ota_update_v1\",\"library_db_v1\",\"library_refresh\"]}";
 }
 String stat(const String& path,SyncTransport who){String p;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return "";File f=SD.open(p.c_str());if(!f){fail("NOT_FOUND");return "";}String result=entry(f,p);f.close();return result;}
 String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who){
@@ -64,10 +65,11 @@ String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who)
 }
 bool read(const String& path,uint32_t offset,uint8_t* buffer,size_t count,size_t& got,SyncTransport who){String p;got=0;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return false;if(count>65536)return fail("INVALID_COUNT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()||offset>f.size()){f.close();return fail("INVALID_RANGE");}if(offset==f.size()){f.close();return true;}if(!f.seek(offset)){f.close();return fail("SEEK_FAILED");}size_t n=min(count,(size_t)(f.size()-offset));int actual=f.read(buffer,n);f.close();if(actual<0||(size_t)actual!=n)return fail("SD_READ");got=n;return true;}
 bool mkdir(const String& path,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(SD.exists(p.c_str()))return fail("ALREADY_EXISTS");return SD.mkdir(p.c_str())||fail("MKDIR_FAILED");}
-bool remove(const String& path,bool directory,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(protectedRoot(p))return fail("PROTECTED_ROOT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()!=directory){f.close();return fail("WRONG_TYPE");}if(directory){File child=f.openNextFile();if(child){child.close();f.close();return fail("DIRECTORY_NOT_EMPTY");}}f.close();return (directory?SD.rmdir(p.c_str()):SD.remove(p.c_str()))||fail("DELETE_FAILED");}
-bool rename(const String& path,const String& dest,SyncTransport who){String p,q;if(!gate(who)||active||!canonical(path,p)||!canonical(dest,q))return false;if(protectedRoot(p)||protectedRoot(q))return fail("PROTECTED_ROOT");if(SD.exists(q.c_str()))return fail("ALREADY_EXISTS");if(!SD.exists(p.c_str()))return fail("NOT_FOUND");if(q.startsWith(p+"/"))return fail("INVALID_PATH");return SD.rename(p.c_str(),q.c_str())||fail("RENAME_FAILED");}
+bool remove(const String& path,bool directory,SyncTransport who){String p;if(!gate(who)||active||!canonical(path,p))return false;if(protectedRoot(p))return fail("PROTECTED_ROOT");File f=SD.open(p.c_str());if(!f)return fail("NOT_FOUND");if(f.isDirectory()!=directory){f.close();return fail("WRONG_TYPE");}if(directory){File child=f.openNextFile();if(child){child.close();f.close();return fail("DIRECTORY_NOT_EMPTY");}}f.close();bool ok=directory?SD.rmdir(p.c_str()):SD.remove(p.c_str());if(ok)media.markDirty(p);return ok||fail("DELETE_FAILED");}
+bool rename(const String& path,const String& dest,SyncTransport who){String p,q;if(!gate(who)||active||!canonical(path,p)||!canonical(dest,q))return false;if(protectedRoot(p)||protectedRoot(q))return fail("PROTECTED_ROOT");if(SD.exists(q.c_str()))return fail("ALREADY_EXISTS");if(!SD.exists(p.c_str()))return fail("NOT_FOUND");if(q.startsWith(p+"/"))return fail("INVALID_PATH");bool ok=SD.rename(p.c_str(),q.c_str());if(ok){media.markDirty(p);media.markDirty(q);}return ok||fail("RENAME_FAILED");}
 void recover(){
  if(!media.sdOK()||active)return;
+ if(SD.exists(JOURNAL))media.markDirty();
 
  if(SD.exists(JOURNAL)){File j=SD.open(JOURNAL);String p=j?j.readStringUntil('\n'):String();if(j)j.close();p.trim();String checked;if(!canonical(p,checked,p=="/MonoPod/theme.mpt"))return;
   if(SD.exists(BACKUP)){if(SD.exists(p.c_str())){if(!SD.remove(BACKUP))return;}else if(!SD.rename(BACKUP,p.c_str()))return;}
@@ -101,7 +103,7 @@ bool commit(){
  File j=SD.open(JOURNAL,FILE_WRITE);if(!j){abort();return fail("JOURNAL_WRITE");}j.println(dest);j.flush();j.close();
  if(old&&!SD.rename(dest.c_str(),BACKUP)){SD.remove(JOURNAL);abort();return fail("BACKUP_RENAME");}
  if(!SD.rename(PART,dest.c_str())){if(old)SD.rename(BACKUP,dest.c_str());if(!SD.exists(BACKUP))SD.remove(JOURNAL);abort();return fail("COMMIT_FAILED");}
- active=false;target="";
+ active=false;target="";media.markDirty(dest,checksum);
  if(installTheme&&!display.reloadTheme()){
   SD.remove(dest.c_str());if(old)SD.rename(BACKUP,dest.c_str());display.reloadTheme();if(!SD.exists(BACKUP))SD.remove(JOURNAL);return fail("THEME_ACTIVATION_FAILED");
  }

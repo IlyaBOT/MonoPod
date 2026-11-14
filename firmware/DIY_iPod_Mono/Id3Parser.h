@@ -15,7 +15,8 @@ constexpr uint32_t kMaxTagScan=32UL*1024UL*1024UL;
 constexpr uint32_t kMaxFrameHeaders=8192; // avoid unbounded I/O on malformed tags
 constexpr uint32_t kMaxTextFrame=4096; // heap, never allocated on the task stack
 struct Tags {
-  char title[kValueSize]={},artist[kValueSize]={},album[kValueSize]={},genre[kValueSize]={};
+  char title[kValueSize]={},artist[kValueSize]={},album[kValueSize]={},albumArtist[kValueSize]={},genre[kValueSize]={};
+  uint16_t trackNumber=0;
   uint32_t durationSeconds=0;
   uint16_t year=0;
 };
@@ -143,12 +144,16 @@ template<class Reader> bool parse(Reader& f,Tags& tags){
         if(ver==2){
           if(!memcmp(fh,"TT2",3))name="TIT2";
           else if(!memcmp(fh,"TP1",3))name="TPE1";
+          else if(!memcmp(fh,"TP2",3))name="TPE2";
+          else if(!memcmp(fh,"TRK",3))name="TRCK";
           else if(!memcmp(fh,"TAL",3))name="TALB";
           else if(!memcmp(fh,"TCO",3))name="TCON";
           else if(!memcmp(fh,"TLE",3))name="TLEN";
           else if(!memcmp(fh,"TYE",3))name="TYER";
         }else if(!memcmp(fh,"TIT2",4))name="TIT2";
         else if(!memcmp(fh,"TPE1",4))name="TPE1";
+        else if(!memcmp(fh,"TPE2",4))name="TPE2";
+        else if(!memcmp(fh,"TRCK",4))name="TRCK";
         else if(!memcmp(fh,"TALB",4))name="TALB";
         else if(!memcmp(fh,"TCON",4))name="TCON";
         else if(!memcmp(fh,"TLEN",4))name="TLEN";
@@ -181,6 +186,8 @@ template<class Reader> bool parse(Reader& f,Tags& tags){
             if(value[0]){
               if(!strcmp(name,"TIT2"))copyIfMissing(tags.title,value);
               else if(!strcmp(name,"TPE1"))copyIfMissing(tags.artist,value);
+              else if(!strcmp(name,"TPE2"))copyIfMissing(tags.albumArtist,value);
+              else if(!strcmp(name,"TRCK")){unsigned long n=strtoul(value,nullptr,10);if(n>0&&n<=65535)tags.trackNumber=n;}
               else if(!strcmp(name,"TALB"))copyIfMissing(tags.album,value);
               else if(!strcmp(name,"TCON"))copyIfMissing(tags.genre,value);
               else if(!strcmp(name,"TDRC") || !strcmp(name,"TYER")){
@@ -214,6 +221,8 @@ template<class Reader> bool parse(Reader& f,Tags& tags){
       latin1Plain(v1+3,30,value,sizeof(value));copyIfMissing(tags.title,value);
       latin1Plain(v1+33,30,value,sizeof(value));copyIfMissing(tags.artist,value);
       latin1Plain(v1+63,30,value,sizeof(value));copyIfMissing(tags.album,value);
+      // ID3v1.1: zero at comment[28] and track number in comment[29].
+      if(!tags.trackNumber && v1[125]==0 && v1[126]!=0)tags.trackNumber=v1[126];
       if(!tags.year && v1[93]>='0' && v1[93]<='9' && v1[94]>='0' && v1[94]<='9' &&
          v1[95]>='0' && v1[95]<='9' && v1[96]>='0' && v1[96]<='9')
         tags.year=(v1[93]-'0')*1000+(v1[94]-'0')*100+(v1[95]-'0')*10+(v1[96]-'0');
