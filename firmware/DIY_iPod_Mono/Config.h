@@ -121,14 +121,14 @@ constexpr uint8_t PIN_HAPTIC_SCL = 33;
 // Debounce / release guard apply to both ESP32 and ESP32-S3.
 constexpr uint16_t BUTTON_ADC_DEBOUNCE_MS = 60;
 constexpr uint16_t BUTTON_ADC_RELEASE_GUARD_MS = 100;
-constexpr uint16_t PIEZO_SCROLL_HZ = 100;
-constexpr uint16_t PIEZO_ACTION_HZ = 868;
+constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
+constexpr uint16_t PIEZO_ACTION_HZ = 2700;
 // Single SD SPI frequency, no diagnostic probing or speed fallback.
 // Conservative starting speed for breadboard wiring; tune after real testing.
 constexpr uint32_t SPI_SD_HZ = 8000000; // 4 MHz fallback if wiring/card is unreliable
 // ST7735S was at 16MHz. 20/26.67MHz are optional OVERCLOCK values,
 // not guaranteed by ST7735S datasheet. Keep stable default first.
-constexpr uint32_t SPI_TFT_HZ = 20000000; // experimentally test 20000000 later
+constexpr uint32_t SPI_TFT_HZ = 16000000; // experimentally test 20000000 later
 constexpr uint8_t TFT_ROTATION = 1;
 // P-channel high-side MOSFET on the separate TFT LED/BL anode: LOW = ON.
 // Set false only when using verified active-high PWM hardware.

@@ -75,7 +75,7 @@ void WiFiSyncService::otaFinished(){
  }else{
   if(wifiOta.inProgress()&&!wifiOta.restartPending())wifiOta.abort("INCOMPLETE_IMAGE");
   int status=error=="INVALID_PIN"||error=="PIN_LOCKED_RESTART_SYNC"?403:
-    error=="NO_OTA_PARTITION"?409:error=="TRANSFER_ACTIVE"?409:422;
+    error=="NO_OTA_PARTITION"?409:error=="LOW_SUPPLY_OR_BUTTON_HELD"?409:error=="TRANSFER_ACTIVE"?409:422;
   server.send(status,"application/json",String("{\"ok\":false,\"error\":\"")+error+"\"}");
  }
  ui.redraw();

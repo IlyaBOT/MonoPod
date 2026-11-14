@@ -24,6 +24,7 @@
 #include "IpodIdentity.h"
 #include "Feedback.h"
 #include "Battery.h"
+#include "PowerGuard.h"
 #if FEATURE_BLUETOOTH
 #include "BluetoothOutput.h"
 #endif
@@ -44,7 +45,7 @@ void setup(){
   Serial.begin(115200); // native USB CDC reserved for MPOD1 v4
 #endif
   delay(200);
-  MONOPOD_LOG.printf("\nMonoPod v0.10.7.1 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
+  MONOPOD_LOG.printf("\nMonoPod v0.10.7.2 / %s\n", MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3":"original ESP32");
 #if defined(ARDUINO_ARCH_ESP32)
   MONOPOD_LOG.printf("Chip=%s rev=%u, flash=%u B, PSRAM=%u B (%s), heap=%u B\n",
     ESP.getChipModel(),(unsigned)ESP.getChipRevision(),
@@ -54,6 +55,7 @@ void setup(){
     MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"ESP32-S3 N16R8":"ESP32-WROVER",FEATURE_BLUETOOTH?"enabled":"compiled out");
 #endif
   MONOPOD_LOG.println("Build: wheel interpolation / adaptive detents / precise seek / reliable clicks");
+  PowerGuard::earlyBoot(); // Before SD, settings, Wi-Fi, audio, touch, TFT init.
   settings.begin();
   backlight.begin(settings.data.backlightBrightness);
   battery.begin();
@@ -158,6 +160,7 @@ void loop(){
 #endif
   usbSync.loop();
   battery.loop();
+  PowerGuard::loop();
   ui.loop();
   clockService.loop();
   feedback.loop();

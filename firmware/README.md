@@ -1,3 +1,9 @@
+## v0.10.7.2 — HOLD Deep Sleep low-rail prototype
+
+- Critical 3V3 proxy on released GPIO9; show low-battery screen before full init.
+- Deep Sleep and HOLD LOCK→UNLOCK wake cycle on GPIO21.
+- See `README_POWER_GUARD_HOLD_v0.10.7.2_RU.md` for wiring and limitations.
+
 ## v0.10.7.1 — Skip embedded FLAC cover art
 
 - Virtual FLAC stream replaces PICTURE metadata payload with empty PADDING headers, without changing files on microSD.

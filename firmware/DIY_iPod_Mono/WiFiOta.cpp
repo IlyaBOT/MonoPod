@@ -1,6 +1,7 @@
 #include "WiFiOta.h"
 #if FEATURE_WIFI_SYNC
 #include "IpodIdentity.h"
+#include "PowerGuard.h"
 #include <Update.h>
 #include <esp_ota_ops.h>
 #include <esp_image_format.h>
@@ -71,7 +72,7 @@ void WiFiOtaService::newSession(){
 }
 void WiFiOtaService::stopSession(){abort();pinCode="";}
 String WiFiOtaService::info()const{
-  return String("{\"protocol\":1,\"firmware\":\"0.10.7.1\",\"board\":\"")+boardName()+
+  return String("{\"protocol\":1,\"firmware\":\"0.10.7.2\",\"board\":\"")+boardName()+
     "\",\"device_id\":\""+IpodIdentity::guid()+
     "\",\"supported\":"+(supported()?"true":"false")+
     ",\"max_image_bytes\":"+String(maxImageBytes())+
@@ -109,6 +110,7 @@ bool WiFiOtaService::start(const String& pin,const String& size,const String& di
   if(rebootQueued){lastError="REBOOT_PENDING";return false;}
   if(uploading||transferBusy){lastError="TRANSFER_ACTIVE";return false;}
   if(!supported()){lastError="NO_OTA_PARTITION";return false;}
+  if(!PowerGuard::voltageSafeForOta()){lastError="LOW_SUPPLY_OR_BUTTON_HELD";return false;}
   if(badPinAttempts>=5){lastError="PIN_LOCKED_RESTART_SYNC";return false;}
   // Constant-time comparison over 6 positions; never send/log the secret.
   uint8_t diff=(uint8_t)(pin.length()!=6 || pinCode.length()!=6);
