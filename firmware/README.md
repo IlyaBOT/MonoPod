@@ -1,3 +1,7 @@
+# MonoPod v0.9.1 — status bar and font smoothing
+
+See `CHANGELOG_v0.9.1.md`. Existing v0.9.0 features and firmware layout remain unchanged.
+
 # MonoPod v0.9.0 — Now Playing / GPU-style offscreen TFT / boot assets / battery
 
 See `CHANGELOG_v0.9.0.md`. Video player uses your own MP4 converted with `tools/convert_badapple.py`. Missing user video is not bundled.

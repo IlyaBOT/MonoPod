@@ -90,10 +90,13 @@ void Display::drawGlyph(int x,int y,uint32_t cp,uint16_t front,uint16_t back,boo
   const int height=small?12:16;
   for(int yy=0;yy<height;yy++){
     const int dy=y+yy;if(dy<0||dy>=128)continue;
-    uint32_t row=g.bits[yy];
     for(int xx=0;xx<g.advance;xx++){
-      int dx=x+xx;
-      if(dx>=0&&dx<160)surface().writePixel(OX+dx,OY+dy,(row&(0x80000000UL>>xx))?front:back);
+      const int dx=x+xx;
+      if(dx<0||dx>=160)continue;
+      uint8_t alpha=MonoFont::alpha(g,small,xx,yy);
+      if(!settings.data.fontSmoothing)alpha=(alpha>=8)?15:0;
+      surface().writePixel(OX+dx,OY+dy,
+        alpha==15?front:(alpha==0?back:blend565(back,front,alpha)));
     }
   }
 }
@@ -130,7 +133,7 @@ void Display::wifiSignal(uint8_t bars){
   if(bars>3)bars=3;
   for(uint8_t i=0;i<bars;i++){
     const int height=3+3*i;
-    surface().fillRect(OX+3+5*i,OY+16-height,3,height,fg);
+    surface().fillRect(OX+3+5*i,OY+15-height,3,height,fg);
   }
 }
 String Display::fittedTitle(const String& title, int width) const {
@@ -153,12 +156,12 @@ void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars
   surface().fillRect(OX,OY,160,20,bg);
   // Outer icons: network/lock at left, battery at right.  Title centered on x=80.
   wifiSignal(wifiBars);
-  if(held)smallText(20,3,"H",fg,bg);
+  if(held)smallText(20,4,"H",fg,bg);
   else if(playing){surface().fillRect(OX+22,OY+5,3,10,fg);surface().fillRect(OX+28,OY+5,3,10,fg);}
   const String fitted=fittedTitle(title,94);
   const int w=textWidth(fitted,false);
   const int x=(160-w)/2;
-  drawString(x,2,fitted,fg,bg,false,0,134);
+  drawString(x,3,fitted,fg,bg,false,0,134);
   batteryIcon();
   surface().drawFastHLine(OX,OY+19,160,fg);
 }
