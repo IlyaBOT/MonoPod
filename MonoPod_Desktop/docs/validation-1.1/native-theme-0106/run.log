@@ -1,9 +1,0 @@
-load csharp-mpt1.mpt: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels
-load csharp-mpt2.mpt: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels
-reject truncated, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
-reject crc, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
-reject glyph-width, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
-reject surrogate, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
-reject version, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
-reject glyph-count, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
-reject trailing-payload, retain active theme: PASS actual Theme.cpp 0.10.6: palette, 324 glyphs, 40624 alpha pixels; invalid replacement rejected, prior theme retained
