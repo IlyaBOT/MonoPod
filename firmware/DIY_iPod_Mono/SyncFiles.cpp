@@ -14,7 +14,7 @@ const char* JOURNAL="/.monopod-transfer.target";
 File output;String target;uint32_t expected=0,checksum=0,received=0,runningCRC=~0u,lastWrite=0;
 bool active=false,isTheme=false;
 bool fail(const char* text){error=text;return false;}
-bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes";}
+bool protectedRoot(String p){p.toLowerCase();return p=="/"||p=="/music"||p=="/playlists"||p=="/themes"||p=="/monopod";}
 String number(uint64_t n){char buf[24];snprintf(buf,sizeof(buf),"%llu",(unsigned long long)n);return String(buf);}
 String entry(File& f,const String& path){return "{\"name\":"+quote(path.substring(path.lastIndexOf('/')+1))+",\"path\":"+quote(path)+",\"directory\":"+(f.isDirectory()?"true":"false")+",\"size\":"+number(f.size())+",\"modified\":"+number(f.getLastWrite())+"}";}
 }
@@ -31,6 +31,9 @@ bool canonical(const String& in,String& out,bool theme){
   if(out.length()>1)out+='/';out+=part;
  }
  String low=out;low.toLowerCase();
+ // Explicit user media asset; permit generic USB/Wi-Fi file upload and download.
+ // Keep theme.mpt and other /MonoPod private files behind their own APIs.
+ if(low=="/monopod" || low=="/monopod/badapple.bav")return true;
  if(theme && low=="/monopod/theme.mpt")return true;
  if(low=="/monopod"||low.startsWith("/monopod/")||low=="/ipod_control"||low.startsWith("/ipod_control/")||low.startsWith("/system volume information")||low.startsWith("/$recycle.bin")||low.startsWith("/recycler"))return fail("PROTECTED_PATH");
  return true;
@@ -48,7 +51,7 @@ String info(){
  formats+=",\".aac\"";
 #endif
  formats+="]";
- return "{\"firmware\":\"0.10.5\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\"]}";
+ return "{\"firmware\":\"0.10.6\",\"protocol\":4,\"sd_ready\":"+String(media.sdOK()?"true":"false")+",\"total_bytes\":"+number(total)+",\"free_bytes\":"+number(total>=used?total-used:0)+",\"tracks\":"+String((unsigned)media.size())+",\"sync_mode\":"+quote(mode)+",\"ip\":"+quote(WiFi.status()==WL_CONNECTED?WiFi.localIP().toString():WiFi.softAPIP().toString())+",\"font_smoothing\":"+String(settings.data.fontSmoothing?"true":"false")+",\"ntp_enabled\":"+String(clockService.ntpEnabled()?"true":"false")+",\"timezone\":"+quote(clockService.timezone())+",\"clock_unix\":"+number(clockService.valid()?(uint64_t)time(nullptr):0)+",\"audio_formats\":"+formats+",\"capabilities\":[\"clock_sync\",\"ntp\",\"list\",\"stat\",\"read\",\"fs_upload\",\"upload\",\"delete\",\"mkdir\",\"rename\",\"theme\",\"theme_get\",\"scan\",\"metadata_ranges\",\"smoothing\",\"sync_end\"]}";
 }
 String stat(const String& path,SyncTransport who){String p;if(!gate(who)||!canonical(path,p,path=="/MonoPod/theme.mpt"))return "";File f=SD.open(p.c_str());if(!f){fail("NOT_FOUND");return "";}String result=entry(f,p);f.close();return result;}
 String list(const String& path,uint32_t offset,uint16_t limit,SyncTransport who){

@@ -67,7 +67,13 @@ constexpr uint8_t PIN_SD_CS = 14;
 constexpr uint8_t PIN_I2S_BCLK = 16;
 constexpr uint8_t PIN_I2S_LRC = 17;
 constexpr uint8_t PIN_I2S_DATA = 18;
-constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, 10k pull-up / resistor ladder
+constexpr uint8_t PIN_BUTTON_ADC = 9; // ADC1, internal pull-up + resistor ladder
+// ADC button ladder on S3 uses weak internal pull-up to 3V3; no 10k external pull-up.
+// Button resistor branches: MENU=0, PREV=2k2, NEXT=5k1, PLAY=10k, SELECT=22k.
+// The internal pull-up is not precision rated: verify measured ADC levels on the real board.
+constexpr bool BUTTON_ADC_INTERNAL_PULLUP = true;
+// mV thresholds nominally for ~45k internal pull-up. Tune using actual GPIO9 measurements.
+constexpr int BUTTON_ADC_BOUNDS_MV[5] = {75, 245, 470, 795, 1550};
 constexpr uint8_t PIN_BATTERY_ADC = 4; // ADC1, 100k/100k divider
 constexpr uint8_t PIN_HOLD = 21; // external 10k pull-up
 constexpr uint8_t WHEEL_PINS[6] = {1,2,5,6,7,8}; // all actual S3 touch channels
@@ -91,6 +97,9 @@ constexpr uint8_t PIN_SD_CS   = 21;
 constexpr uint8_t PIN_I2S_BCLK = 26;
 constexpr uint8_t PIN_I2S_LRC = 25;
 constexpr uint8_t PIN_I2S_DATA = 15;
+// Classic ESP32 GPIO34 cannot use an internal pull-up: retain external 10k resistor.
+constexpr bool BUTTON_ADC_INTERNAL_PULLUP = false;
+constexpr int BUTTON_ADC_BOUNDS_MV[5] = {200, 820, 1290, 1840, 2580};
 constexpr uint8_t PIN_BUTTON_ADC = 34;
 constexpr uint8_t PIN_BATTERY_ADC = 36;
 constexpr uint8_t PIN_HOLD = 35;

@@ -121,6 +121,17 @@ void Display::drawString(int x,int y,const String& value,uint16_t f,uint16_t b,b
 }
 void Display::text(int x,int y,const String& s,uint16_t f,uint16_t b,uint8_t limit){drawString(x,y,s,f,b,false,limit);}
 void Display::smallText(int x,int y,const String& s,uint16_t f,uint16_t b,uint8_t limit){drawString(x,y,s,f,b,true,limit);}
+void Display::serialText(int x,int y,const String& serial,uint16_t front,uint16_t back){
+  // Built-in 5x7 font has an exact 6px advance, compared to 8-10px for
+  // the regular 12px small font. A 16-char GUID takes 96px, so there is no
+  // cropping or scrolling and both S/N and the entire value fit on one row.
+  // The 2px y-offset visually aligns this 8px face with the 12px label.
+  surface().setTextSize(1);
+  surface().setTextWrap(false);
+  surface().setTextColor(front,back);
+  surface().setCursor(OX+x,OY+y+2);
+  surface().print(serial);
+}
 void Display::centerText(int y,const String& s,bool small,bool inv){
   const int w=textWidth(s,small);int x=max(2,(160-w)/2);
   drawString(x,y,s,inv?bg:fg,inv?hi:bg,small,0);
@@ -151,17 +162,21 @@ String Display::fittedTitle(const String& title, int width,bool small) const {
   }
   return result+dots;
 }
-void Display::header(const String& title,bool held,bool playing,uint8_t wifiBars,bool nowPlaying){
+void Display::header(const String& title,bool held,bool playbackActive,uint8_t wifiBars,bool nowPlaying,bool playbackPaused){
   surface().fillRect(OX,OY,160,20,bg);
-  // Now Playing reserves the left indicator for actual playback state.
-  if(nowPlaying){
+  // Show current playback status in *every* menu; while idle use Wi-Fi indicator.
+  // HOLD overrides the playback glyph; never show PAUSE for an inactive player.
+  if(held || playbackActive || nowPlaying){
     surface().fillRect(OX+2,OY,30,19,bg);
     if(held)smallText(20,5,"H",fg,bg);
-    else if(playing)surface().fillTriangle(OX+7,OY+4,OX+7,OY+15,OX+17,OY+9,themed(7,fg));
-    else {surface().fillRect(OX+7,OY+4,3,11,fg);surface().fillRect(OX+14,OY+4,3,11,fg);}
+    else if(playbackActive && playbackPaused){
+      surface().fillRect(OX+7,OY+4,3,11,themed(7,fg));
+      surface().fillRect(OX+14,OY+4,3,11,themed(7,fg));
+    }else if(playbackActive){
+      surface().fillTriangle(OX+7,OY+4,OX+7,OY+15,OX+17,OY+9,themed(7,fg));
+    }
   }else{
     wifiSignal(wifiBars);
-    if(held)smallText(20,5,"H",fg,bg);
   }
   headerTitleMarquee(title,0);
   batteryIcon();

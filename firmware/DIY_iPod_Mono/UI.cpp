@@ -23,7 +23,7 @@
 #include "IpodIdentity.h"
 #include <time.h>
 PlayerUI ui;
-void PlayerUI::begin(){page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
+void PlayerUI::begin(){page=Page::Home;lastHiddenTrack=player.active()?(int)player.current():-1;selectedSince=nowTitleSince=millis();marqueeSelection=-1;marqueeTitle="";lastMarqueeFrame=lastTitleFrame=UINT32_MAX;lastWiFiIndicator=255;lastPlaybackState=-1;blank=false;brightnessEditing=false;lastTouch=millis();backlight.wake();build();paint();}
 void PlayerUI::notify(const String& msg){blank=false;lastTouch=millis();backlight.wake();showMessage(msg);}
 void PlayerUI::navigate(Page next){
   history.push_back({page,selected,scroll,activeCategory,filter});
@@ -101,7 +101,10 @@ void PlayerUI::build(){
   case Page::Home:
     add("Music",0);add("Extras",1);add("Settings",2);
     add("Shuffle Songs",3,false);add("Backlight",4,false);
-    if(player.active())add("Now Playing",5,false);break;
+    // Do not display a stale Now Playing entry when playback is stopped or paused.
+    // Home is rebuilt whenever playState changes (0=stopped, 1=playing, 2=paused).
+    if(player.active() && !player.paused())add("Now Playing",5,true);
+    break;
   case Page::Music:
     add("Playlists",0);add("Artists",1);add("Albums",2);
     add("Songs",3);add("Genres",4);add("Folders",5);break;
@@ -251,7 +254,7 @@ void PlayerUI::open(){
         if(backlight.lit()){blank=true;backlight.sleep();}
         else{blank=false;backlight.wake();}
         dirty=true;break;
-      case 5:navigate(Page::NowPlaying);break;
+      case 5:if(player.active() && !player.paused())navigate(Page::NowPlaying);break;
     }return;
   }
   if(page==Page::Music){
@@ -651,7 +654,7 @@ void PlayerUI::paint(){
   const uint8_t bars=lastWiFiIndicator==5?3:(lastWiFiIndicator==4?0:lastWiFiIndicator);
   String headerText=title();
   if(page==Page::NowPlaying && clockService.valid())headerText=clockService.shortTime();
-  display.header(headerText,input.held() && !devConsole.hardwareDisabled(),player.active()&&!player.paused(),page==Page::NowPlaying?0:bars,page==Page::NowPlaying);
+  display.header(headerText,input.held() && !devConsole.hardwareDisabled(),player.active(),page==Page::NowPlaying?0:bars,page==Page::NowPlaying,player.paused());
   display.headerTitleMarquee(headerText,marqueeOffset(nowTitleSince,millis()));
   if(page==Page::WiFiPassword){paintKeyboard();}
 #if FEATURE_BLUETOOTH
@@ -692,17 +695,24 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.10.5";break;
+        case 3:value="0.10.6";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }
-        display.smallText(6,23+i*18,entry.title,display.foreground(),display.background());
-        // Long 16-char GUID is rendered on a separate small row (not clipped into the label).
+        const int rowY=23+i*18;
+        display.smallText(6,rowY,entry.title,display.foreground(),display.background());
+        if(entry.id==4){
+          // Full 16-digit device ID, directly after S/N + exactly two small-font spaces.
+          // The compact (6x8px) glyphs fit on one 160px row without ellipsis.
+          const int serialX=6+display.textWidth(entry.title,true)+display.textWidth("  ",true);
+          display.serialText(serialX,rowY,value,display.foreground(),display.background());
+          continue;
+        }
         const int valueWidth=display.textWidth(value,true);
         if(valueWidth<92){
-          display.smallText(155-valueWidth,23+i*18,value,display.foreground(),display.background());
+          display.smallText(155-valueWidth,rowY,value,display.foreground(),display.background());
         }else{
-          display.smallText(70,23+i*18,display.fittedTitle(value,82),display.foreground(),display.background());
+          display.smallText(70,rowY,display.fittedTitle(value,82),display.foreground(),display.background());
         }
         continue;
       }
@@ -783,6 +793,13 @@ void PlayerUI::loop(){
     blank=false;backlight.wake();backlight.loop();
     if(dirty || millis()-lastRender>500UL)paint();
     return;
+  }
+  // Audio runs independently of the UI page; reflect play/pause on every screen.
+  const int8_t playState=player.active()?(player.paused()?2:1):0;
+  if(playState!=lastPlaybackState){
+    lastPlaybackState=playState;
+    if(page==Page::Home){build();}  // Show or hide Now Playing as playback starts/stops/pauses.
+    dirty=true;
   }
   wifiNetworks.tick();
   const bool wifiChanged=wifiNetworks.changed();
@@ -889,7 +906,7 @@ void PlayerUI::loop(){
     }
   }
   // Update only the Wi-Fi glyph while idle; do not clear/redraw the menu.
-  if(!blank && !dirty && page!=Page::NowPlaying){
+  if(!blank && !dirty && page!=Page::NowPlaying && !player.active() && !input.held()){
     const uint8_t next=wifiNetworks.indicator();
     if(next!=lastWiFiIndicator){
       lastWiFiIndicator=next;

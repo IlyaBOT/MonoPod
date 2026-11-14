@@ -34,6 +34,7 @@ private:
   String selectedText()const;
   uint32_t lastTouch=0,lastRender=0,sleepDeadline=0;
   uint8_t lastWiFiIndicator=255,lastBatteryBand=255;
+  int8_t lastPlaybackState=-1; // 0 idle, 1 playing, 2 paused; refresh status icon on transitions
   // Network password keyboard. MENU toggles case; SELECT types; NEXT joins;
   // PREVIOUS deletes; Play/Pause cancels, Scroll moves selection.
   String wifiSSID,wifiPassword;

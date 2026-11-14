@@ -1,11 +1,17 @@
 #include "Input.h"
 #include "Config.h"
 #include <math.h>
+#include <driver/gpio.h>
 InputManager input;
 void InputManager::begin() {
-  pinMode(Config::PIN_BUTTON_ADC,INPUT);
+  pinMode(Config::PIN_BUTTON_ADC, Config::BUTTON_ADC_INTERNAL_PULLUP ? INPUT_PULLUP : INPUT);
   analogReadResolution(12);
   analogSetPinAttenuation(Config::PIN_BUTTON_ADC,ADC_11db);
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+  // Reinstate pull-up after ADC config: ESP-IDF may reconfigure GPIO pads for analog input.
+  if (Config::BUTTON_ADC_INTERNAL_PULLUP)
+    gpio_pullup_en(static_cast<gpio_num_t>(Config::PIN_BUTTON_ADC));
+#endif
   pinMode(Config::PIN_HOLD, INPUT); // external 10k pull-up is mandatory
   hold=(digitalRead(Config::PIN_HOLD)==LOW);
 #if FEATURE_TOUCH_WHEEL
@@ -26,8 +32,22 @@ void InputManager::resetState(){
   hold=(digitalRead(Config::PIN_HOLD)==LOW);
 }
 Key InputManager::readButtons() {
-  const int mV=analogReadMilliVolts(Config::PIN_BUTTON_ADC);
-  // Single key supported, measured windows for 10k pullup / 0/2k2/4k7/10k/22k resistors.
+  // Three readings reduce noise from the weak internal pull-up / ADC acquisition.
+  const int a=analogReadMilliVolts(Config::PIN_BUTTON_ADC);
+  const int b=analogReadMilliVolts(Config::PIN_BUTTON_ADC);
+  const int c=analogReadMilliVolts(Config::PIN_BUTTON_ADC);
+  const int mV=a+b+c - min(a,min(b,c)) - max(a,max(b,c)); // median
+  if (Config::BUTTON_ADC_INTERNAL_PULLUP) {
+    // Nominal S3 voltages for 0/2k2/5k1/10k/22k with ~45k pull-up:
+    // 0, 154, 336, 600, 1084 mV. Keep the rest of the range as no key.
+    if(mV<Config::BUTTON_ADC_BOUNDS_MV[0])return Key::Menu;
+    if(mV<Config::BUTTON_ADC_BOUNDS_MV[1])return Key::Previous;
+    if(mV<Config::BUTTON_ADC_BOUNDS_MV[2])return Key::Next;
+    if(mV<Config::BUTTON_ADC_BOUNDS_MV[3])return Key::PlayPause;
+    if(mV<Config::BUTTON_ADC_BOUNDS_MV[4])return Key::Select;
+    return Key::None;
+  }
+  // Classic ESP32: keep the original 10k external pull-up thresholds.
   if(mV<200)return Key::Menu;
   if(mV>350 && mV<820)return Key::Previous;
   if(mV>870 && mV<1290)return Key::Next;

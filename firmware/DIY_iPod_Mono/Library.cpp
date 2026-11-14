@@ -14,6 +14,12 @@ MediaLibrary media;
 static String clipTag(String s) {s.trim(); if(s.length()>80) s.remove(80);return s;}
 static String noExt(String n) {int slash=n.lastIndexOf('/');if(slash>=0)n=n.substring(slash+1);int dot=n.lastIndexOf('.');if(dot>0)n.remove(dot);return n;}
 static bool strLess(String a,String b) {a.toLowerCase(); b.toLowerCase();return a.compareTo(b)<0;}
+static uint32_t bigEndian4(const uint8_t* p) {
+    return (uint32_t(p[0]) << 24) |
+           (uint32_t(p[1]) << 16) |
+           (uint32_t(p[2]) << 8)  |
+            uint32_t(p[3]);
+}
 // MP3 duration: exact when Xing/Info frame count is available; otherwise CBR estimate.
 // Accurate remaining time needs TLEN/Xing. Unknown files display --:-- instead.
 static uint32_t probeMp3Duration(const String& path){

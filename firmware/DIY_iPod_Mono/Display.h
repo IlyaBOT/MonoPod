@@ -15,7 +15,7 @@ public:
   void clear();
   void startFrame(); // draw offscreen when PSRAM/RAM is available
   void endFrame(); // one full-screen SPI transfer: no visible erase/flicker
-  void header(const String& title,bool held,bool playing,uint8_t wifiBars,bool nowPlaying=false);
+  void header(const String& title,bool held,bool playbackActive,uint8_t wifiBars,bool nowPlaying=false,bool playbackPaused=false);
   void wifiSignal(uint8_t bars); // refresh only the icon region; 0 hides it
   void footer(const String& message=""); // Explicit info only; no generic item counter
   void listRow(uint8_t row,const String& label,bool selected,bool submenu,int scrollPx=0);
@@ -23,6 +23,7 @@ public:
   void nowPlayingTitleMarquee(const String& label,int scrollPx);
   void text(int x,int y,const String& value,uint16_t front,uint16_t back,uint8_t maxChars=0);
   void smallText(int x,int y,const String& value,uint16_t front,uint16_t back,uint8_t maxChars=0);
+  void serialText(int x,int y,const String& serial,uint16_t front,uint16_t back); // Compact 6x8px hex serial, never ellipsized.
   void centerText(int y,const String& value,bool small=false,bool inverted=false);
   void fillRect(int x,int y,int w,int h,uint16_t color){surface().fillRect(x+OX,y+OY,w,h,color);}
   void progress(int x,int y,int w,int percent);

@@ -45,7 +45,7 @@ void DevelopmentConsole::printHelp(){
   MONOPOD_LOG.println("[DEV] $MENU $SELECT $SELECT_LONG $UP $DOWN $PREV $NEXT $PLAY");
   MONOPOD_LOG.println("[DEV] $KEY=MENU|SELECT|SELECT_LONG|UP|DOWN|PREV|NEXT|PLAY_PAUSE");
   MONOPOD_LOG.println("[DEV] $SCROLL=UP,5 | $SCROLL=DOWN,5 (max 32)");
-  MONOPOD_LOG.println("[DEV] $STATUS $BATTERY $SD $HELP");
+  MONOPOD_LOG.println("[DEV] $STATUS $BATTERY $BUTTON_ADC $SD $HELP");
   MONOPOD_LOG.println("[DEV] $CLICKER_MUTE=1|0 $CLICKER=1|0 $CLICKER_STATUS");
   MONOPOD_LOG.println("[DEV] $WIFI_STATUS (NVS/STA/RSSI, does not show password)");
   MONOPOD_LOG.println("[DEV] End commands with newline. No NVS persistence.");
@@ -55,6 +55,15 @@ void DevelopmentConsole::printStatus(){
     disabled?"DISABLED":"ENABLED",syncName(syncMode.transport()),(unsigned)repeats);
 }
 void DevelopmentConsole::handle(const char* command){
+  // The S3 internal ADC pull-up is weak and varies across chips. Capture the
+  // actual voltage for each button rather than assuming nominal 45k resistance.
+  if(strcmp(command,"$BUTTON_ADC")==0){
+    const uint32_t mv=analogReadMilliVolts(Config::PIN_BUTTON_ADC);
+    MONOPOD_LOG.printf("[DEV] BUTTON_ADC=%lu mV PIN=%u INTERNAL_PULLUP=%s\n",
+      (unsigned long)mv,(unsigned)Config::PIN_BUTTON_ADC,
+      Config::BUTTON_ADC_INTERNAL_PULLUP?"YES":"NO");
+    return;
+  }
   using namespace DevConsoleProtocol;
   const Command c=parse(command);
   switch(c.type){
