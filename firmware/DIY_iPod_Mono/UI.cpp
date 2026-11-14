@@ -641,7 +641,8 @@ void PlayerUI::paint(){
   if(syncMode.active()){
     blank=false;
     display.syncScreen(syncMode.is(SyncTransport::WiFi),
-                       syncMode.is(SyncTransport::WiFi)?wifiSync.busy():usbSync.busy());
+                       syncMode.is(SyncTransport::WiFi)?wifiSync.busy():usbSync.busy(),
+                       syncMode.is(SyncTransport::WiFi)?wifiSync.ip():String());
     display.endFrame();dirty=false;lastRender=millis();return;
   }
   display.clear();
@@ -687,7 +688,7 @@ void PlayerUI::paint(){
         case 1:value=String((unsigned long)(media.totalBytes()/(1024ULL*1024ULL)))+" MB";break;
         case 2:{uint64_t cap=media.totalBytes(),used=media.usedBytes();
           value=String((unsigned long)((cap>used?cap-used:0)/(1024ULL*1024ULL)))+" MB";break;}
-        case 3:value="0.9.1";break;
+        case 3:value="0.9.1.1";break;
         case 4:value=String(IpodIdentity::guid());break;
         case 5:value=MONOPOD_BOARD==MONOPOD_BOARD_ESP32_S3?"S3 N16R8":"ESP32";break;
         }

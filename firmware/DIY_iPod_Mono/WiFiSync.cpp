@@ -13,7 +13,10 @@
 #include "WiFiNetworks.h"
 WiFiSyncService wifiSync;
 #if FEATURE_WIFI_SYNC
-String WiFiSyncService::ip() const {return running?WiFi.softAPIP().toString():"Offline";}
+String WiFiSyncService::ip() const {
+  if(!running)return "Offline";
+  return apMode?WiFi.softAPIP().toString():WiFi.localIP().toString();
+}
 void WiFiSyncService::page(){
   server.send(200,"text/html; charset=utf-8",
     "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
@@ -24,7 +27,7 @@ void WiFiSyncService::page(){
     "<input type='file' name='track' accept='.mp3,.wav,.flac,.aac'>"
     "<button type='submit'>Upload</button></form>"
     "<button onclick=\"fetch('/time?unix='+Math.floor(Date.now()/1000)).then(()=>alert('Time set'))\">Set clock from this device</button>"
-    "<p>Local AP, HTTP only. No Internet required.</p>");
+    "<p>Local network or MonoPod AP. HTTP only; no public Internet exposure.</p>");
 }
 static String safeName(String s){
   int cut=max(s.lastIndexOf('/'),s.lastIndexOf('\\'));if(cut>=0)s=s.substring(cut+1);
@@ -177,13 +180,24 @@ void WiFiSyncService::begin(){
   }
   SD.remove("/Music/.monopod-wifi.part");
   // The moment the user explicitly starts Wi-Fi Sync, audio and UI are locked.
+  // Reuse an existing station connection; never disconnect it merely to enable Sync.
+  const bool staReady=(WiFi.status()==WL_CONNECTED);
+  if(!staReady && wifiNetworks.connecting()){
+    ui.notify("Wi-Fi connecting...");return;
+  }
   if(!syncMode.enter(SyncTransport::WiFi))return;
-  wifiNetworks.suspendForSync(); // AP owns radio until safe exit
-  WiFi.mode(WIFI_AP);
-  if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){
-    WiFi.mode(WIFI_OFF);syncMode.leave(SyncTransport::WiFi);
-    wifiNetworks.resumeAfterSync();
-    ui.notify("Wi-Fi AP failed");return;
+  apMode=!staReady;
+  if(apMode){
+    // Offline fallback only: give the PC a dedicated MonoPod-Sync access point.
+    wifiNetworks.suspendForSync();
+    WiFi.mode(WIFI_AP);
+    if(!WiFi.softAP(Config::WIFI_AP_SSID,Config::WIFI_AP_PASS)){
+      WiFi.mode(WIFI_OFF);
+      syncMode.leave(SyncTransport::WiFi);
+      wifiNetworks.resumeAfterSync();
+      apMode=false;
+      ui.notify("Wi-Fi AP failed");return;
+    }
   }
   server.on("/",HTTP_GET,[this](){page();});
   server.on("/time",HTTP_GET,[this](){
@@ -195,7 +209,7 @@ void WiFiSyncService::begin(){
   server.on("/upload",HTTP_POST,[this](){finished();},[this](){upload();});
   server.on("/api/theme",HTTP_POST,[this](){themeFinished();},[this](){themeUpload();});
   server.on("/api/info",HTTP_GET,[this](){
-    String body="{\"firmware\":\"MonoPod v0.8.7\",\"tracks\":"+String((unsigned)media.size())+
+    String body="{\"firmware\":\"MonoPod v0.9.1.1\",\"tracks\":"+String((unsigned)media.size())+
       ",\"sd_ready\":"+String(media.sdOK()?"true":"false")+
       ",\"sd_total_mb\":"+String((uint32_t)(media.totalBytes()/1024/1024))+
       ",\"sd_used_mb\":"+String((uint32_t)(media.usedBytes()/1024/1024))+
@@ -218,13 +232,26 @@ void WiFiSyncService::begin(){
   });
   server.onNotFound([this](){server.send(404,"text/plain","Not found");});
   server.begin();running=true;
+  MONOPOD_LOG.printf("[Wi-Fi Sync] %s HTTP listening at http://%s:80\n",
+    apMode?"AP":"LAN",ip().c_str());
+  if(apMode)MONOPOD_LOG.printf("[Wi-Fi Sync] Connect PC to SSID %s\n",Config::WIFI_AP_SSID);
+  ui.redraw(); // Sync screen must show the actual address, not the old AP default.
 }
 void WiFiSyncService::end(){
   if(!running || busy())return; // never close files or remove SD during HTTP transfer
   server.stop();if(uploadFile)uploadFile.close();if(themeUploadFile)themeUploadFile.close();
-  WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);running=false;
+  if(apMode){
+    WiFi.softAPdisconnect(true);WiFi.mode(WIFI_OFF);
+  }
+  running=false;
   syncMode.leave(SyncTransport::WiFi);
-  wifiNetworks.resumeAfterSync();
+  if(apMode)wifiNetworks.resumeAfterSync();
+  apMode=false;
 }
-void WiFiSyncService::loop(){if(running)server.handleClient();}
+void WiFiSyncService::loop(){
+  if(!running)return;
+  // Keep STA reconnects alive if the router briefly disappears during LAN Sync.
+  if(!apMode)wifiNetworks.tick();
+  server.handleClient();
+}
 #endif

@@ -40,7 +40,8 @@ def test_wifi_session_started_before_ap_and_no_exit_during_upload():
     assert 'uploadActive=false;' in src
     assert '"/Music/.monopod-wifi.target"' in src
     assert 'SD.rename(part,dest.c_str())' in src
-    assert 'WiFi.mode(WIFI_OFF);syncMode.leave(SyncTransport::WiFi)' in src
+    assert 'syncMode.leave(SyncTransport::WiFi)' in src
+    assert 'if(apMode)' in src
 
 def test_usb_connection_info_does_not_enter_sync():
     class Port:

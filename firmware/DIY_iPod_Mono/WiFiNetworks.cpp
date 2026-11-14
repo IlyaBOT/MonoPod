@@ -105,8 +105,8 @@ uint8_t WiFiNetworkManager::indicator() const {
   return 0;
 }
 void WiFiNetworkManager::tick(){
-  // The radio belongs exclusively to Wi-Fi Sync in AP mode.
-  if(suspended || syncMode.active())return;
+  // AP-mode Sync suspends STA. LAN-mode Sync keeps reconnect service alive.
+  if(suspended || (syncMode.active() && !syncMode.is(SyncTransport::WiFi)))return;
   const uint32_t now=millis();
   const bool online=connected();
   if(online){

@@ -30,7 +30,7 @@ public:
   void fillRect(int x,int y,int w,int h,uint16_t color){surface().fillRect(x+OX,y+OY,w,h,color);}
   void progress(int x,int y,int w,int percent);
   void clock(const String& dt);
-  void syncScreen(bool wifi, bool transferring);
+  void syncScreen(bool wifi, bool transferring, const String& address="");
   void nowPlaying(const String& title,const String& artist,const String& album,bool paused,uint32_t trackNumber,uint32_t trackCount);
   void nowPlayingControls(uint8_t mode,uint8_t progress,uint8_t volume,uint8_t scrub,uint32_t elapsed,uint32_t remaining,bool knownDuration);
   uint8_t batteryBand() const;

@@ -26,7 +26,8 @@ def test_ap_sync_exclusive_and_credentials_disconnect():
         assert 'p.remove("ssid")' in wifi and 'p.remove("pass")' in wifi
         assert 'wifiNetworks.suspendForSync()' in sync
         assert sync.count('wifiNetworks.resumeAfterSync()')>=2
-        assert 'if(suspended || syncMode.active())return;' in wifi
+        assert 'if(apMode)wifiNetworks.resumeAfterSync();' in sync
+        assert 'if(suspended || (syncMode.active() && !syncMode.is(SyncTransport::WiFi)))return;' in wifi
 
 def test_wifi_icon_is_three_bars_and_only_region_repainted():
     for folder in ('DIY_iPod_Mono','Wokwi_ILI9341'):

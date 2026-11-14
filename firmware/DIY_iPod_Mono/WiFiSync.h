@@ -18,6 +18,7 @@ private:
   bool themeUploadSuccess=false;
   String themeUploadError;
   size_t themeUploadSize=0;
+  bool apMode=false; // true only when no working STA association exists
   bool running=false, uploadSuccess=false;
   bool uploadActive=false,themeUploadActive=false;
   String uploadError,uploadName;

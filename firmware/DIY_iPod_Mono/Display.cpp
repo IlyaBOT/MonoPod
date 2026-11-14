@@ -188,7 +188,7 @@ void Display::progress(int x,int y,int w,int percent){
   surface().fillRect(OX+x+2,OY+y+2,w-4,4,bg);
   if(percent) surface().fillRect(OX+x+2,OY+y+2,(w-4)*percent/100,4,fg);
 }
-void Display::syncScreen(bool wifi,bool transferring){
+void Display::syncScreen(bool wifi,bool transferring,const String& address){
   clear();
   // Minimal 160x128 monochrome-like lock screen. No status bar/navigation.
   const int cx=80;
@@ -215,9 +215,10 @@ void Display::syncScreen(bool wifi,bool transferring){
   surface().setCursor(OX+45,OY+49);surface().print("SYNC");
   surface().setTextSize(1);
   const uint16_t color=fg,back=bg;
-  smallText(3,82,transferring?"DATA TRANSFER ACTIVE":(wifi?"Wi-Fi sync active":"USB sync active"),color,back);
-  smallText(3,96,"DO NOT REMOVE SD",color,back);
-  smallText(3,110,wifi?"KEEP Wi-Fi CONNECTED":"DO NOT UNPLUG USB",color,back);
+  smallText(3,77,transferring?"DATA TRANSFER ACTIVE":(wifi?"Wi-Fi sync active":"USB sync active"),color,back);
+  if(wifi && !address.isEmpty())smallText(3,91,"IP: "+address,color,back);
+  smallText(3,101,"DO NOT REMOVE SD",color,back);
+  smallText(3,113,wifi?"KEEP Wi-Fi CONNECTED":"DO NOT UNPLUG USB",color,back);
 }
 void Display::clock(const String& dt){centerText(47,dt,true);}
 static String timeLabel(uint32_t seconds){

@@ -1,3 +1,13 @@
+# MonoPod v0.9.1.1 — Wi-Fi Sync over LAN
+
+The player now keeps its existing STA connection to the router when entering Wi-Fi Sync. The HTTP service opens only after `Settings > Wi-Fi > Start Wi-Fi Sync`; it listens on the player's existing IP address on port 80. The Sync screen shows `IP: x.x.x.x`. In MonoPod Studio enter `http://x.x.x.x` (the old `192.168.4.1` is **only for AP fallback**).
+
+When no router association is active and no connection is in progress, Sync starts the old `MonoPod-Sync` softAP. Connect the PC to that Wi-Fi and use `http://192.168.4.1`.
+
+Never expose the HTTP service to the Internet: uploads and settings requests are **unencrypted and unauthenticated**. Use a trusted local LAN or the dedicated offline AP. Synchronization still requires explicit entry into Sync Mode, blocks normal controls and audio, and rejects exit while a file transfer is active.
+
+For details see `CHANGELOG_v0.9.1.1.md` and `docs/WiFi_Sync_LAN_v0.9.1.1_RU.md`.
+
 # MonoPod v0.9.1 — status bar and font smoothing
 
 See `CHANGELOG_v0.9.1.md`. Existing v0.9.0 features and firmware layout remain unchanged.
