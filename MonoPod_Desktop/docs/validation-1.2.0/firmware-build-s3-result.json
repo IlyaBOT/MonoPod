@@ -1,7 +1,0 @@
-{
-  "exit_code": 0,
-  "sketch": "I:\\DIY_iPod_Mono\\MonoPod_Desktop\\work\\ota-time-2026-11-01\\firmware-build-input\\DIY_iPod_Mono",
-  "fqbn": "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=cdc,FlashSize=16M,PSRAM=opi,PartitionScheme=custom",
-  "seconds": 1323.2004705,
-  "flashed": false
-}
