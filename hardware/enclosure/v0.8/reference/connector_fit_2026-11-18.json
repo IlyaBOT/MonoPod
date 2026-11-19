@@ -1,0 +1,459 @@
+{
+  "passed": true,
+  "version": "0.4.1",
+  "parameters_sha256": "8e1d576a22562857ea9e19eaead9f7bf9e0761193d800dcd36718b77760a6de6",
+  "generator_sha256": "93a91e8945fc88157d494ce00a76b789956b5d0399741d1e9d4b13423e627dfc",
+  "export_script_sha256": "f8c9a1ac6bf4cf8f78e2ac0e5b871131e3760afb38d45279144678164f379697",
+  "parts": {
+    "bottom_connector_insert": {
+      "step_sha256": "ccbda260d1d5bfaa8bd871d907c11757c132cbc27a6d5136f134d6791673eb24",
+      "stl_sha256": "24eef5fdc814db85c7a9a86f92a888276b062b644da114fa0afb13a30725b4f5",
+      "size_mm": [
+        54.0,
+        21.200000762939453,
+        4.550000190734864
+      ],
+      "volume_mm3": 2190.457574177758,
+      "pose": {
+        "rotation_x_degrees": 90,
+        "translation_xyz": [
+          39.0,
+          -2.5999999999999934,
+          74.0
+        ],
+        "mirrored": false
+      },
+      "watertight": true,
+      "step_roundtrip": true
+    },
+    "bottom_edge_coupon": {
+      "step_sha256": "9fbfcf8ba73ac1d90d5386bbed83c79d5d61d5b59e443c2049e7740edf874338",
+      "stl_sha256": "284e46f5549f4e8049d84cbea69ad77b6427c6770cc582848e2c79baa3d03a24",
+      "size_mm": [
+        94.0,
+        35.0,
+        23.600000381469727
+      ],
+      "volume_mm3": 11349.75179284526,
+      "pose": {
+        "rotation_x_degrees": 0,
+        "translation_xyz": [
+          47.0,
+          74.0,
+          26.0
+        ],
+        "mirrored": false
+      },
+      "watertight": true,
+      "step_roundtrip": true
+    }
+  },
+  "usb_shift_mm": {
+    "right": 1.0,
+    "up_towards_front": 0.5
+  },
+  "small_aperture_mm": [
+    9.6,
+    3.8
+  ],
+  "actual_aperture_difference_mm3": 0.0,
+  "hood_well_mm": [
+    11.5,
+    7.4,
+    2.299999999999997
+  ],
+  "usb_measured_web_mm": 0.7999999999999972,
+  "jack_measured_web_mm": 1.0,
+  "jack_exposed_thread_mm": 2.55,
+  "old_jack_exposed_thread_mm": 1.9499999999999997,
+  "extra_insertion_hood_overlaps_mm3": {
+    "insert": 0.0,
+    "chassis": 0.0,
+    "mainboard": 0.0,
+    "mainboard_component_keepout": 0.0,
+    "mainboard_rear_solder_keepout": 0.0,
+    "tp4056_pcb": 0.0,
+    "tp4056_components": 0.0,
+    "usb_c_shell": 0.0,
+    "jack_body": 0.0,
+    "jack_nut": 0.0
+  },
+  "back_chassis_and_coupon_match_existing": true,
+  "display_inputs_sha256": {
+    "Probnik.stl": "6b63d0f5a0def00dfb0ab4b937b5b3ba7e2561633f980633cb9b2c4df794e60c",
+    "Ramka.stl": "21b13895ec41c0820ad8f007c7925e2a4974a370c92f7694f005b9af3ea47241",
+    "README_RU.md": "eaae4e43238506768d4ad07c003f8f11e9a6ce6e0d53bf0df666351d32268f29"
+  },
+  "assembly": {
+    "passed": true,
+    "unintended_overlaps_mm3": {
+      "front_back": 0.0,
+      "front__clickwheel_frame": 0.0,
+      "front__clickwheel_wheel": 0.0,
+      "front__clickwheel_select": 0.0,
+      "front__clickwheel_pcb": 0.0,
+      "front__display_pcb": 0.0,
+      "front__display_glass": 0.0,
+      "front__display_rear_keepout": 0.0,
+      "front__screen_lens": 0.0,
+      "front__lens_adhesive_envelope": 0.0,
+      "back__mainboard": 0.0,
+      "back__mainboard_component_keepout": 0.0,
+      "back__mainboard_rear_solder_keepout": 0.0,
+      "back__tp4056_pcb": 0.0,
+      "back__tp4056_components": 0.0,
+      "back__usb_c_shell": 0.0,
+      "back__jack_body": 0.0,
+      "back__jack_nut": 0.0,
+      "back__hold_switch_body": 0.0,
+      "back__hold_lever": 0.0,
+      "back__hold_terminal_keepout": 0.0,
+      "back__display_rear_keepout": 0.0,
+      "back__clickwheel_assembly": 0.0,
+      "insert_back": 0.0,
+      "insert_front": 0.0,
+      "insert__mainboard": 0.0,
+      "insert__mainboard_component_keepout": 0.0,
+      "insert__mainboard_rear_solder_keepout": 0.0,
+      "insert__tp4056_pcb": 0.0,
+      "insert__tp4056_components": 0.0,
+      "insert__usb_c_shell": 0.0,
+      "insert__jack_body": 0.0,
+      "insert__jack_nut": 0.0,
+      "carrier__front": 0.0,
+      "carrier__back": 0.0,
+      "carrier__clickwheel_frame": 0.0,
+      "carrier__clickwheel_wheel": 0.0,
+      "carrier__clickwheel_select": 0.0,
+      "carrier__clickwheel_pcb": 0.0,
+      "carrier__clickwheel_assembly": 0.0,
+      "carrier__display_pcb": 0.0,
+      "carrier__display_glass": 0.0,
+      "carrier__display_active": 0.0,
+      "carrier__display_rear_keepout": 0.0,
+      "carrier__screen_lens": 0.0,
+      "carrier__lens_adhesive_envelope": 0.0,
+      "carrier__mainboard": 0.0,
+      "carrier__tp4056_pcb": 0.0,
+      "carrier__tp4056_components": 0.0,
+      "carrier__usb_c_shell": 0.0,
+      "carrier__jack_body": 0.0,
+      "carrier__jack_nut": 0.0,
+      "carrier__mainboard_component_keepout": 0.0,
+      "carrier__mainboard_rear_solder_keepout": 0.0,
+      "carrier__hold_switch_body": 0.0,
+      "carrier__hold_lever": 0.0,
+      "carrier__hold_terminal_keepout": 0.0,
+      "front__mainboard": 0.0,
+      "front__mainboard_component_keepout": 0.0,
+      "front__mainboard_rear_solder_keepout": 0.0,
+      "front__tp4056_pcb": 0.0,
+      "front__tp4056_components": 0.0,
+      "front__usb_c_shell": 0.0,
+      "front__jack_body": 0.0
+    },
+    "hold_sweep": [
+      {
+        "offset_x": -1.5,
+        "cap_back_overlap_mm3": 0.0,
+        "cap_lever_overlap_mm3": 0.0,
+        "cap_body_overlap_mm3": 0.0
+      },
+      {
+        "offset_x": 0,
+        "cap_back_overlap_mm3": 0.0,
+        "cap_lever_overlap_mm3": 0.0,
+        "cap_body_overlap_mm3": 0.0
+      },
+      {
+        "offset_x": 1.5,
+        "cap_back_overlap_mm3": 0.0,
+        "cap_lever_overlap_mm3": 0.0,
+        "cap_body_overlap_mm3": 0.0
+      }
+    ],
+    "wheel_down_clearance_overlap_mm3": 0.0,
+    "select_down_clearance_overlap_mm3": 0.0,
+    "imported_screw_pilot_interference_mm3": 9.248848772168234,
+    "expected_thread_forming_interference_mm3": 9.24884877216835,
+    "module_pair_overlaps_mm3": {
+      "wheel__display": 0.0,
+      "wheel__electronics": 0.0,
+      "wheel__jack_nut": 0.0,
+      "wheel__hold": 0.0,
+      "wheel__lens": 0.0,
+      "display__electronics": 0.0,
+      "display__jack_nut": 0.0,
+      "display__hold": 0.0,
+      "display__lens": 0.0,
+      "electronics__jack_nut": 0.0,
+      "electronics__hold": 0.0,
+      "electronics__lens": 0.0,
+      "jack_nut__hold": 0.0,
+      "jack_nut__lens": 0.0,
+      "hold__lens": 0.0
+    },
+    "thread_note": "Intentional Ø2.5 unthreaded reference shanks intersect Ø2.1 pilots. No modeled thread or physical pull-out test.",
+    "acrylic": {
+      "width": 35.0,
+      "height": 42.0,
+      "front_depth": 0.1,
+      "rear_depth": 1.1,
+      "display_air_gap": 1.5,
+      "carrier_front": 1.3,
+      "carrier_rear": 2.1,
+      "carrier_ear_front": 5.2,
+      "clear_width": 31.0,
+      "clear_height": 38.0
+    },
+    "board_datums": {
+      "left": -35.0,
+      "right": 35.0,
+      "bottom": -65.5,
+      "top": 24.5,
+      "x": 0.0,
+      "y": -20.5,
+      "front": 19.0,
+      "rear": 20.6,
+      "solder_rear": 22.6
+    },
+    "usb_datums": {
+      "x": -23.1,
+      "pcb_x": -24.1,
+      "mouth_y": -72.0,
+      "pcb_front_y": -70.5,
+      "pcb_end_y": -42.5,
+      "pcb_rear_depth": 18.8,
+      "axis_depth": 15.8
+    },
+    "jack_datums": {
+      "x": -8.7,
+      "tip_y": -73.0,
+      "shoulder_y": -69.45,
+      "base_depth": 18.8,
+      "axis_depth": 15.8,
+      "panel_outer_y": -70.45
+    },
+    "rigid_module_pair_overlaps_mm3": {
+      "mainboard__charger": 0.0,
+      "mainboard__jack": 0.0,
+      "charger__jack": 0.0
+    },
+    "installation": {
+      "passed": true,
+      "whole_board_lowering_continuous_conservative_envelopes_mm3": {
+        "mainboard": 0.0,
+        "mainboard_component_keepout": 0.0,
+        "mainboard_rear_solder_keepout": 0.0,
+        "tp4056_pcb": 0.0,
+        "tp4056_components": 0.0,
+        "usb_c_shell": 0.0,
+        "jack_body": 0.0
+      },
+      "insert_slide_samples": [
+        {
+          "offset_y_mm": -24.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -12.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -6.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -3.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -1.5,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -0.75,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": -0.25,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        },
+        {
+          "offset_y_mm": 0.0,
+          "chassis_overlap_mm3": 0.0,
+          "soldered_assembly_overlap_mm3": 0.0
+        }
+      ],
+      "insert_slide_sampling_not_continuous_proof": true,
+      "sequence": [
+        "remove jack nut and bottom insert",
+        "lower complete soldered board along -Z",
+        "secure board with three M2x5",
+        "slide insert along +Y over both connectors",
+        "secure insert with two M2x4",
+        "fit jack nut without forcing soldered alignment",
+        "fit front panel"
+      ],
+      "physical_assembly_verified": false
+    },
+    "usb_cable_fit": {
+      "passed": true,
+      "datums": {
+        "body_front_y": -73.0,
+        "body_rear_y": -89.0,
+        "metal_tip_y": -66.0,
+        "well_floor_y": -71.7,
+        "well_rear_y": -70.9,
+        "well_depth": 2.299999999999997,
+        "well_width": 11.5,
+        "well_height": 7.3999999999999995,
+        "usb_recess": 2.0,
+        "pcb_clearance": 0.4000000000000057,
+        "corner_radius": 0.6
+      },
+      "hood_insertion_samples": [
+        {
+          "variant": "nominal",
+          "offset_y_mm": -15.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "nominal",
+          "offset_y_mm": -5.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "nominal",
+          "offset_y_mm": -1.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "nominal",
+          "offset_y_mm": 0.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": -15.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": -5.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": -1.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        },
+        {
+          "variant": "size_allowance_and_shorter_tip",
+          "offset_y_mm": 0.0,
+          "front_panel_overlap_mm3": 0.0,
+          "back_chassis_overlap_mm3": 0.0,
+          "bottom_connector_insert_overlap_mm3": 0.0,
+          "mainboard_overlap_mm3": 0.0,
+          "mainboard_component_keepout_overlap_mm3": 0.0,
+          "mainboard_rear_solder_keepout_overlap_mm3": 0.0,
+          "tp4056_pcb_overlap_mm3": 0.0,
+          "tp4056_components_overlap_mm3": 0.0,
+          "usb_c_shell_overlap_mm3": 0.0,
+          "jack_body_overlap_mm3": 0.0,
+          "jack_nut_overlap_mm3": 0.0
+        }
+      ],
+      "metal_printed_part_overlaps_mm3": {
+        "front_panel": 0.0,
+        "back_chassis": 0.0,
+        "bottom_connector_insert": 0.0
+      },
+      "measurement_allowance_on_total_size_mm": 0.2,
+      "shorter_tip_allowance_mm": 0.2,
+      "assumed_engagement_mm": 6.0,
+      "physical_cable_fit_or_electrical_contact_verified": false,
+      "note": "User measured hood 9.7x5.6 and exposed tip about 7 mm. Mating depth and metal section are provisional envelopes; no internal USB contact geometry or physical mating validation."
+    },
+    "limits": "Rigid CAD positions and envelopes only. No FEA, measured fit, wiring/battery routing or real actuation validation."
+  },
+  "physical_fit_verified": false,
+  "display_geometry_source": "User-provided finished STL, accompanied by 52x30.4 / glue-flange README."
+}

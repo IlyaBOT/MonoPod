@@ -1,0 +1,11 @@
+{
+  "README_RU.md": "f6a1a66976696a8feefcc93e9db5623772e9ea0e719b4e851e4f8148377a2d46",
+  "source/parameters.json": "b2185f4788af624541dae4dbcd3c958725c4201cb72deee394054bec29344d74",
+  "source/build_enclosure.py": "5fae999358f898d88143245914cf8a8764d6300c9f93e38670d93c8651aa1125",
+  "cad/Probnik.step": "40cd86bf7823399c7aac3d95cb7403eb43086fd47fda6eaf2d647f5fa1ef4586",
+  "cad/Ramka.step": "eec4a2389f1939f11a9969a67d57585378b1850ff1d8b2aabeec8813c1ed56ff",
+  "cad/Front_Panel.step": "6f28ed905d1178f82925651464ddb8475f63d0128b0a849b1dc3d846e33f5cc7",
+  "cad/Back_Chassis.step": "c0bfac6ffa3fb7fad555c12a5f6b2ab5957b64b0b7021d7e38f5bb29659c3a0e",
+  "stl/Probnik.stl": "6b63d0f5a0def00dfb0ab4b937b5b3ba7e2561633f980633cb9b2c4df794e60c",
+  "stl/Ramka.stl": "21b13895ec41c0820ad8f007c7925e2a4974a370c92f7694f005b9af3ea47241"
+}

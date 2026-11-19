@@ -1,0 +1,962 @@
+{
+  "source": "I:\\DIY_iPod_Mono\\MonoPod_v0.8.6\\hardware\\clickwheel-pcb\\MonoPod_ClickWheel.kicad_pcb",
+  "sha256": "a7bdeb4b372455b6ef700c6a342041ecb3fbb6f173e195c51b35aa866ef53abd",
+  "frame": "front view: x right, y MENU/up; assembly front Z=0, rear negative Z",
+  "thickness_mm": 1.6,
+  "footprints": {
+    "H3": {
+      "value": "M2 / 2.2 NPTH",
+      "xy": [
+        -13.0,
+        -13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "",
+          "xy": [
+            -13.0,
+            -13.0
+          ],
+          "size": [
+            2.2,
+            2.2
+          ],
+          "drill": 2.2,
+          "net": ""
+        }
+      ]
+    },
+    "R3": {
+      "value": "2.2k",
+      "xy": [
+        -11.0,
+        -1.85
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -11.825,
+            -1.85
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/PREV_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -10.175,
+            -1.85
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/GND"
+        }
+      ]
+    },
+    "R1": {
+      "value": "10k",
+      "xy": [
+        -4.0,
+        -13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -4.825,
+            -13.0
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/3V3"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -3.175,
+            -13.0
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        }
+      ]
+    },
+    "E1": {
+      "value": "TOUCH1",
+      "xy": [
+        -4.5,
+        -6.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -4.5,
+            -6.0
+          ],
+          "size": [
+            1.5,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/TOUCH1"
+        }
+      ]
+    },
+    "SW5": {
+      "value": "SELECT",
+      "xy": [
+        0.0,
+        0.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -3.0,
+            1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "1",
+          "xy": [
+            3.0,
+            1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -3.0,
+            -1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/SELECT_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            3.0,
+            -1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/SELECT_RET"
+        }
+      ]
+    },
+    "SW3": {
+      "value": "NEXT",
+      "xy": [
+        16.5,
+        0.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            13.5,
+            1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "1",
+          "xy": [
+            19.5,
+            1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "2",
+          "xy": [
+            13.5,
+            -1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/NEXT_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            19.5,
+            -1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/NEXT_RET"
+        }
+      ]
+    },
+    "E5": {
+      "value": "TOUCH5",
+      "xy": [
+        4.5,
+        -6.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            4.5,
+            -6.0
+          ],
+          "size": [
+            1.5,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/TOUCH5"
+        }
+      ]
+    },
+    "SW4": {
+      "value": "PLAY",
+      "xy": [
+        0.0,
+        -16.5
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -3.0,
+            -14.65
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "1",
+          "xy": [
+            3.0,
+            -14.65
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -3.0,
+            -18.35
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/PLAY_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            3.0,
+            -18.35
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/PLAY_RET"
+        }
+      ]
+    },
+    "SW2": {
+      "value": "PREV",
+      "xy": [
+        -16.5,
+        0.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -19.5,
+            1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "1",
+          "xy": [
+            -13.5,
+            1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -19.5,
+            -1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/PREV_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -13.5,
+            -1.85
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/PREV_RET"
+        }
+      ]
+    },
+    "R5": {
+      "value": "10k",
+      "xy": [
+        8.0,
+        -16.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            7.175,
+            -16.0
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/PLAY_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            8.825,
+            -16.0
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/GND"
+        }
+      ]
+    },
+    "H4": {
+      "value": "M2 / 2.2 NPTH",
+      "xy": [
+        13.0,
+        -13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "",
+          "xy": [
+            13.0,
+            -13.0
+          ],
+          "size": [
+            2.2,
+            2.2
+          ],
+          "drill": 2.2,
+          "net": ""
+        }
+      ]
+    },
+    "R2": {
+      "value": "0R",
+      "xy": [
+        0.0,
+        12.0
+      ],
+      "rotation_kicad": -90.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            0.0,
+            12.825
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/MENU_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            0.0,
+            11.175
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/GND"
+        }
+      ]
+    },
+    "H2": {
+      "value": "M2 / 2.2 NPTH",
+      "xy": [
+        13.0,
+        13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "",
+          "xy": [
+            13.0,
+            13.0
+          ],
+          "size": [
+            2.2,
+            2.2
+          ],
+          "drill": 2.2,
+          "net": ""
+        }
+      ]
+    },
+    "J1": {
+      "value": "WIRE / 2x05 P2.54",
+      "xy": [
+        -5.08,
+        -11.0
+      ],
+      "rotation_kicad": 90.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -5.08,
+            -11.0
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/3V3"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -5.08,
+            -8.46
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/GND"
+        },
+        {
+          "number": "3",
+          "xy": [
+            -2.54,
+            -11.0
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "4",
+          "xy": [
+            -2.54,
+            -8.46
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/TOUCH1"
+        },
+        {
+          "number": "5",
+          "xy": [
+            0.0,
+            -11.0
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/TOUCH2"
+        },
+        {
+          "number": "6",
+          "xy": [
+            0.0,
+            -8.46
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/TOUCH3"
+        },
+        {
+          "number": "7",
+          "xy": [
+            2.54,
+            -11.0
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/TOUCH4"
+        },
+        {
+          "number": "8",
+          "xy": [
+            2.54,
+            -8.46
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/TOUCH5"
+        },
+        {
+          "number": "9",
+          "xy": [
+            5.08,
+            -11.0
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": "/TOUCH6"
+        },
+        {
+          "number": "10",
+          "xy": [
+            5.08,
+            -8.46
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 0.0,
+          "net": ""
+        },
+        {
+          "number": "10",
+          "xy": [
+            5.08,
+            -8.46
+          ],
+          "size": [
+            1.7,
+            1.7
+          ],
+          "drill": 1.0,
+          "net": ""
+        }
+      ]
+    },
+    "E4": {
+      "value": "TOUCH4",
+      "xy": [
+        2.54,
+        -13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            2.54,
+            -13.0
+          ],
+          "size": [
+            1.5,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/TOUCH4"
+        }
+      ]
+    },
+    "SW1": {
+      "value": "MENU",
+      "xy": [
+        0.0,
+        16.5
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -3.0,
+            18.35
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "1",
+          "xy": [
+            3.0,
+            18.35
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -3.0,
+            14.65
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/MENU_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            3.0,
+            14.65
+          ],
+          "size": [
+            1.0,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/MENU_RET"
+        }
+      ]
+    },
+    "R4": {
+      "value": "4.7k",
+      "xy": [
+        11.0,
+        -1.85
+      ],
+      "rotation_kicad": 180.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            11.825,
+            -1.85
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/NEXT_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            10.175,
+            -1.85
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/GND"
+        }
+      ]
+    },
+    "E3": {
+      "value": "TOUCH3",
+      "xy": [
+        0.0,
+        -6.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            0.0,
+            -6.0
+          ],
+          "size": [
+            1.5,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/TOUCH3"
+        }
+      ]
+    },
+    "E6": {
+      "value": "TOUCH6",
+      "xy": [
+        5.08,
+        -13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            5.08,
+            -13.0
+          ],
+          "size": [
+            1.5,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/TOUCH6"
+        }
+      ]
+    },
+    "H1": {
+      "value": "M2 / 2.2 NPTH",
+      "xy": [
+        -13.0,
+        13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "",
+          "xy": [
+            -13.0,
+            13.0
+          ],
+          "size": [
+            2.2,
+            2.2
+          ],
+          "drill": 2.2,
+          "net": ""
+        }
+      ]
+    },
+    "E2": {
+      "value": "TOUCH2",
+      "xy": [
+        0.0,
+        -13.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            0.0,
+            -13.0
+          ],
+          "size": [
+            1.5,
+            1.0
+          ],
+          "drill": 0.0,
+          "net": "/TOUCH2"
+        }
+      ]
+    },
+    "C1": {
+      "value": "100n",
+      "xy": [
+        -8.0,
+        -8.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            -8.775,
+            -8.0
+          ],
+          "size": [
+            0.9,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/BTN_ADC"
+        },
+        {
+          "number": "2",
+          "xy": [
+            -7.225,
+            -8.0
+          ],
+          "size": [
+            0.9,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/GND"
+        }
+      ]
+    },
+    "R6": {
+      "value": "22k",
+      "xy": [
+        6.0,
+        -2.0
+      ],
+      "rotation_kicad": 0.0,
+      "pads": [
+        {
+          "number": "1",
+          "xy": [
+            5.175,
+            -2.0
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/SELECT_RET"
+        },
+        {
+          "number": "2",
+          "xy": [
+            6.825,
+            -2.0
+          ],
+          "size": [
+            0.8,
+            0.95
+          ],
+          "drill": 0.0,
+          "net": "/GND"
+        }
+      ]
+    }
+  },
+  "edge_circles": [
+    {
+      "center": [
+        0.0,
+        0.0
+      ],
+      "radius": 22.0
+    }
+  ]
+}
