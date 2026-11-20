@@ -28,6 +28,16 @@ private:SemaphoreHandle_t mutex_;
 #include "BluetoothOutput.h"
 static BluetoothAudioOutput btOutput;
 #endif
+#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
+static constexpr uint16_t i2sBufferCount=24;
+static constexpr uint16_t i2sBufferBytes=512;
+#else
+// Keep ESP8266Audio's default DMA size for the classic ESP32.
+static constexpr uint16_t i2sBufferCount=5;
+static constexpr uint16_t i2sBufferBytes=2304;
+#endif
+static constexpr uint16_t i2sBufferedFrames=i2sBufferCount*i2sBufferBytes/4;
+
 AudioEngine player;
 bool AudioEngine::active() const{AUDIO_LOCK();return activeTrack>=0;}
 bool AudioEngine::paused() const{AUDIO_LOCK();return pausedState;}
@@ -44,12 +54,8 @@ bool AudioEngine::begin() {
   i2s=new AudioOutputI2S();
   if(!i2s){error="Cannot allocate I2S";return false;}
   i2s->SetPinout(Config::PIN_I2S_BCLK,Config::PIN_I2S_LRC,Config::PIN_I2S_DATA);
-#if MONOPOD_BOARD == MONOPOD_BOARD_ESP32_S3
-  // 24 x 512-byte DMA buffers: ~70ms @44.1kHz, so a TFT 20ms SPI burst
-  // does not drain the entire I2S queue while SD and display share the bus.
-  i2s->SetBuffers(24,512);
-#endif
-  clickMix=new ClickMixOutput(i2s);
+  i2s->SetBuffers(i2sBufferCount,i2sBufferBytes);
+  clickMix=new ClickMixOutput(i2s,i2sBufferedFrames);
   if(!clickMix){error="Cannot allocate click mixer";return false;}
   sink=clickMix;
   clickMix->SetRate(44100);
@@ -61,7 +67,9 @@ bool AudioEngine::begin() {
 void AudioEngine::headphoneClick(uint16_t frequency,uint8_t durationMs){
   AUDIO_LOCK();
 #if FEATURE_AUDIO
-  if(clickMix) clickMix->trigger(frequency,durationMs);
+  if(clickMix && !backgroundSuspended_ && (!decoder || pausedState)){
+    clickMix->trigger(frequency,durationMs);
+  }
 #else
   (void)frequency; (void)durationMs;
 #endif
@@ -243,7 +251,9 @@ void AudioEngine::previous(){
   startFile(queue[queuePos]);
 }
 void AudioEngine::suspendBackground(bool suspend){
-  AUDIO_LOCK();backgroundSuspended_=suspend;
+  AUDIO_LOCK();
+  backgroundSuspended_=suspend;
+  if(suspend && clickMix)clickMix->cancelClick();
 }
 void AudioEngine::loop(){
   AUDIO_LOCK();
@@ -268,13 +278,13 @@ bool AudioEngine::switchBluetooth(bool on){
   std::vector<size_t> previousQueue=queue;
   releaseDecoder();activeTrack=-1;
   if(on){
-    if(clickMix)clickMix->setTarget(&btOutput);
+    if(clickMix)clickMix->setTarget(&btOutput,BluetoothAudioOutput::CAPACITY);
     sink=clickMix;
     const float g=(settings.data.volume/100.0f);
     btOutput.SetGain(g*sqrtf(g));
     bluetoothOn=true;
   } else {
-    if(clickMix)clickMix->setTarget(i2s);
+    if(clickMix)clickMix->setTarget(i2s,i2sBufferedFrames);
     sink=clickMix;bluetoothOn=false;
   }
   if(previous>=0)play(previous,previousQueue);

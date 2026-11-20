@@ -1,8 +1,10 @@
 #pragma once
 #include "Config.h"
 #include "Types.h"
-
-enum class FeedbackEvent : uint8_t { Scroll, Select, Menu, Transport };
+#if FEATURE_PIEZO
+#include <atomic>
+#include <esp_timer.h>
+#endif
 
 class FeedbackController {
 public:
@@ -12,9 +14,8 @@ public:
   void setRuntimeMuted(bool muted);
   bool runtimeMuted() const {return suppressed;}
   uint32_t eventCount() const {return fired;}
-  void fire(FeedbackEvent event);
+  void cursorMoved(uint32_t steps=1);
   void setMode(ClickerMode route);
-  ClickerMode nextMode(ClickerMode current) const;
   const char* modeName(ClickerMode mode) const;
   bool available(ClickerMode mode) const;
 private:
@@ -22,14 +23,12 @@ private:
   bool localReady=false;
   bool suppressed=false;
   uint32_t fired=0;
-  bool piezoPlaying=false;
-  bool secondPulsePending=false;
-  uint16_t secondPulseHz=0;
-  uint8_t secondPulseMs=0;
-  uint32_t piezoStopAt=0;
-  uint32_t secondPulseAt=0;
-  void startTone(uint16_t hz,uint8_t durationMs);
-  void silencePiezo();
-  void localEffect(FeedbackEvent event,uint32_t now);
+#if FEATURE_PIEZO
+  esp_timer_handle_t pulseTimer=nullptr;
+  uint32_t pendingPulses=0;
+  std::atomic<bool> pulseActive{false};
+  uint32_t lastPulseEnd=0;
+  static void endPulse(void* arg);
+#endif
 };
 extern FeedbackController feedback;

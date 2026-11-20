@@ -33,7 +33,7 @@
   #define MONOPOD_HAS_BT_CLASSIC 1
 #endif
 // Compile-time hardware selection. The user-facing menu selects the click ROUTE.
-// NONE: no local clicker; PIEZO: GPIO2; HAPTIC: DRV2605L via I2C.
+// NONE: no local clicker; PIEZO: GPIO42 on S3, GPIO2 on ESP32; HAPTIC: DRV2605L via I2C.
 #define CLICKER_HW_NONE   0
 #define CLICKER_HW_PIEZO  1
 #define CLICKER_HW_HAPTIC 2
@@ -121,8 +121,9 @@ constexpr uint8_t PIN_HAPTIC_SCL = 33;
 // Debounce / release guard apply to both ESP32 and ESP32-S3.
 constexpr uint16_t BUTTON_ADC_DEBOUNCE_MS = 60;
 constexpr uint16_t BUTTON_ADC_RELEASE_GUARD_MS = 100;
-constexpr uint16_t PIEZO_SCROLL_HZ = 3400;
-constexpr uint16_t PIEZO_ACTION_HZ = 2700;
+constexpr uint8_t BUZZER_PULSE_MS = 60;
+constexpr uint8_t BUZZER_GAP_MS = 12;
+constexpr uint16_t HEADPHONE_CLICK_HZ = 3400;
 // The microSD and ST7735S share SCK/MISO/MOSI but have separate CS.
 // Each driver must use its OWN SPI transaction frequency, not SPI.setFrequency().
 // ESP32-S3 N16R8 prototype: SD starts at 16MHz and falls back to 8/4MHz

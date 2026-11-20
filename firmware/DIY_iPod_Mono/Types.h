@@ -11,7 +11,8 @@ enum class Page : uint8_t { Home, Music, Playlists, Artists, Albums, Genres, Son
 enum class Category : uint8_t { Artist, Album, Genre, Folder, Playlist };
 enum class RepeatMode : uint8_t { Off=0, One=1, All=2 };
 enum class UsbMode : uint8_t { MassStorage=0, ITunes=1 };
-enum class ClickerMode : uint8_t { Off=0, Speaker=1, Headphones=2, Both=3 };
+// Stored as clickroute in NVS. Value 1 was previously labelled Speaker.
+enum class ClickerMode : uint8_t { Off=0, Buzzer=1, Headphones=2, Both=3 };
 struct Track {
   String path, title, artist, album, albumArtist, genre, folder, extension, codec;
   uint64_t fileSize=0;
@@ -33,7 +34,7 @@ struct SettingsState {
   uint8_t backlightBrightness = 75; // percentage, 5..100 (saved in NVS)
   bool shuffle = false;
   RepeatMode repeat = RepeatMode::Off;
-  ClickerMode clicker = ClickerMode::Speaker; // route, not the fitted output hardware
+  ClickerMode clicker = ClickerMode::Buzzer;
   bool fontSmoothing = false; // default: crisp 1-bit rasterization
   UsbMode usbMode = UsbMode::MassStorage;
   uint8_t contrast = 2;    // monochrome palette; not TFT physical contrast

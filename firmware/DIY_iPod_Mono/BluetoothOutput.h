@@ -25,6 +25,7 @@ struct BTPairRequest {
 
 class BluetoothAudioOutput: public AudioOutput {
 public:
+  static constexpr uint16_t CAPACITY = 4096;
   BluetoothAudioOutput();
   bool begin() override;
   bool SetRate(int hz) override;
@@ -56,7 +57,6 @@ public:
   static void cancelPairing();
   static String addressString(const uint8_t addr[6]);
 private:
-  static constexpr uint16_t CAPACITY = 4096;
   static int16_t pcm[CAPACITY*2];
   static volatile uint16_t rd, wr;
   static portMUX_TYPE mux;

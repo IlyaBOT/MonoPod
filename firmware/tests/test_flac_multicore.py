@@ -25,7 +25,8 @@ def test_second_core_dedicated_audio_and_sync_protected():
     assert 'if(!monopodAudioTask)player.loop();' in app
     engine=(FW/'AudioEngine.cpp').read_text()
     assert 'xSemaphoreTakeRecursive' in engine and 'xSemaphoreGiveRecursive' in engine
-    assert 'i2s->SetBuffers(24,512)' in engine
+    assert 'i2sBufferCount=24' in engine and 'i2sBufferBytes=512' in engine
+    assert 'i2s->SetBuffers(i2sBufferCount,i2sBufferBytes)' in engine
     assert 'player.suspendBackground(true)' in (FW/'SyncMode.cpp').read_text()
     assert 'player.suspendBackground(true)' in (FW/'BadApple.cpp').read_text()
 

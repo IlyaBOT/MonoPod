@@ -451,7 +451,9 @@ void PlayerUI::adjust(int delta,bool physicalWheel){
       const int32_t maximum=(int32_t)min(duration-1, (uint32_t)INT32_MAX);
       // Seek precision is one *second*, independent of the track's length.
       const int32_t next=(int32_t)seekPreviewSeconds+delta*(fast?30:1);
-      seekPreviewSeconds=(uint32_t)constrain(next,0,maximum);
+      const uint32_t desired=(uint32_t)constrain(next,0,maximum);
+      if(desired!=seekPreviewSeconds)feedback.cursorMoved();
+      seekPreviewSeconds=desired;
       seekPreview=(int)((uint64_t)seekPreviewSeconds*100u/duration);
     }else{
       nowOverlay=NowOverlay::Volume;
@@ -459,7 +461,7 @@ void PlayerUI::adjust(int delta,bool physicalWheel){
       // Saturating arithmetic in signed int: no uint8 underflow or wraparound.
       const int desired=constrain(previous+delta*(fast?5:1),0,100);
       settings.data.volume=(uint8_t)desired;
-      if(previous!=desired){player.setVolume(settings.data.volume);settings.markDirty();}
+      if(previous!=desired){player.setVolume(settings.data.volume);settings.markDirty();feedback.cursorMoved();}
     }
     updateNowPlayingOverlay();return;
   }
@@ -467,7 +469,10 @@ void PlayerUI::adjust(int delta,bool physicalWheel){
   if(!listPage()||count==0)return;
   const int before=selected;
   selected=constrain(selected+delta*(fast?3:1),0,count-1);
-  if(selected!=before){selectedSince=millis();lastMarqueeFrame=UINT32_MAX;marqueeSelection=selected;}
+  if(selected!=before){
+    feedback.cursorMoved((uint32_t)abs(selected-before));
+    selectedSince=millis();lastMarqueeFrame=UINT32_MAX;marqueeSelection=selected;
+  }
   if(selected<scroll)scroll=selected;
   if(selected>=scroll+Display::ROW_COUNT)scroll=selected-Display::ROW_COUNT+1;
   dirty=true;
@@ -484,8 +489,8 @@ static char kbChar(int i,bool lower){
 void PlayerUI::passwordEvent(Key key){
   int count=kbCount();
   switch(key){
-  case Key::Up:keyboardIndex=(keyboardIndex-1+count+2)%(count+2);dirty=true;break;
-  case Key::Down:keyboardIndex=(keyboardIndex+1)%(count+2);dirty=true;break;
+  case Key::Up:keyboardIndex=(keyboardIndex-1+count+2)%(count+2);feedback.cursorMoved();dirty=true;break;
+  case Key::Down:keyboardIndex=(keyboardIndex+1)%(count+2);feedback.cursorMoved();dirty=true;break;
   case Key::Menu:keyboardLower=!keyboardLower;dirty=true;break;
   case Key::Previous:if(wifiPassword.length())wifiPassword.remove(wifiPassword.length()-1);dirty=true;break;
   case Key::Next:wifiConnect();dirty=true;break;
@@ -513,7 +518,7 @@ void PlayerUI::bluetoothEvent(Key key){
   if(page==Page::BluetoothPairConfirm){
     if(key==Key::PlayPause)btYes=true;
     else if(key==Key::Menu){BluetoothAudioOutput::cancelPairing();back();return;}
-    else if(key==Key::Up || key==Key::Down){btYes=!btYes;dirty=true;return;}
+    else if(key==Key::Up || key==Key::Down){btYes=!btYes;feedback.cursorMoved();dirty=true;return;}
     else if(key!=Key::Select)return;
     if(BluetoothAudioOutput::answerPairing(btYes))showMessage(btYes?"Pair request accepted":"Pair denied");
     else showMessage("Reply failed");
@@ -521,10 +526,12 @@ void PlayerUI::bluetoothEvent(Key key){
   }
   if(page==Page::BluetoothPin){
     if(key==Key::Menu){BluetoothAudioOutput::cancelPairing();back();return;}
+    const int before=btDigitIndex;
     if(key==Key::Up||key==Key::Down){
       if(btDigitIndex>=0&&btDigitIndex<(int)btDigits.length()){
         char &c=btDigits[btDigitIndex];
         c='0'+((c-'0'+(key==Key::Up?9:1))%10);
+        feedback.cursorMoved();
       }
     }else if(key==Key::Previous){if(btDigitIndex>0)btDigitIndex--;}
     else if(key==Key::Next){
@@ -535,6 +542,7 @@ void PlayerUI::bluetoothEvent(Key key){
       if(BluetoothAudioOutput::answerPairing(true,btDigits)){showMessage("PIN submitted");back();}
       else showMessage("Invalid PIN length");
     }
+    if(btDigitIndex!=before)feedback.cursorMoved();
     dirty=true;return;
   }
 }
@@ -572,11 +580,21 @@ void PlayerUI::paintBluetoothDialog(){
 #endif // FEATURE_BLUETOOTH
 void PlayerUI::event(Key key,bool physicalWheel){
   if(key==Key::None)return;
+  if(key==Key::HoldChanged && input.held()){
+    feedback.quiet();
+    dirty=true;
+    return; // Locking preserves the current backlight state and idle timer.
+  }
   if(page==Page::BadApple){if(key==Key::Menu)back();return;}
   // Modal consent before entering any sync state. No storage operation is allowed yet.
   if(wifiSync.pending()){
-    if(key==Key::Up||key==Key::Previous){wifiConsentYes=true;dirty=true;}
-    else if(key==Key::Down||key==Key::Next){wifiConsentYes=false;dirty=true;}
+    if(key==Key::Up||key==Key::Previous){
+      if(!wifiConsentYes)feedback.cursorMoved();
+      wifiConsentYes=true;dirty=true;
+    }else if(key==Key::Down||key==Key::Next){
+      if(wifiConsentYes)feedback.cursorMoved();
+      wifiConsentYes=false;dirty=true;
+    }
     else if(key==Key::PlayPause){wifiSync.answer(true);dirty=true;}
     else if(key==Key::Menu){wifiSync.answer(false);dirty=true;}
     else if(key==Key::Select){wifiSync.answer(wifiConsentYes);dirty=true;}
@@ -594,14 +612,18 @@ void PlayerUI::event(Key key,bool physicalWheel){
   }
   lastTouch=millis();
   backlight.wake();
-  if(blank){blank=false;backlight.wake();return;} // TFT RAM retained; do not clear it when waking
-  if(key==Key::Up || key==Key::Down)feedback.fire(FeedbackEvent::Scroll);
+  if(blank){blank=false;return;} // TFT RAM is retained when waking.
   if(page==Page::Backlight && brightnessEditing){
     if(key==Key::Up || key==Key::Down || key==Key::Previous || key==Key::Next){
       const int delta=(key==Key::Up || key==Key::Previous)?-5:5;
-      settings.data.backlightBrightness=constrain((int)settings.data.backlightBrightness+delta,5,100);
-      settings.markDirty();backlight.setBrightness(settings.data.backlightBrightness);
-      build();dirty=true;
+      const int before=settings.data.backlightBrightness;
+      const int desired=constrain(before+delta,5,100);
+      if(desired!=before){
+        settings.data.backlightBrightness=desired;
+        settings.markDirty();backlight.setBrightness(settings.data.backlightBrightness);
+        feedback.cursorMoved();
+        build();dirty=true;
+      }
     }else if(key==Key::Select || key==Key::Menu){brightnessEditing=false;build();dirty=true;}
     return;
   }

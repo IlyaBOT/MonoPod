@@ -59,11 +59,8 @@ def test_offscreen_backlight_stays_off():
     block = ui.split('if(blank && !syncMode.active()){')[1].split('// Marquee is updated')[0]
     assert 'backlight.wake()' not in block
 
-def test_click_and_default_metadata():
-    feedback = (ROOT/'Feedback.cpp').read_text()
+def test_default_metadata():
     library = (ROOT/'Library.cpp').read_text()
-    assert 'startTone(Config::PIEZO_SCROLL_HZ,3)' in feedback
-    assert 'headphoneClick(Config::PIEZO_SCROLL_HZ,2)' in feedback
     for v in ('Unknown Artist','Unknown Album','Unknown Genre'):
         assert v in library
     assert 'if(tags.year)t.year=tags.year;' in library
