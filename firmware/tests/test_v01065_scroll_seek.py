@@ -37,8 +37,3 @@ def test_exact_second_scrub_and_saturating_volume():
     assert 'constrain(previous+delta*(fast?5:1),0,100)' in ui
     assert 'gain=gain*sqrtf(gain)' in audio
     assert 'scrubSeconds==UINT32_MAX' in display
-
-def test_three_version_surfaces():
-    assert 'MonoPod v0.10.7.5 /' in (R/'DIY_iPod_Mono.ino').read_text()
-    assert 'case 3:value="0.10.7.5";' in (R/'UI.cpp').read_text()
-    assert r'\"firmware\":\"0.10.7.5\"' in (R/'SyncFiles.cpp').read_text()

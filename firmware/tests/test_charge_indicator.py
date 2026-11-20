@@ -10,8 +10,3 @@ def test_charging_state_and_render():
     assert "adcMv>Config::BATTERY_CHARGE_ADC_ON_MV" in batt
     assert "if(battery.charging())return 5;" in disp
     assert "if(b==5){ // charging" in disp
-
-def test_all_version_surfaces_consistent():
-    assert 'MonoPod v0.10.7.5 /' in (ROOT/"DIY_iPod_Mono.ino").read_text()
-    assert 'case 3:value="0.10.7.5";' in (ROOT/"UI.cpp").read_text()
-    assert r'\"firmware\":\"0.10.7.5\"' in (ROOT/"SyncFiles.cpp").read_text()

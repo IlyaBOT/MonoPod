@@ -29,9 +29,13 @@ def test_id3_uses_new_decoder():
     assert 'new(std::nothrow)' in p
 
 def test_fw_version_updated_protocol_unchanged():
-    for fname in ('DIY_iPod_Mono.ino','UI.cpp','SyncFiles.cpp'):
-        assert '0.10.7' in (ROOT/fname).read_text()
-    assert '"protocol":4' in (ROOT/'SyncFiles.cpp').read_text().replace('\\','')
+    assert '#define MONOPOD_FIRMWARE_VERSION "0.10.8"' in (ROOT/'Config.h').read_text()
+    assert '"\\nMonoPod v" MONOPOD_FIRMWARE_VERSION' in (ROOT/'DIY_iPod_Mono.ino').read_text()
+    assert 'case 3:value=MONOPOD_FIRMWARE_VERSION;' in (ROOT/'UI.cpp').read_text()
+    sync = (ROOT/'SyncFiles.cpp').read_text()
+    ota = (ROOT/'WiFiOta.cpp').read_text()
+    assert r'\"firmware\":\"" MONOPOD_FIRMWARE_VERSION "\",\"protocol\":4' in sync
+    assert r'\"protocol\":1,\"firmware\":\"" MONOPOD_FIRMWARE_VERSION' in ota
 
 
 def test_id3_scans_large_artwork_without_allocating_it():

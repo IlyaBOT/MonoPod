@@ -3,6 +3,7 @@
 // Display: ST7735S 1.8", 128x160 pixels, rotated to 160x128.
 // Arduino-ESP32 3.x; ESP8266Audio + Adafruit GFX/ST7735.
 #include <Arduino.h>
+#define MONOPOD_FIRMWARE_VERSION "0.10.8"
 // Select the board at COMPILE time, not in the runtime Settings screen.
 // AUTO follows the board selected in Arduino IDE; explicit selection is possible.
 #define MONOPOD_BOARD_ESP32 1
